@@ -1,1 +1,0 @@
-What are the recent mathematical and computational approaches to achieving fairness in the allocation of indivisible resources when individuals have additive valuation functions?

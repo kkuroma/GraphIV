@@ -1,1 +1,0 @@
-What are the current empirical studies and human-centered design approaches used to evaluate how end-users perceive and interact with explainable artificial intelligence in various real-world applications?

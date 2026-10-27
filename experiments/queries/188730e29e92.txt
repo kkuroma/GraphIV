@@ -1,1 +1,0 @@
-What are the different mechanisms, structures, and coordination strategies used to enable collaborative interaction and collective problem solving within multi-agent systems powered by large language models?

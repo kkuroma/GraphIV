@@ -1,1 +1,0 @@
-What are the current methods for generating adversarial perturbations to exploit neural network vulnerabilities and the various strategies used to defend against these malicious attacks?

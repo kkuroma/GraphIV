@@ -1,0 +1,6 @@
+method = "specter2"
+dataset = "surveymatch"
+split = "test"
+
+[run]
+ks = [100, 1000]

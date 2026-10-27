@@ -1,1 +1,0 @@
-What are the mathematical properties and implications of sofic and hyperlinear groups regarding their approximation by finite groups and their relationship to the Connes embedding conjecture?

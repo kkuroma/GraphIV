@@ -1,1 +1,0 @@
-What are the current data-centric approaches for developing foundation models in healthcare, specifically regarding data quality, privacy, security, and alignment with clinical workflows to improve patient outcomes?

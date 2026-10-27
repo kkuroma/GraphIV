@@ -1,1 +1,0 @@
-What are the current methods and technical challenges for implementing decentralized machine learning architectures that enable collaborative model training while ensuring data privacy and managing heterogeneous distributed systems?

@@ -1,1 +1,0 @@
-What are the current methods and models for generating low-dimensional knowledge graph embeddings that integrate both structured relational information and unstructured literal data for link prediction tasks?

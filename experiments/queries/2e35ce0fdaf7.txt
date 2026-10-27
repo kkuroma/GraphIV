@@ -1,1 +1,0 @@
-What are the current methodologies, architectures, and training strategies for adapting large-scale vision-language models to specialized domains and diverse multimodal applications across various visual data types?

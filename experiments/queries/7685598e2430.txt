@@ -1,1 +1,0 @@
-What are the computational applications and scalability of quantum-inspired algorithms within tensor networks for high-dimensional numerical problems and industrial use cases across machine learning and materials science?

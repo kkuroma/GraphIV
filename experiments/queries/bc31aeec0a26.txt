@@ -1,1 +1,0 @@
-What are the current developments in multi-agent systems powered by large language models, specifically regarding their communication protocols, coordination mechanisms, and integration with established multi-agent theory?

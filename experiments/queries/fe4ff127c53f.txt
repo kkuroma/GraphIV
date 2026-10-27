@@ -1,1 +1,0 @@
-What are the methodologies and effectiveness of physical adversarial attacks against deep neural networks in computer vision applications and the role of adversarial mediums in real-world scenarios?

@@ -1,1 +1,0 @@
-What are the practical applications and interdisciplinary uses of emergent communication systems developed through deep multi-agent reinforcement learning within machine learning, linguistics, and cognitive science?

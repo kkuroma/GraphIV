@@ -1,1 +1,0 @@
-What are the mathematical modeling techniques and operational research optimization algorithms used to solve computational problems in kidney exchange programs involving donor-recipient cycles and chains?

@@ -1,1 +1,0 @@
-What are the current methodologies and available datasets for developing systems that can reason over visual elements and natural language questions to provide accurate answers?

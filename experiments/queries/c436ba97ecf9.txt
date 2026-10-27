@@ -1,1 +1,0 @@
-What are the current methodologies, data sources, and evaluation metrics for using generative adversarial networks to create synthetic electronic health records while maintaining patient privacy?

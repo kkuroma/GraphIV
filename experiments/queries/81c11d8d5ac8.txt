@@ -1,1 +1,0 @@
-What is the current state of research regarding the ability of large language models to perform symbolic reasoning and whether they possess inherent reasoning capabilities or require external components?

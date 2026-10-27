@@ -1,1 +1,0 @@
-What are the recent developments in lattice gauge theory simulations regarding the thermodynamic properties, phase transitions, and conserved charge fluctuations of strongly interacting matter at finite temperatures?

@@ -250,7 +250,7 @@ STAGES = [
         label="Evaluate",
         script=f"{E}/stage2_evaluate.py",
         reads="one split of every benchmark, [recipe_tuning] SPLIT",
-        writes="experiments/retrieve/<split>/<benchmark>",
+        writes="benchmarks/data/recipe_tuning/<split>/<benchmark>",
         delta=False,
     ),
     Stage(

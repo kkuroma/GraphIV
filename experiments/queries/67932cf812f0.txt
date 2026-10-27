@@ -1,1 +1,0 @@
-What are the current methods for extracting contextual visual representations from untrimmed videos by modeling the interactions between actors, objects, and environments to improve human-like video understanding?

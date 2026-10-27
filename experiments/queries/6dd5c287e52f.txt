@@ -1,1 +1,0 @@
-What are the fundamental principles of quantum machine learning and how do quantum mechanical properties influence the adversarial robustness and stability of models against malicious inputs?

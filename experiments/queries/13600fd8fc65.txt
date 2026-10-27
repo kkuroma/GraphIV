@@ -1,1 +1,0 @@
-How can controlling the superconducting phase bias be used to break time-reversal symmetry and induce Majorana zero modes in quasi-one-dimensional topological insulators for quantum computation?

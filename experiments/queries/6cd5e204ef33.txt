@@ -1,1 +1,0 @@
-What are the theoretical foundations of topological superconductivity and the emergence of Majorana zero modes in semiconductor-superconductor heterostructures for applications in fault-tolerant quantum computing?

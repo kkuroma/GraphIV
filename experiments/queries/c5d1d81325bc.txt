@@ -1,1 +1,0 @@
-What are the current deep learning architectures and optimization strategies used to implement multi-task learning for improving performance and efficiency in pixel-level dense prediction tasks?

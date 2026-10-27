@@ -1,1 +1,0 @@
-What are the current applications and comparative advantages of quantum gate, annealing, and quantum-inspired computing methods for performing pattern recognition tasks in high-energy physics experiments?

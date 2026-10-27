@@ -1,1 +1,0 @@
-What are the current methods and mathematical frameworks for parallel text and multimodal generation using discrete diffusion processes as an alternative to autoregressive decoding paradigms?

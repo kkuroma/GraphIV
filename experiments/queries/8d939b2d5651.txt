@@ -1,1 +1,0 @@
-What are the theoretical foundations and recent developments regarding the statistical inference and distributional limit theorems for empirical optimal transport plans, maps, and costs in various applications?

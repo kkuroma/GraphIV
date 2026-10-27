@@ -1,1 +1,0 @@
-What are the fundamental technical developments and historical milestones regarding control systems, computing architectures, communication protocols, mapping technologies, testing methodologies, and human behavioral interactions in autonomous and intelligent vehicles?

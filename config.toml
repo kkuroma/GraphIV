@@ -53,6 +53,8 @@ DATA_REPO = "kkuroma/GraphIV"
 CITATION_REPO = "kkuroma/GraphIV-citation-intent"
 SURVEY_REPO = "kkuroma/GraphIV-survey"
 BENCHMARK_REPO = "kkuroma/GraphIV_benchmarks"
+# each benchmark question the model wrote, cached by its input so a re-export keeps it
+QUERY_CACHE = "data/cache/queries"
 
 [endpoints]
 EMBED_API = "http://127.0.0.1:11434/embedding/nomic-embed-text-v2-moe"
@@ -134,7 +136,7 @@ CONSENSUS_MIN_KEY = 5
 # Recipe tuning and evaluation on graphiv-benchmarks-<CUTOFF> under EXPORT_PATH, one run directory per split and metric
 [recipe_tuning]
 RECIPE_PATH = "retrieval_recipes"
-OUTPUT_PATH = "experiments/retrieve"
+OUTPUT_PATH = "benchmarks/data/recipe_tuning"
 # each case's pool and terms, cached once per version and split for the fit
 CACHE_PATH = "data/cache/recipe_tuning"
 RETURN_LIMIT = 1000

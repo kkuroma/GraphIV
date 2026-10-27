@@ -1,0 +1,7 @@
+method = "boundedfield"
+dataset = "pasa"
+split = "test"
+
+[run]
+ks = [20, 50, 100]
+recipe = "evolution"

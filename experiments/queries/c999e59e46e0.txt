@@ -1,1 +1,0 @@
-What are the current developments regarding the deconfinement transition, equation of state, quark screening, and meson spectral functions within lattice QCD at finite temperature?

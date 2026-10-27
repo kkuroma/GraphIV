@@ -1,1 +1,0 @@
-What are the current developments in randomized derivative-free algorithms for solving convex optimization problems when objective function evaluations are noisy and gradient information is unavailable?

@@ -1,1 +1,0 @@
-What are the recent advancements and applications of reinforcement learning and bandit algorithms for improving adaptive, interactive, and scalable models within the fields of speech and natural language processing?

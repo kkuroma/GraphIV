@@ -1,1 +1,0 @@
-What are the current methods, architectural challenges, and evaluation techniques for achieving interpretability and transparency within large-scale vision foundation models in artificial intelligence?

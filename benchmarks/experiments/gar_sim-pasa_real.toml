@@ -1,0 +1,8 @@
+method = "gar"
+dataset = "pasa"
+split = "real"
+
+[run]
+ks = [20, 50, 100]
+variant = "sim"
+first_stage = "nomic_cosine-pasa_real"

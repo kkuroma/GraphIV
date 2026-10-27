@@ -1,1 +1,0 @@
-What are the current methods, evaluation metrics, and security challenges regarding the removal of specific training data from machine learning models to satisfy privacy regulations?

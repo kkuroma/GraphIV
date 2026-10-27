@@ -1,1 +1,0 @@
-What are the mathematical existence theorems for the Cauchy problem in general relativity, specifically regarding local and global solutions, small data stability, and the formation of spacetime singularities?

@@ -1,1 +1,0 @@
-What are the current technical requirements and developmental milestones for deploying cold atom technologies in space for applications in metrology, geodesy, and fundamental physics experiments?

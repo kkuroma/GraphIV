@@ -1,1 +1,0 @@
-What are the different interaction mechanisms and architectural strategies for enabling effective collaboration between large and small language models to optimize performance and efficiency on resource-constrained devices?

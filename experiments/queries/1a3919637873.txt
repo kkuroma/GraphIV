@@ -1,1 +1,0 @@
-What are the different types of information exchanged in decentralized machine learning beyond model weights and gradients, specifically regarding communication efficiency, privacy trade-offs, and diverse data representation methods?

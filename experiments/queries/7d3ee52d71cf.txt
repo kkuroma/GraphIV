@@ -1,1 +1,0 @@
-What are the latest technological developments and methodologies for estimating the three-dimensional poses of human hands and various objects using camera-based sensing for augmented reality applications?

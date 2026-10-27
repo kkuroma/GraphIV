@@ -1,1 +1,0 @@
-What are the architectural principles, cognitive reasoning frameworks, and reinforcement learning methods used to develop autonomous intelligent systems capable of perception and planning in complex environments?

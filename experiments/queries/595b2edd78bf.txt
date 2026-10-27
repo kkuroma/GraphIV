@@ -1,1 +1,0 @@
-What are the current definitions, mathematical formulations, and algorithmic mitigation strategies used to address bias arising from the combination of multiple sensitive attributes in machine learning models?

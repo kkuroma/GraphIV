@@ -1,1 +1,0 @@
-What are the fundamental differences between short and long chain-of-thought reasoning in large language models, specifically regarding inference-time scaling, overthinking, and the mechanisms of deep exploration and reflection?

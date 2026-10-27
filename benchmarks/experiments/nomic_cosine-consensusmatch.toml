@@ -1,0 +1,6 @@
+method = "nomic"
+dataset = "consensusmatch"
+split = "test"
+
+[run]
+ks = [100, 1000]

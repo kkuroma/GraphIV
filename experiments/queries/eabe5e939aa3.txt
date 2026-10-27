@@ -1,1 +1,0 @@
-What are the current methodologies, training techniques, and emerging applications for using large language models to perform reasoning, understanding, and data manipulation tasks on structured tabular data?

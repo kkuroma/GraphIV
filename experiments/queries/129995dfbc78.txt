@@ -1,1 +1,0 @@
-What are the recent technical methodologies and paradigms for automated data generation and supervisory signal production to overcome manual annotation bottlenecks in document intelligence tasks?

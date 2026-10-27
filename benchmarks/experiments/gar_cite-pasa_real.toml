@@ -1,0 +1,10 @@
+method = "gar"
+dataset = "pasa"
+split = "real"
+
+[run]
+ks = [20, 50, 100]
+variant = "cite"
+first_stage = "nomic_cosine-pasa_real"
+# the stored runs were made after gar_sim on each case, sharing its reranker scores
+warm = ["sim"]

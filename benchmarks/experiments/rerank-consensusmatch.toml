@@ -1,0 +1,8 @@
+method = "gar"
+dataset = "consensusmatch"
+split = "test"
+
+[run]
+ks = [100, 1000]
+variant = "rerank"
+first_stage = "nomic_cosine-consensusmatch"

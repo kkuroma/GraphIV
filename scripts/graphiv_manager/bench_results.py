@@ -136,7 +136,7 @@ def read(cfg: dict[str, Any]) -> dict[str, Any]:
     """
     bench = cfg.get("benchmarks", {})
     tuning = cfg.get("recipe_tuning", {})
-    output = Path(str(tuning.get("OUTPUT_PATH", "experiments/retrieve")))
+    output = Path(str(tuning.get("OUTPUT_PATH", "benchmarks/data/recipe_tuning")))
     cutoff = str(bench.get("CUTOFF", ""))
     return {
         "cutoff": cutoff,

@@ -1,1 +1,0 @@
-How do quantum information theory and entanglement influence the thermodynamics of small-scale systems, specifically regarding thermalization, fluctuation theorems, and the efficiency of quantum heat engines?

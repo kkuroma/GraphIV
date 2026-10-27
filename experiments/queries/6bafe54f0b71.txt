@@ -1,1 +1,0 @@
-What are the recent advancements in sparse conditional computation architectures designed to improve computational efficiency and model capacity when training large scale foundational models on heterogeneous data?

@@ -1,1 +1,0 @@
-What are the current applications, theoretical foundations, statistical properties, and optimization methods used for generative diffusion models across computer vision, audio, and high-dimensional data modeling?

@@ -1,1 +1,0 @@
-What are the fundamental optical principles, fluorophore characteristics, and probabilistic modeling techniques required to quantitatively interpret images captured via various fluorescence microscopy modalities at sub-wavelength scales?

@@ -1,1 +1,0 @@
-What are the current methods for knowledge graph completion using embedding techniques, specifically focusing on link prediction, entity type prediction, and the integration of large language models?

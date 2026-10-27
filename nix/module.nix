@@ -333,6 +333,8 @@ in
             CITATION_REPO = opt types.str "" "The model repo for the citation intent classifier, empty to skip it.";
             SURVEY_REPO = opt types.str "" "The model repo for the survey classifier, empty to skip it.";
             BENCHMARK_REPO = opt types.str "" "The dataset repo for the benchmarks, empty to skip it.";
+            QUERY_CACHE = derived types.str "${toString cfg.stateDir}/cache/queries" ''"''${stateDir}/cache/queries"''
+              "Each benchmark question the model wrote, cached by its input so a re-export keeps it.";
           };
 
           endpoints = section "The models, all of them served elsewhere." {
@@ -441,8 +443,8 @@ in
                 ''"''${package}/share/graphiv/retrieval_recipes"''
                 "Where the compared recipes are read from.";
             OUTPUT_PATH =
-              derived types.str "${toString cfg.stateDir}/experiments/retrieve"
-                ''"''${stateDir}/experiments/retrieve"''
+              derived types.str "${toString cfg.stateDir}/benchmarks/recipe_tuning"
+                ''"''${stateDir}/benchmarks/recipe_tuning"''
                 ''
                   One directory per split, metric and recipe.
                 '';

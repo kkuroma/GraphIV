@@ -1,1 +1,0 @@
-What are the current methods for improving reasoning efficiency and managing long chain-of-thought processes in large language models to prevent overthinking and reduce token consumption during inference?

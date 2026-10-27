@@ -1,1 +1,0 @@
-What are the current post-training quantization techniques and methodologies used to reduce the computational resource requirements and energy consumption of large language models during inference?

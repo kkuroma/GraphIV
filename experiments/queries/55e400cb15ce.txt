@@ -1,1 +1,0 @@
-What are the latest algorithmic developments in multigrid solvers, Fourier acceleration, and parallel tempering for accelerating four dimensional field simulations and optimizing topological tunneling on modern parallel architectures?

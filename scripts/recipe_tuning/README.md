@@ -25,7 +25,7 @@ uv run python scripts/recipe_tuning/stage2_evaluate.py --split test
 Stage 0 is the slow one, a pool per case against the store, and a split already cached under the same cutoff is skipped.
 Stage 1 fits a smooth recall@k by gradient, since the log of the score is linear in the exponents, then runs CMA-ES on the exact recall from that point.
 Val picks among the shipped point, the fit and the search, except for consensus, whose 13 val cases are pooled with train.
-It rewrites only each recipe's weights block and its first comment line, and writes the report to `experiments/retrieve/tuning/<version>.json`.
+It rewrites only each recipe's weights block and its first comment line, and writes the report to `benchmarks/data/recipe_tuning/tuning/<version>.json`.
 `ancestry` and `evolution` follow as the survey and frontier points with one direction of the walk at zero.
 
 `[recipe_tuning] SPLIT` is stage 2's default split: train to tune on, val to choose, test to report.
@@ -34,7 +34,7 @@ It rewrites only each recipe's weights block and its first comment line, and wri
 ## What Comes Out
 
 ```
-experiments/retrieve/<split>/<Metric>/
+benchmarks/data/recipe_tuning/<split>/<Metric>/
     run.log                     every line, console and file
     performance.png             one horizontal box per recipe
     {recipe}/config.toml        the settings and the recipe, copied verbatim

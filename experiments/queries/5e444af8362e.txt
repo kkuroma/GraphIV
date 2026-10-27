@@ -1,1 +1,0 @@
-What are the current developments, practical applications, and evaluation methodologies for using large language models to support clinical decision making, medical education, and multimodal healthcare tasks?

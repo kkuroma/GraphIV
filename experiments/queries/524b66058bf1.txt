@@ -1,1 +1,0 @@
-How can self-supervised learning objectives be designed to optimize representation learning for specific clinical downstream tasks such as segmentation and classification in medical image analysis?

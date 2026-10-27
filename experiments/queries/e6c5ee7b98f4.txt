@@ -1,1 +1,0 @@
-What are the current methods for executing jailbreak attacks and implementing defense mechanisms against safety bypasses in multimodal generative models across various input and output modalities?

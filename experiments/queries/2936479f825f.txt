@@ -1,1 +1,0 @@
-What are the current developments, technical architectures, and clinical application scenarios for large language models and multimodal models within the field of healthcare and medicine?

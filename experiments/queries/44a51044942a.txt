@@ -1,1 +1,0 @@
-What are the current multiscale modeling approaches for simulating the structural deformation and plastic behavior of amorphous glasses across atomistic, mesoscopic, and macroscopic length and time scales?

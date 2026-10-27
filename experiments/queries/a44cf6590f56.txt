@@ -1,1 +1,0 @@
-What are the theoretical foundations and recent developments of mean-field approximation methods used to analyze the macroscopic behavior and inference processes in large-scale neural networks?

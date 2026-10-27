@@ -1,1 +1,0 @@
-What are the current methods and strategies for selecting and sampling high quality text data to optimize the pre-training process of large scale language models?

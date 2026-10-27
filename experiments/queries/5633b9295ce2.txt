@@ -1,1 +1,0 @@
-What are the current methodologies and evaluation frameworks for using generative artificial intelligence to develop and validate user personas in human-centered design and software development research?

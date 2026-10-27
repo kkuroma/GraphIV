@@ -1,1 +1,0 @@
-What are the current methods, architectural innovations, and learning paradigms used to improve logical deduction, mathematical problem-solving, and multi-step reasoning capabilities in large language models?

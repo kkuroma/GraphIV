@@ -1,1 +1,0 @@
-What are the mathematical frameworks, modeling methods, and training techniques used in discrete diffusion models for parallel token generation in large language and multimodal generative tasks?

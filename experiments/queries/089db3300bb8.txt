@@ -1,1 +1,0 @@
-What are the recent developments in multimodal models for visual question answering, specifically regarding image-text fusion, knowledge retrieval, and complex reasoning capabilities for answering questions about visual content?

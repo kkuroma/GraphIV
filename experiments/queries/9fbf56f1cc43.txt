@@ -1,1 +1,0 @@
-What are the technical challenges, channel models, and integration strategies for using unmanned aerial vehicles as aerial base stations or mobile users in next generation wireless networks?

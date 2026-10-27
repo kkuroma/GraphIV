@@ -1,1 +1,0 @@
-What are the current methods and applications for integrating knowledge transfer and distillation techniques into federated learning to address data heterogeneity and communication efficiency challenges?

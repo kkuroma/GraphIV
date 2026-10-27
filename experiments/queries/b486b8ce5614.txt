@@ -1,1 +1,0 @@
-What are the recent advancements and methodological developments in using Bayesian optimization for the efficient design and optimization of complex, noisy, and expensive-to-evaluate sustainable process systems?

@@ -1,1 +1,0 @@
-What are the current advancements in self-supervised and multi-modal foundation models for analyzing histopathological whole slide images, including their training strategies, datasets, and downstream clinical evaluation tasks?

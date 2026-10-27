@@ -1,1 +1,0 @@
-What are the current methodologies and advancements in combining self-supervised representation learning with few-shot learning techniques to improve object detection performance when labeled data is scarce?

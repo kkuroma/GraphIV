@@ -1,1 +1,0 @@
-What are the mathematical bounds and construction methods for rank-metric codes over arbitrary fields, including finite fields, algebraically closed fields, and real numbers?

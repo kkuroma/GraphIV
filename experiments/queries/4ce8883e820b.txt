@@ -1,1 +1,0 @@
-How can ultracold atomic and molecular gases in optical lattices be used as quantum simulators to model condensed matter phenomena, disordered systems, frustrated lattices, and artificial magnetic fields?

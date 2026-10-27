@@ -1,0 +1,6 @@
+method = "specter2"
+dataset = "pasa"
+split = "real"
+
+[run]
+ks = [20, 50, 100]

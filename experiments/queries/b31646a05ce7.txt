@@ -1,1 +1,0 @@
-What are the current methodologies, datasets, and evaluation techniques used to assess the logical reasoning capabilities and problem-solving behaviors of large language models across various reasoning tasks?

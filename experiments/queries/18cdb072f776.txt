@@ -1,1 +1,0 @@
-What are the latest deep learning optimization techniques, such as model compression and efficient architecture search, used to bridge the computational gap for implementing intelligence on resource-constrained edge computing devices?

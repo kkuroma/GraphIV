@@ -1,0 +1,16 @@
+[project]
+name = "graphiv-benchmarks"
+version = "0.1.0"
+description = "Baselines scored against GraphIV's four retrieval benchmarks"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "adapters",
+    "bm25s[core]",
+    "FlagEmbedding",
+    "pyterrier-adaptive",
+    "sentence-transformers",
+    "torch",
+]
+
+[tool.uv]
+package = false

@@ -1,1 +1,0 @@
-What are the computational limitations and performance differences between classical and quantum distributed models in networks where communication bandwidth is unconstrained but distance is a factor?

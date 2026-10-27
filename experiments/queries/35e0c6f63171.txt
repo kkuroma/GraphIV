@@ -1,1 +1,0 @@
-What are the current applications, methodologies, and empirical evaluation practices for using quantum, quantum-inspired, and hybrid algorithms to solve classical software engineering optimization problems?

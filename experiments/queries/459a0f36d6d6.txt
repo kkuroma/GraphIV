@@ -1,1 +1,0 @@
-What are the current generative modeling techniques and large language model approaches used to synthesize data that accurately captures heavy-tailed distributions for modeling rare and catastrophic extreme events?

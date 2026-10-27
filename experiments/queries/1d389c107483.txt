@@ -1,1 +1,0 @@
-What are the current advancements and methodologies regarding the development of autonomous agents that use large language models to navigate and interact with web, mobile, and desktop graphical user interfaces?

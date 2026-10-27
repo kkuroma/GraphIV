@@ -1,1 +1,0 @@
-What are the current capabilities and limitations of large language models in automated planning tasks and how can they be integrated with traditional methods for long-horizon reasoning?

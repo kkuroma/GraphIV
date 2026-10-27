@@ -51,6 +51,5 @@ output/
 # Working space, one directory per task, plus .records/, which keeps every finding on this machine
 scratchpad/
 
-# temporary ignore
-benchmarks/
-experiments/
+# The benchmarks' data is a symlink into the vault
+/benchmarks/data

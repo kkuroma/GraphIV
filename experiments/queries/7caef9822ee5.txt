@@ -1,1 +1,0 @@
-What are the different large N limits and exact solution methods for sphere partition functions in supersymmetric quantum field theories across three, four, and five dimensions?

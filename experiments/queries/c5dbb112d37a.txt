@@ -1,1 +1,0 @@
-What are the current algorithmic and network-level optimization strategies used to reduce communication overhead and mitigate bandwidth bottlenecks during large-scale distributed deep neural network training?

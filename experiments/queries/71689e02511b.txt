@@ -1,1 +1,0 @@
-What are the current algorithmic developments and theoretical approaches for overcoming the sign problem in lattice field theory simulations at finite density?

@@ -1,1 +1,0 @@
-What are the current advancements, key components, and major challenges in self-supervised and contrastive learning methods for developing effective visual and multi-modal feature representations?

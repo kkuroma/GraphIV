@@ -1,1 +1,0 @@
-What are the mathematical, philosophical, and legal perspectives regarding the development of algorithmic fairness and the integration of social science principles into machine learning metrics?

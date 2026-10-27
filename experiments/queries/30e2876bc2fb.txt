@@ -1,1 +1,0 @@
-What are the current advancements and methodologies in using few-shot learning and meta-learning techniques to address data scarcity for medical image classification, segmentation, and registration tasks?

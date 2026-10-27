@@ -1,1 +1,0 @@
-What are the fundamental mathematical principles and practical applications of using topological and geometric tools to extract meaningful features from complex, high-dimensional datasets in data science?

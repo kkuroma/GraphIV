@@ -1,0 +1,7 @@
+method = "boundedfield"
+dataset = "frontiermatch"
+split = "test"
+
+[run]
+ks = [100, 1000]
+recipe = "ancestry"

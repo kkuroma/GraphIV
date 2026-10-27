@@ -1,1 +1,0 @@
-What are the current advancements in multimodal generative techniques for creating realistic video and audio deepfakes and the corresponding algorithmic methods for detecting these synthetic manipulations?

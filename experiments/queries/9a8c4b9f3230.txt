@@ -1,1 +1,0 @@
-What are the current methods and techniques for applying binary quantization and post-training quantization to reduce the memory footprint and computational overhead of large language models?

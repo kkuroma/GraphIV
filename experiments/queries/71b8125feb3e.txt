@@ -1,1 +1,0 @@
-What are the current advancements in using transformer architectures and physics-informed machine learning to develop generalizable foundation models for global weather forecasting and regional climate prediction tasks?

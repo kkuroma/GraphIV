@@ -1,1 +1,0 @@
-What are the current methods for generating adversarial examples to exploit deep neural networks and what are the most effective defensive strategies to protect these models in safety-critical applications?

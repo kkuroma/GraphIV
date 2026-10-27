@@ -1,1 +1,0 @@
-What are the different mathematical definitions of fairness in machine learning and how can they be applied to mitigate discrimination in various real-world decision-making scenarios?

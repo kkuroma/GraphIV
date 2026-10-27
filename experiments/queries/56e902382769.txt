@@ -1,1 +1,0 @@
-What are the current advancements in self-supervised learning and transformer-based architectures for developing general-purpose foundation models to extract robust features from electroencephalography data?

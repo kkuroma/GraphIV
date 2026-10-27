@@ -1,1 +1,0 @@
-What are the underlying mechanisms of model collapse when training generative artificial intelligence on synthetic data and what are the most effective strategies to mitigate this degradation?

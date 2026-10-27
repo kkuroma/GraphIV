@@ -1,1 +1,0 @@
-How do bidirectional interactions between neural activity and network topology influence the structural evolution and functional dynamics of complex biological systems and their emergent behaviors?

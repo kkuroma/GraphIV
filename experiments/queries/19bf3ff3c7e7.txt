@@ -1,1 +1,0 @@
-What are the current computational modeling methods used to simulate intraoperative organ deformation for improving the accuracy of preoperative anatomical alignment during augmented reality guided surgical navigation?

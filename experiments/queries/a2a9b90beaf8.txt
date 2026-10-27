@@ -1,1 +1,0 @@
-What are the theoretical properties of Kitaev honeycomb models regarding spin fractionalization and dynamical correlations, and how do these physics relate to experimental observations in candidate quantum spin liquid materials?

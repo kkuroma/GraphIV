@@ -1,1 +1,0 @@
-What are the current methodologies, training datasets, and evaluation frameworks for developing and implementing large language models and multimodal models within clinical diagnosis and healthcare applications?

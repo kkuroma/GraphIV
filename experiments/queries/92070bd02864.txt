@@ -1,1 +1,0 @@
-What are the current causes, detection methods, evaluation benchmarks, and mitigation strategies for addressing the problem of hallucination in multimodal foundation models across various media types?

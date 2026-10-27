@@ -1,1 +1,0 @@
-What are the current methodologies, training paradigms, and architectural approaches for developing vision language action models to enable generalized robotic manipulation and decision-making in dynamic environments?

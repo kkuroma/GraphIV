@@ -1,1 +1,0 @@
-What are the current methods and technical challenges involved in removing specific data samples from trained machine learning models to ensure privacy and the right to be forgotten?

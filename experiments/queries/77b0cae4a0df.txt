@@ -1,1 +1,0 @@
-What are the current methodologies and application domains for implementing interpretable artificial intelligence models to improve transparency and decision-making within internet of things environments?

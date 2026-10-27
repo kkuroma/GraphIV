@@ -1,1 +1,0 @@
-What are the recent advancements in deep learning architectures and pre-trained language models for converting natural language questions into structured SQL queries for relational database access?

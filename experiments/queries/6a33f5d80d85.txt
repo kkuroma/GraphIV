@@ -1,1 +1,0 @@
-What are the current applications, performance capabilities, and practical implications of using large language models for automating tasks like market forecasting, sentiment analysis, and report generation within the financial sector?

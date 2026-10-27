@@ -1,1 +1,0 @@
-What are the current advancements, specialized models, evaluation benchmarks, and datasets used for applying large language models to various tasks within the legal domain?

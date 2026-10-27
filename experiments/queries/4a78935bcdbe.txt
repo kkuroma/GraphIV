@@ -1,1 +1,0 @@
-What are the current developments, agentic architectures, and evaluation methodologies for applying large language models to specialized legal tasks and professional practice?

@@ -1,1 +1,0 @@
-What are the current methods and mathematical frameworks for applying self-supervised learning techniques to graph neural networks to reduce reliance on large labeled datasets?

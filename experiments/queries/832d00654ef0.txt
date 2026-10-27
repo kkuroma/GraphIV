@@ -1,1 +1,0 @@
-What are the current methodologies and pretext task designs used in self-supervised learning for graph-structured data to improve generalization and reduce reliance on manual labels?

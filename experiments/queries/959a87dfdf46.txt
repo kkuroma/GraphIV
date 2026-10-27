@@ -1,1 +1,0 @@
-What are the current advancements in vision-language-action models for robotic manipulation, specifically regarding architectural design, data collection strategies, and methods for improving computational efficiency in real-world deployment?

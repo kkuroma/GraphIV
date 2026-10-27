@@ -1,1 +1,0 @@
-What are the current methodologies, architectural frameworks, and evaluation metrics for integrating external information retrieval into generative models to improve accuracy and reduce hallucinations?

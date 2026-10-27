@@ -1,1 +1,0 @@
-What are the current applications, theoretical models, and experimental data challenges involving the use of quantum computing to accelerate numerical simulations within the field of high-energy physics?

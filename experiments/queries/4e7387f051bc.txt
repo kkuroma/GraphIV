@@ -1,1 +1,0 @@
-What are the current methods and advancements in using explicit Gaussian representations for fast novel view synthesis, 3D scene reconstruction, and dynamic geometric editing in computer vision?

@@ -1,1 +1,0 @@
-What are the recent advancements in generative models for synthesizing high-quality images from textual descriptions, including methods for improving controllability, diversity, and spatial consistency?

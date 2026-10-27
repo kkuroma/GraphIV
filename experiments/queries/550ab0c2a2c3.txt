@@ -1,1 +1,0 @@
-What are the mathematical optimization frameworks and numerical techniques used to solve fundamental problems in regression, classification, clustering, deep learning, and emerging machine learning applications?

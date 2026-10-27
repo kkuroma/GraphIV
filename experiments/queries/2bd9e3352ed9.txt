@@ -1,1 +1,0 @@
-What are the theoretical convergence guarantees and global performance results for first-order and stochastic optimization algorithms applied to non-convex functions and structured minimization problems?

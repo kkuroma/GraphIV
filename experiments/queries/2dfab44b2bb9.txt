@@ -1,1 +1,0 @@
-What are the fundamental principles, channel modeling techniques, and optimization strategies for using reconfigurable intelligent surfaces to enhance wireless communication performance and coverage in next-generation networks?

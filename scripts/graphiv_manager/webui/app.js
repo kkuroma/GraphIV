@@ -1232,7 +1232,7 @@ function benchVersions() {
 }
 
 function benchResults(split, splits) {
-  if (!splits.length) return `<div class="pending">No run yet. Evaluate writes experiments/retrieve/&lt;split&gt;.</div>`;
+  if (!splits.length) return `<div class="pending">No run yet. Evaluate writes benchmarks/data/recipe_tuning/&lt;split&gt;.</div>`;
   const runs = BS.runs[split] || {};
   const recipes = [...new Set(Object.values(runs).flatMap((r) => Object.keys(r)))].sort();
   const best = {};

@@ -1,1 +1,0 @@
-What are the current architectures, training methodologies, and model compression techniques used to develop efficient small language models for deployment on resource-constrained edge and mobile devices?

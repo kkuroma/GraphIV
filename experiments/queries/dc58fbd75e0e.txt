@@ -1,1 +1,0 @@
-What are the recent developments in applying self-attention mechanisms and transformer architectures to various computer vision tasks including backbone networks, low-level vision, and video processing?

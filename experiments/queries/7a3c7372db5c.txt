@@ -1,1 +1,0 @@
-What are the latest advancements in explicit scene representation methods for high-speed 3D reconstruction and novel view synthesis compared to traditional neural implicit volumetric rendering techniques?

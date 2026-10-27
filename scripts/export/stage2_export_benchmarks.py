@@ -150,7 +150,7 @@ def main() -> None:
     writer = GemmaWriter(
         str(cfg["endpoints"]["LLM_API"]),
         str(cfg["endpoints"]["LLM_NAME"]),
-        Path(str(cfg["recipe_tuning"]["OUTPUT_PATH"])).parent / "queries",
+        Path(str(cfg["export"]["QUERY_CACHE"])),
     )
     counts: dict[str, dict[str, int]] = {}
     for metric in ("SurveyMatch", "FrontierMatch", "ConsensusMatch"):

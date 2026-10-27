@@ -1,1 +1,0 @@
-What are the mathematical properties, well-posedness conditions, and stability of standing waves for the nonlinear Schrödinger equation featuring point-concentrated nonlinearity and its blow-up analysis?

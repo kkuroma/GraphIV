@@ -1,1 +1,0 @@
-What are the theoretical foundations and recent advancements in using graph isomorphism heuristics for supervised node and graph representation learning within equivariant neural architectures?

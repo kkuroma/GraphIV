@@ -1,1 +1,0 @@
-What are the current state-of-the-art methods and underlying techniques used for identifying anomalous patterns and irregular structures within complex graph-structured data across various application domains?

@@ -1,1 +1,0 @@
-What is the historical development and sociotechnical risk profile of using human preference models as reward functions for optimizing large language models and their underlying optimization processes?

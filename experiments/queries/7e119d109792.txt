@@ -1,1 +1,0 @@
-What are the current methodologies and technical frameworks for integrating structured relational knowledge from graphs into large language models to improve retrieval-augmented generation and reduce hallucinations?

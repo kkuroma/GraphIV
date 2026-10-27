@@ -1,1 +1,0 @@
-What are the current architectures, learning paradigms, and data collection strategies for integrating vision, language, and action modalities to enable generalizable robotic control in diverse real-world environments?

@@ -1,1 +1,0 @@
-What are the current methodologies, datasets, and evaluation techniques for integrating diverse external knowledge sources into generative models to improve factual grounding across text, image, and video modalities?

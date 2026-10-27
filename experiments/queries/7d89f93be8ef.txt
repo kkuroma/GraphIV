@@ -1,1 +1,0 @@
-What are the current deep learning methods and technical approaches used to solve the challenges of person re-identification when subjects are partially hidden by objects or other people?

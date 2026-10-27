@@ -1,1 +1,0 @@
-What are the recent mathematical techniques and recursive methods used to construct compact integrand representations for multiloop gauge theory scattering amplitudes in supersymmetric and non-supersymmetric theories?

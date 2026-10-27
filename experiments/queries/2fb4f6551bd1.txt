@@ -1,1 +1,0 @@
-What are the different strategies and mathematical frameworks used for graph coarsening and dimensionality reduction within graph neural networks to improve performance on various structural learning tasks?

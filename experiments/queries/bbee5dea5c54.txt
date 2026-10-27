@@ -1,1 +1,0 @@
-What are the recent advancements in neural machine translation architectures and evaluation metrics that incorporate document-level context and inter-sentence dependencies to improve translation quality?

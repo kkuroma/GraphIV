@@ -1,1 +1,0 @@
-What are the historical developments, architectural advancements, and current challenges in neural machine translation, specifically regarding multilingual modeling and end-to-end deep learning approaches for automatic language translation?

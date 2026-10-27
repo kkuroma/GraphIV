@@ -1,1 +1,0 @@
-What are the current methods and architectures for integrating external factual and commonsense knowledge into pre-trained language models to improve reasoning and performance in natural language processing tasks?

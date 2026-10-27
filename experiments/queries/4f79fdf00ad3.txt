@@ -1,1 +1,0 @@
-How can quantum machine learning and quantum optimization algorithms be applied to improve various stages of the software development lifecycle to address increasing system complexity?

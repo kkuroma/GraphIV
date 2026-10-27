@@ -1,1 +1,0 @@
-What are the current methods and technical approaches for performing three dimensional reconstruction using spherical imagery to model complex urban environments and indoor scenes?

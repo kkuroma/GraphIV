@@ -1,1 +1,0 @@
-What are the mathematical implications and potential risks of using improper prior distributions in Bayesian statistical modeling within the field of astronomical research and data analysis?

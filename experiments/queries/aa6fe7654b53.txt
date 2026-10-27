@@ -1,1 +1,0 @@
-What are the current neurobiologically plausible mechanisms for credit assignment in artificial neural networks that aim to address the limitations of backpropagation through biologically motivated synaptic plasticity?

@@ -1,0 +1,8 @@
+# where every path below is read from, relative to this directory
+[paths]
+# every source, cache, fit and run
+DATA = "data"
+# the GraphIV checkout whose environment runs src/graphiv/
+ROOT = ".."
+# what make_table.py writes
+TABLES = "data/tables.md"

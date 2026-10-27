@@ -1,1 +1,0 @@
-What are the recent architectural advancements and hybrid approaches in developing unified models that integrate multimodal understanding capabilities with text-to-image generation tasks?

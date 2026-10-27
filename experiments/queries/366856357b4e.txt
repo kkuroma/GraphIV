@@ -1,1 +1,0 @@
-What are the recent technical developments and scalability challenges regarding the integration of quantum information processing components within silicon-based photonic platforms for large-scale computing and communication?

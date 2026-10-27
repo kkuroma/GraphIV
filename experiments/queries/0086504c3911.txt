@@ -1,1 +1,0 @@
-What are the current methods for knowledge graph representation learning, including embedding techniques that incorporate auxiliary information, knowledge acquisition strategies, and approaches for ensuring model explainability?

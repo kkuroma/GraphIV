@@ -1,1 +1,0 @@
-What are the current methods and stabilization techniques for using stochastic quantization to solve the sign problem in supersymmetric quantum field theories and matrix models?

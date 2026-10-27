@@ -1,0 +1,17 @@
+method = "ppr"
+dataset = "surge"
+split = "test"
+
+# SurGE has no train split, so it takes SurveyMatch's pick
+[fit]
+train = "surveymatch"
+split = "train"
+cases = 200
+seed = 0
+k = 1000
+alphas = [0.1, 0.3, 0.5, 0.7, 0.85, 0.95]
+teleports = ["pool", "core"]
+directions = ["back", "both"]
+
+[run]
+ks = [100, 1000]

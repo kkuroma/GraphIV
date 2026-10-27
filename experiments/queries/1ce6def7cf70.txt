@@ -1,1 +1,0 @@
-What are the current methods for embedding malicious triggers into deep neural networks and the corresponding defense mechanisms used to protect models against these poisoning attacks?

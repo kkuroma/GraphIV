@@ -1,1 +1,0 @@
-What are the current techniques and emerging trends for compressing explicit 3D Gaussian representations to reduce memory usage and storage requirements for real-time scene rendering?

@@ -1,1 +1,0 @@
-What are the recent advancements and architectural developments in open-domain question answering systems that integrate neural machine reading comprehension with large-scale unstructured document retrieval methods?

@@ -1,1 +1,0 @@
-What are the current methodologies and frameworks for evaluating the performance, factual accuracy, and safety of retrieval augmented generation systems within large language model architectures?

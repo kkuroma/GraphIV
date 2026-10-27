@@ -1,1 +1,0 @@
-What are the fundamental theoretical principles and numerical applications of dynamical mean-field theory for studying the electronic properties of strongly correlated quantum many-body systems on a lattice?

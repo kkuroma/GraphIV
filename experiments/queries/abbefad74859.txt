@@ -1,1 +1,0 @@
-What are the different methods for integrating geometric constraints into deep learning architectures to improve depth estimation and scene understanding in computer vision tasks?

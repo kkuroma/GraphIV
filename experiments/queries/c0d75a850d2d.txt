@@ -1,1 +1,0 @@
-What are the recent advancements in deep learning architectures and methodologies for processing 3D point clouds regarding shape classification, object detection, tracking, and semantic segmentation tasks?

@@ -1,1 +1,0 @@
-What are the current methods and technical challenges involved in developing object detection algorithms that can accurately identify and locate novel categories using only a very limited number of annotated training samples?

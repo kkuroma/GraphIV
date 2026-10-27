@@ -1,1 +1,0 @@
-What are the current methodologies and available datasets used for developing models that can generate natural language answers to questions about visual images?

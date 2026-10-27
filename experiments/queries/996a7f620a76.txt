@@ -1,1 +1,0 @@
-What are the current methodologies and algorithmic principles for adapting large pre-trained models to specific downstream tasks while minimizing computational costs and parameter updates?

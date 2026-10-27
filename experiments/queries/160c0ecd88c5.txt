@@ -1,1 +1,0 @@
-What are the existing performance assessment metrics and evaluation methods used for measuring semantic and goal-oriented communication efficiency in wireless, optical, and quantum transmission systems?

@@ -1,1 +1,0 @@
-What are the current machine learning techniques and generative approaches used for the creation and detection of manipulated facial images and synthetic video content?

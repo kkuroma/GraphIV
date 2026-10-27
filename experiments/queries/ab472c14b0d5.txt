@@ -1,1 +1,0 @@
-What are the current methods and techniques used to address the tendency of deep learning models to prioritize low frequency components when approximating solutions to partial differential equations?

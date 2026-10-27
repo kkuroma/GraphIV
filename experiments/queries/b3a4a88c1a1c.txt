@@ -1,1 +1,0 @@
-What are the current applications, adaptation strategies, and practical challenges of using large language models for tasks like drug discovery, diagnostic assistance, and medical question answering in biomedical contexts?

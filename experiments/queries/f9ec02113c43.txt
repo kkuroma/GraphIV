@@ -1,1 +1,0 @@
-What are the recent advancements in large language model architectures, post-training methodologies for reasoning and alignment, and the integration of multimodal capabilities for enhanced performance?

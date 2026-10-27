@@ -1,1 +1,0 @@
-What are the current applications and research challenges of using generative artificial intelligence for perception, decision making, and synthetic data generation in the development of fully autonomous driving systems?

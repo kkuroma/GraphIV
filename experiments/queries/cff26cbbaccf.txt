@@ -1,1 +1,0 @@
-What are the different methodologies and mechanisms for parameter-efficient fine-tuning to adapt large-scale foundation models to downstream tasks while minimizing computational and memory costs?

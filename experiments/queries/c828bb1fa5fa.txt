@@ -1,1 +1,0 @@
-What are the quantitative modeling approaches for replicating human reasoning and predicting behavioral patterns to enable effective human-agent collaboration in autonomous and adaptive systems?

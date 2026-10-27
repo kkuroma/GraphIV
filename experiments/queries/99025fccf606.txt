@@ -1,1 +1,0 @@
-What are the recent advancements in integrating visual perception, natural language understanding, and embodied control within unified models for generalist robotic manipulation and autonomous agentic tasks?

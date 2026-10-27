@@ -1,0 +1,10 @@
+method = "gar"
+dataset = "frontiermatch"
+split = "test"
+
+[run]
+ks = [100, 1000]
+variant = "cite"
+first_stage = "nomic_cosine-frontiermatch"
+# the stored runs were made after gar_sim on each case, sharing its reranker scores
+warm = ["sim"]

@@ -1,1 +1,0 @@
-What are the fundamental principles, identification assumptions, and prior selection challenges involved in applying Bayesian methods to causal effect estimation within the potential outcomes framework?

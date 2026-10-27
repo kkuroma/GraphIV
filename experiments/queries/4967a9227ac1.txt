@@ -1,1 +1,0 @@
-What are the current methods and underlying technologies for generating three-dimensional shapes from textual descriptions using differentiable rendering and large-scale pretraining techniques?

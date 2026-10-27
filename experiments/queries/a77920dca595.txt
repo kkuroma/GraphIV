@@ -1,1 +1,0 @@
-What are the current theoretical foundations, algorithmic variants, and practical applications of direct preference optimization and reinforcement learning techniques for aligning large language models with human values?

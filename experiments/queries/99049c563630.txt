@@ -1,1 +1,0 @@
-What are the current deep learning methods and technical challenges regarding representation, alignment, and translation for achieving effective cross-media retrieval across different types of digital media?

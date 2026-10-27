@@ -1,1 +1,0 @@
-What are the current methods for generating adversarial perturbations to attack graph neural networks and the corresponding defensive strategies used to improve their robustness against structural manipulations?
