@@ -98,7 +98,7 @@ def shuffle_key(seed: int, sample_id: str) -> str:
 
 class CaseMiner:
     """
-    Reads the store once and hands out samples for any of the four benchmarks
+    Reads the store once and hands out samples for any of the three benchmarks
     """
 
     def __init__(
@@ -161,7 +161,7 @@ class CaseMiner:
         Every sample of one benchmark, in seeded order and capped
 
         Args:
-            metric: SurveyMatch, FrontierMatch, ConsensusMatch or PrecisionMatch.
+            metric: SurveyMatch, FrontierMatch or ConsensusMatch.
             kwargs: The per-metric floors, which the caller reads out of config.
 
         Returns:
@@ -169,7 +169,7 @@ class CaseMiner:
         """
         with psycopg.connect(self.pg_dest) as conn:
             self._stage(conn)
-            if metric in ("SurveyMatch", "PrecisionMatch"):
+            if metric == "SurveyMatch":
                 out = self._mine_single(conn, metric)
             elif metric == "FrontierMatch":
                 out = self._mine_pairs(conn, **kwargs)

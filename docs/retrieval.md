@@ -171,16 +171,15 @@ We'll explain what each benchmark entails in the next section.
 
 ## Evaluation
 
-I designed four benchmarks for this study, defined in [benchmarks.md](benchmarks.md), all of which are LLM-free apart from writing each case's query. The benchmarks use human-written literature reviews (identified with our own survey labeler) as ground truth, measuring our recall with respect to these citations. We can rerun them with [`benchmarks/`](../benchmarks/README.md).
+I designed three benchmarks for this study, defined in [benchmarks.md](benchmarks.md), all of which are LLM-free apart from writing each case's query. The benchmarks use human-written literature reviews (identified with our own survey labeler) as ground truth, measuring our recall with respect to these citations. We can rerun them with [`benchmarks/`](../benchmarks/README.md).
 
 | Benchmark | Number of Papers | Input | Ground truth |
 |---|---|---|---|
 | SurveyMatch | 300 | One literature review | Its reference list within arXiv |
 | FrontierMatch | 300 | Two reviews in the same topic leaf, at most 190 days apart and at cosine 0.80 or more | Papers the later cites but not the earlier |
 | ConsensusMatch | 151 | Three reviews in one topic within 190 days | Papers all three cite |
-| PrecisionMatch | 300 | The SurveyMatch cases | Papers that either share the case's leaf of the topic tree or are cited by another review in that leaf |
 
-Below is the score (recall, except precision for PrecisionMatch) comparing BoundedField against pure cosine retrieval, scored at each retrieval count.
+Below is the recall comparing BoundedField against pure cosine retrieval, scored at each retrieval count.
 
 | Benchmark | Recipe | @100 | @200 | @500 | @1000 |
 |---|---|---|---|---|---|
@@ -190,8 +189,6 @@ Below is the score (recall, except precision for PrecisionMatch) comparing Bound
 | | `frontier` | **0.322** | **0.496** | **0.685** | **0.770** |
 | ConsensusMatch | Cosine only | 0.269 | 0.372 | 0.512 | 0.609 |
 | | `consensus` | **0.809** | **0.887** | **0.956** | **0.980** |
-| PrecisionMatch | Cosine only | 0.340 | 0.298 | 0.237 | 0.188 |
-| | `survey` | **0.549** | **0.479** | **0.371** | **0.283** |
 
 And here is a breakdown of SurveyMatch recall at 1,000:
 

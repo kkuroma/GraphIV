@@ -70,7 +70,7 @@ def main() -> None:
         src, tgt = np.concatenate(srcs), np.concatenate(tgts)
         del srcs, tgts
 
-        # 5) Read the topic tree, which selects a case set and scores a precision band
+        # 5) Read the topic tree, which the graph carries as each paper's three levels
         level = np.full((len(rows), 3), -1, np.int8)
         for arxiv_id, l0, l1, l2 in conn.execute(
             "SELECT arxiv_id, level_0, level_1, level_2 FROM topic_tree"

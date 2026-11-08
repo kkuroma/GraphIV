@@ -59,8 +59,6 @@ Each version's cases per split and median answer size are in its `manifest.json`
 
 A retriever searches GraphIV with every paper dated after `date_max` and every paper in `anchors` removed, and its score is recall at `headline_k`: the share of `citations` in its top `headline_k`. `benchmarks/tune.py` fits a recipe on train and chooses its point on val, and `benchmarks/run.py` reports on test.
 
-PrecisionMatch reuses the SurveyMatch cases with no answer key, and calls a retrieved paper on topic when it shares the case's leaf or another review in that leaf cites it. It is not published, since its judge is the topic tree itself.
-
 ## Limitations
 
 - Every answer is what a later document cited, so all three reward work that was already being noticed. A paper too new to be cited can't be an answer, and [LeyLine](leyline.md) is scored on that case separately.

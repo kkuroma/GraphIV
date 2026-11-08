@@ -19,8 +19,6 @@ HEADLINE = {
     "ConsensusMatch": ("consensus", "100"),
 }
 BASELINE = "cosine_only"
-# precision against the topic tree, which no recipe was tuned on
-PRECISION = "PrecisionMatch"
 # where the two-review agreement was measured, kept after its scratchpad task was deleted
 AGREEMENT = "experiments/findings/survey-agreement-REPORT.md"
 # where the tuning set each exponent to 0 from each benchmark's tuned point
@@ -35,11 +33,11 @@ def recall(config: Path) -> dict[str, dict[str, dict[str, float]]]:
         config: The config whose [recipe_tuning] names the benchmarks' output.
 
     Returns:
-        Benchmark to recipe to cut to the mean over its cases, PrecisionMatch's being precision.
+        Benchmark to recipe to cut to the mean over its cases.
     """
     block = tomllib.loads(config.read_text(encoding="utf-8"))["recipe_tuning"]
     out: dict[str, dict[str, dict[str, float]]] = {}
-    for bench in [*HEADLINE, PRECISION]:
+    for bench in HEADLINE:
         out[bench] = {}
         for name in block["recipes"][bench]:
             stem = name.removesuffix(".toml")
@@ -126,7 +124,7 @@ def cases(config: Path) -> dict[str, int]:
     """
     block = tomllib.loads(config.read_text(encoding="utf-8"))["recipe_tuning"]
     out: dict[str, int] = {}
-    for bench in [*HEADLINE, PRECISION]:
+    for bench in HEADLINE:
         path = Path(block["OUTPUT_PATH"]) / bench / BASELINE / "scores.jsonl"
         out[bench] = len(path.read_text(encoding="utf-8").splitlines())
     return out

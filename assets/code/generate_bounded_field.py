@@ -140,9 +140,9 @@ def curves(
         axis: The panel.
         bench: The benchmark.
         scores: Recipe to K to the mean score.
-        tuned: The recipe tuned on this benchmark, or the survey recipe for PrecisionMatch.
+        tuned: The recipe tuned on this benchmark.
         cut: The K the benchmark's headline is read at, which is annotated.
-        top: BoundedField's ceiling, or 0 where a benchmark has none.
+        top: BoundedField's ceiling.
     """
     xs = list(range(len(CUTS)))
     ours = [scores[tuned][k] for k in CUTS]
@@ -328,20 +328,14 @@ def draw(config: Path, out: Path) -> None:
         ("ceiling", MUTED),
     ]
     page.key(RIGHT, top, key)
-    benches = [*benchmark_scores.HEADLINE, benchmark_scores.PRECISION]
+    benches = list(benchmark_scores.HEADLINE)
     gap = 0.45
     each = (RIGHT - LEFT - 0.35 - gap * (len(benches) - 1)) / len(benches)
     for i, bench in enumerate(benches):
         axis = page.place(LEFT + 0.35 + i * (each + gap), top + 0.65, each, 2.1)
-        tuned, cut = benchmark_scores.HEADLINE.get(bench, ("survey", "100"))
-        precise = bench == benchmark_scores.PRECISION
+        tuned, cut = benchmark_scores.HEADLINE[bench]
         curves(
-            axis,
-            bench if not precise else f"{bench}, precision",
-            scores[bench],
-            tuned,
-            cut,
-            0.0 if precise else benchmark_scores.ceiling(config, bench, tuned),
+            axis, bench, scores[bench], tuned, cut, benchmark_scores.ceiling(config, bench, tuned)
         )
         if i == 0:
             axis.set_ylabel("recall")
@@ -402,14 +396,14 @@ def draw(config: Path, out: Path) -> None:
         color=MUTED,
     )
 
-    survey_cases, frontier, consensus, precision = (counted[b] for b in benches)
+    survey_cases, frontier, consensus = (counted[b] for b in benches)
     notes = [
         "An arrow points from a paper to a paper it cites. $A$ is the citation graph on the pool,"
         " with $A_{ij}=1$ when $j$ cites $i$, $c$ is the core's cosine normalized to sum to 1, $r$"
         " is $1/(1+\\mathrm{age})$, $\\delta$ is 0.5 per hop and $t$ is the date the corpus is"
         " capped at.",
-        f"Mean over {survey_cases} SurveyMatch, {frontier} FrontierMatch, {consensus}"
-        f" ConsensusMatch and {precision} PrecisionMatch cases built from arXiv's literature"
+        f"Mean over {survey_cases} SurveyMatch, {frontier} FrontierMatch and {consensus}"
+        f" ConsensusMatch cases built from arXiv's literature"
         " reviews, each capped at its review's date. Embedding search ranks the 5,000 closest"
         " papers by cosine alone, and the ceiling is the share of the ground truth the pool holds."
         f" Two reviews of the same topic find each other's references at recall {agree:.3f}.",
