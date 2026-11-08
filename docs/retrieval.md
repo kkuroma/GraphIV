@@ -10,7 +10,7 @@ P.S. I named it after Fate/Type-Moon's bounded field, a ward drawn around a terr
 
 ![How BoundedField scores a paper, its recall at top K against embedding search, what each term adds, and its tuned recipes](../assets/figures/bounded-field.png)
 
-The code is [`src/retrieve/`](../src/retrieve/README.md), and every number below comes from [`experiments/retrieve/`](../experiments/retrieve) unless it mentions another file.
+The code is [`src/retrieve/`](../src/retrieve/README.md).
 
 ## Initial retrieval
 
@@ -102,56 +102,58 @@ so BoundedField is a log-linear ranker over bounded features, and tuning it is c
 
 ## Recipes
 
-The code allows us to set each limit and exponent weight for each score term in a toml file. For example, this is [`frontier.toml`](../retrieval_recipes/frontier.toml), the recipe designed to prioritize recent, frontier papers on a topic:
+A recipe sets the core and every exponent for one mode, and the pool sizes it shares with every other mode live in the `[retrieve]` block of [`config.toml`](../config.toml). For example, this is [`frontier.toml`](../retrieval_recipes/frontier.toml), the recipe designed to prioritize recent, frontier papers on a topic:
 
 ```toml
-[[component]]
-KIND = "CosineRetriever"
-LIMIT = 5000
-
-[[component]]
-KIND = "AncestorExpander"
-TOP_K = 200
-HOP_LIMIT = 20000
-
-[[component]]
-KIND = "FrontierExpander"
-TOP_K = 200
-HOP_LIMIT = 20000
-
-[[component]]
-KIND = "GraphScorer"
+NAME = "frontier"
 CORE = 200
-DEPTH = 4
-DECAY = 0.5
 
-[component.weights]
-COS = 0.75
-REC = 1.5
-ANC = 2
-FRO = 0.25
-ANC_DECAY = 0.25
-COCITE = 2.5
-HUB = 2.5
+[weights]
+COS = 1
+REC = 1.231
+ANC = 0.246
+FRO = 0.33
+ANC2 = 0.004
+FRO2 = 0.153
+ANC_DECAY = 0.093
+FRO_DECAY = 0.007
+COCITE = 1.764
+COUPLE = 0.057
+BM25 = 0.207
+HUB = 2.089
 ```
 
-There are five modes/recipes defined in this project as follows:
+```toml
+[retrieve]
+COSINE_LIMIT = 5000
+EXPANSION_LIMIT = 20000
+DEPTH = 4
+DECAY = 0.5
+```
 
-| Term | `survey` | `frontier` | `consensus` | `ancestry` | `evolution` |
-|---|---|---|---|---|---|
-| `cos` | 0.75 | 0.75 | 1.5 | 0.75 | 0.75 |
-| `rec` | 0.75 | 1.5 | 3 | 0.75 | 1.5 |
-| `anc` | 4 | 2 | 4 | 4 | 0 |
-| `fro` | 0.25 | 0.25 | 0.25 | 0 | 0.25 |
-| `anc_decay` | 0 | 0.25 | 1 | 0 | 0 |
-| `cocite` | 0.5 | 2.5 | 2.5 | 0.5 | 2.5 |
-| `hub` | 0.5 | 2.5 | 0.25 | 0.5 | 2.5 |
+There are four modes/recipes defined in this project, each written by [`benchmarks/tune.py`](../benchmarks/README.md) with `cos` pinned at 1, as follows:
 
-`ancestry` is `survey` with `fro` at zero and `evolution` is `frontier` with `anc` and `anc_decay` at zero, both started from a paper's own embedding instead of a question's. Neither is tuned yet.
+| Term | `focused` | `survey` | `frontier` | `consensus` |
+|---|---|---|---|---|
+| tuned on | PaSa | SurveyMatch | FrontierMatch | ConsensusMatch |
+| `cos` | 1 | 1 | 1 | 1 |
+| `rec` | 0.547 | 0.951 | 1.231 | 1.473 |
+| `anc` | 0.518 | 1.384 | 0.246 | 2.643 |
+| `fro` | 0.011 | 0.182 | 0.33 | 0.022 |
+| `anc2` | 0.124 | 0.258 | 0.004 | 0.088 |
+| `fro2` | 0.009 | 0.023 | 0.153 | 0.015 |
+| `anc_decay` | 0.009 | 0.029 | 0.093 | 0.03 |
+| `fro_decay` | 0.005 | 0.017 | 0.007 | 0.018 |
+| `cocite` | 0.362 | 1.89 | 1.764 | 0.29 |
+| `couple` | 0.046 | 0.017 | 0.057 | 0.011 |
+| `bm25` | 0.933 | 0.529 | 0.207 | 0.61 |
+| `hub` | 0.005 | 0.223 | 2.089 | 0.027 |
+
+Passing a paper instead of a question replaces the question's vector with that paper's stored one, so the paper sits at a cosine of 1 and the recipe is unchanged.
 
 ## Tuning
 
-I tuned the first three modes using their corresponding [benchmarks](benchmarks.md) with lattice search. With $11$ terms at $0$ or $1$, this is $2^{11} = 2{,}048$ settings to be tuned. Then coordinate descent optimizes one exponent at a time over $\{0, 0.25, 0.5, 1, 2, 3, 4\}$ and kept a decision only when the benchmark's headline recall rose, at 1,000 for SurveyMatch and FrontierMatch and at 100 for ConsensusMatch, from three starting points: the lattice's best, the previously shipped point, and every term at $1$. The table is from [`frontier-terms-REPORT.md`](../experiments/findings/frontier-terms-REPORT.md).
+I tuned the first three modes using their corresponding [benchmarks](benchmarks.md) with lattice search. With $11$ terms at $0$ or $1$, this is $2^{11} = 2{,}048$ settings to be tuned. Then coordinate descent optimizes one exponent at a time over $\{0, 0.25, 0.5, 1, 2, 3, 4\}$ and kept a decision only when the benchmark's headline recall rose, at 1,000 for SurveyMatch and FrontierMatch and at 100 for ConsensusMatch, from three starting points: the lattice's best, the previously shipped point, and every term at $1$.
 
 | Benchmark | Initialization | Initial Score | Optimized Score |
 |---|---|---|---|
@@ -169,7 +171,7 @@ We'll explain what each benchmark entails in the next section.
 
 ## Evaluation
 
-I designed four benchmarks for this study, defined in [benchmarks.md](benchmarks.md), all of which are LLM-free apart from writing each case's query. The benchmarks use human-written literature reviews (identified with our own survey labeler) as ground truth, measuring our recall with respect to these citations. We can rerun them with [`scripts/recipe_tuning/`](../scripts/recipe_tuning/README.md)
+I designed four benchmarks for this study, defined in [benchmarks.md](benchmarks.md), all of which are LLM-free apart from writing each case's query. The benchmarks use human-written literature reviews (identified with our own survey labeler) as ground truth, measuring our recall with respect to these citations. We can rerun them with [`benchmarks/`](../benchmarks/README.md).
 
 | Benchmark | Number of Papers | Input | Ground truth |
 |---|---|---|---|
@@ -210,17 +212,11 @@ For reference, each score has a ceiling, which is the maximum score we could get
 | FrontierMatch | 0.816 | 8,466 | 0.95 |
 | ConsensusMatch | 0.993 | 8,549 | 0.73 |
 
-For scale, two reviews of one topic at cosine 0.80 or more find each other's references at recall 0.265, over 93 pairs ([`survey-agreement-REPORT.md`](../experiments/findings/survey-agreement-REPORT.md)). Two experts on the same topic overlap that little, which is what a review's own references are being recovered against.
+For scale, two reviews of one topic at cosine 0.80 or more find each other's references at recall 0.265, over 93 pairs. Two experts on the same topic overlap that little, which is what a review's own references are being recovered against.
 
 ## After BoundedField
 
-The `retrieve` tool runs BoundedField and then three steps that are not part of it, and they are where a model first enters. All three live in [`src/miner/`](../src/miner/README.md).
-
-1. The area gate multiplies each score by $\big(\cos(a, p) / \max_{p'} \cos(a, p')\big)^4$, where $a$ embeds the area's question with its method words, which holds a broad ranking to the area the agent asked for.
-2. The era rule finds where the field's current era starts from the ranking's own dates, so the reading budget is not spent on the cohort that simply had the most years to collect citations.
-3. A reader grades 200 papers into one of six roles with a relevance, and a blend of citations per year ($0.65$) and that relevance ($0.35$) keeps 40.
-
-On the temporal knowledge graph run, 36 of the 80 papers kept sat outside cosine's top 1,000, and 18 were never among its 5,000 at all.
+`search_papers` returns the top of the ranking that passes the caller's filter, with each paper's score split by term, and no model enters it. Reading, citations and lineages are separate tools the agent calls on the papers it picks, covered in [`src/mcp/README.md`](../src/mcp/README.md).
 
 ## Using it
 
@@ -229,8 +225,8 @@ from src.core.parse_graph_export import load_graph_export
 from src.retrieve.recipe import build_pipeline, get_seed_limit, read_recipe
 
 recipe = read_recipe("retrieval_recipes/frontier.toml")
-pipeline = build_pipeline(recipe, load_graph_export(GRAPH_PATH), PG_DEST)
-pool = pipeline.build_pool(question, vector, get_seed_limit(recipe), cap)
+pipeline = build_pipeline(recipe, config["retrieve"], load_graph_export(GRAPH_PATH), PG_DEST)
+pool = pipeline.build_pool(question, vector, get_seed_limit(config["retrieve"]), cap)
 ranked = pipeline.score_pool(question, vector, pool, cap)
 ```
 
@@ -238,9 +234,8 @@ ranked = pipeline.score_pool(question, vector, pool, cap)
 
 ## Discussion and Limitations
 
-- A paper too new to be cited scores exactly zero on `anc`, `anc2`, `cocite` and `hub` since they require at least some citation. BoundedField's top 20 held none of the 557 papers that had no citations then and 20 or more within 18 months ([`frontier-system-REPORT.md`](../experiments/findings/frontier-system-REPORT.md)). LeyLine's successors are the answer to that case.
+- A paper too new to be cited scores exactly zero on `anc`, `anc2`, `cocite` and `hub` since they require at least some citation. BoundedField's top 20 held none of the 557 papers that had no citations then and 20 or more within 18 months. LeyLine's successors are the answer to that case.
 - A paper that is neither among the 5,000 nearest nor one hop from a core can never be ranked, which is the ceiling as discussed above. Expanding to two hops greatly increases the pool size and ceiling, but taints the pool with more noise.
-- The two special recipes, `ancestry` and `evolution`, are untuned as they are not meant to optimize towards a metric. Ancestry wants `date_max` at the seed's date, and evolution wants `date_min` there.
 - The terms used are classic bibliometrics, co-citation and coupling included. What BoundedField adds is putting them together, a bounded product, the per-mode exponents and the measurement behind them, and using them in a citation graph.
 
 ## References

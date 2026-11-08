@@ -6,7 +6,7 @@ Existing literature search benchmarks such as LitSearch match a query to one or 
 
 ![The three benchmarks, their splits and their answers](../scripts/export/cards/benchmarks/benchmarks.png)
 
-The cases are mined and exported by [`scripts/export/stage2_export_benchmarks.py`](../scripts/export/README.md), and the recipes are fit and scored on them by [`scripts/recipe_tuning/`](../scripts/recipe_tuning/README.md).
+The cases are mined and exported by [`scripts/export/stage2_export_benchmarks.py`](../scripts/export/README.md), and the recipes are tuned and scored on them by [`benchmarks/`](../benchmarks/README.md).
 
 ## Reviews and Their References
 
@@ -69,5 +69,5 @@ PrecisionMatch reuses the SurveyMatch cases with no answer key, and calls a retr
 ## Limitations
 
 - Every answer is what a later document cited, so all three reward work that was already being noticed. A paper too new to be cited can't be an answer, and [LeyLine](leyline.md) is scored on that case separately.
-- Two reviews on one topic written within three months agree at recall $0.265$ over $93$ pairs ([`survey-agreement-REPORT.md`](../experiments/findings/survey-agreement-REPORT.md)), so past a point a higher score means matching one author's selection more than the field's.
+- Two reviews on one topic written within three months agree at recall $0.265$ over $93$ pairs, so past a point a higher score means matching one author's selection more than the field's.
 - A ConsensusMatch question is written from all three reviews while its cap is the first one's date, so its wording can borrow from reviews published up to $190$ days later. The answer can't, since it is capped.

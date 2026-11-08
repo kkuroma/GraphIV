@@ -1,299 +1,425 @@
 """
-The registrations and both transports, holding the graph and the model for the life of the process
+The six tools and both transports, holding the store, the graph and the model for the process
 
-Every tool body lives in its own file, so each one is callable and testable without a transport
-The docstrings here are what the calling model reads, so they say when to call a tool and why
+The docstrings here are what the calling model reads, so they say what a tool is for and when
+Every call is logged into its session's run, which save_report writes to disk for the webui
 """
 
 from __future__ import annotations
 
 import logging
 import os
-from collections.abc import Callable
-from typing import Any
+import time
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Literal
 
+from anyio import to_thread
+from mcp.server.fastmcp import Context as Session
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
 
-from src.mcp import find_runs as finding
-from src.mcp import identify_areas as splitting
-from src.mcp import mine as mining
-from src.mcp import read_paper as reading
-from src.mcp import recall_paper as recalling
-from src.mcp import refine as refining
-from src.mcp import retrieve as retrieving
-from src.mcp import search_papers as searching
-from src.mcp import what_cites as citing
-from src.mcp import write_report as writing
+from src.core.config import load_config
+from src.mcp import citations, graph, lineages, read, recall, runs, search
+from src.mcp.context import config_path, load
 from src.mcp.dashboard import mount
-from src.mcp.state import Serving, load, serving
+from src.mcp.papers import Filter, read_records
+from src.report.check import (
+    MARKER,
+    body_lines,
+    check,
+    fold,
+    further_ids,
+    relist,
+    split_tldr,
+    summary,
+)
 
 LOG = logging.getLogger(__name__)
 
-# the public vhost reaches this, so an instance set read only registers nothing that writes a file
-READONLY = os.environ.get("GRAPHIV_READONLY") == "1"
 mcp = FastMCP("graphiv")
+# the answer card holds one sentence
+TLDR_WORDS = 40
 
 
-def tool(writes: bool = False) -> Callable[[Callable[..., str]], Callable[..., str]]:
+def session_of(session: Session) -> str:
     """
-    Registers one tool unless this instance is read only and the tool writes
+    The MCP session a call belongs to
+
+    The server holds one session object per client connection on every transport, so its identity
+    tells two clients apart where a request header may not be visible.
 
     Args:
-        writes: Whether calling it leaves anything on disk.
+        session: The request context FastMCP passes.
 
     Returns:
-        The decorator.
+        A key unique to the session.
     """
-
-    def register(body: Callable[..., str]) -> Callable[..., str]:
-        return body if READONLY and writes else mcp.tool()(body)
-
-    return register
+    return f"session-{id(session.session)}"
 
 
-@tool()
-def refine(interest: str) -> str:
+async def logged(session: Session, tool: str, args: dict[str, Any], body: Any) -> str:
     """
-    Turn a freeform research interest into the focused questions this corpus can answer.
+    Runs one tool body off the event loop and records the call in the session's run
 
-    Call this first when the user described what they want rather than asking one question.
-    Returns candidates, each tagged survey (the lineage a field is built on) or frontier (what
-    people are doing right now), plus at most one clarifying question and the corpus titles the
-    candidates were grounded in. Relay the clarifying question only when it is not empty.
+    Args:
+        session: The request context.
+        tool: The tool name.
+        args: What the caller passed.
+        body: A callable taking the run and returning the reply.
+
+    Returns:
+        The reply.
     """
-    return refining.refine(load(), interest)
+    LOG.info("call %s from %s", tool, session_of(session))
+    run = runs.current(session_of(session))
+    began = time.time()
+    reply = await to_thread.run_sync(body, run)
+    run.log(tool, args, reply, began)
+    return reply
 
 
-@tool()
-def identify_areas(
-    question: str = "",
-    cap: int = 4,
-    people: list[dict[str, Any]] | None = None,
-    arxiv_ids: list[str] | None = None,
-    scope: str = "",
+def sources(run: runs.Run) -> dict[str, str]:
+    """
+    The folded full text behind each quote label, for papers whose text the server still holds
+
+    Args:
+        run: The run.
+
+    Returns:
+        Text by label.
+    """
+    opened = load().chunks
+    whole: dict[str, str] = {}
+    out = {}
+    for label, held_quote in run.evidence.items():
+        paper = opened.get(held_quote.arxiv_id)
+        if paper is None:
+            continue
+        if held_quote.arxiv_id not in whole:
+            parts = [paper.record.title, paper.record.abstract] + [c.text for c in paper.chunks]
+            whole[held_quote.arxiv_id] = fold(" ".join(parts))
+        out[label] = whole[held_quote.arxiv_id]
+    return out
+
+
+def held(filter: dict[str, Any] | None) -> Filter:
+    """
+    The caller's filter, empty when none was passed
+
+    Args:
+        filter: The filter object.
+
+    Returns:
+        The filter.
+    """
+    return Filter.model_validate(filter or {})
+
+
+@mcp.tool()
+async def recall_paper(  # noqa: D417
+    description: str,
+    filter: dict[str, Any] | None = None,
+    session: Session = None,  # type: ignore[assignment]
 ) -> str:
     """
-    Split one question, people's work, or one list of papers, into areas read separately.
+    Finds one paper from a vague description among about 3 million arXiv papers
 
-    For a question: call this when it spans more than one field, since a question spanning four
-    fields embeds into a region that is none of them. Returns 2 to `cap` areas, each with the
-    method words a paper in it would use and the question that area alone has to answer. Pass each
-    one to retrieve. A question about a single field does not need this.
+    Use it for a paper you know exists: a method's name, what the paper did, or who wrote it.
+    It returns the one paper that matches, with its arXiv id, title, authors, date, topic and
+    abstract, or says that none matches.
+    When it says none matches, no paper in the corpus fits the description and filter, so do not
+    retry with the same words.
 
-    For people: pass `people`, each {"name": as written on arXiv, "known": [one arxiv id they
-    wrote, or more]}, which answers what a person or a team works on. arXiv has no author id, so
-    the known paper picks which of the people sharing the name is meant: papers sharing coauthors
-    and references with it are kept. A very common name can still pull in namesakes, so compare
-    `kept` with `matched` and check the papers listed. Returns one area per topic their papers sit
-    in, each with an `area_id`. Pass each `area_id` to retrieve, which keeps their own papers as
-    the ranking, then write_report.
-
-    For papers: pass `arxiv_ids` for a reading list, and `scope` when the user named what they
-    care about, such as "knowledge graphs, citation graphs". Returns the areas inside the scope,
-    each with an `area_id`, its papers and their count, plus how many papers fell outside it. Pass
-    the `area_id` to mine to read those papers and to retrieve for the field around them.
+    Args:
+        description: What you remember, like "CaMeL, a prompt injection defense with a privileged
+        and a quarantined LLM".
+        filter: Optional. {"exclude": [arxiv ids], "authors": [names as written on arXiv, any of
+        them must be listed], "date_range": ["YYYY-MM-DD" or null, "YYYY-MM-DD" or null]}.
     """
-    return splitting.identify_areas(load(), question, cap, people, arxiv_ids, scope)
-
-
-@tool()
-def retrieve(
-    question: str = "",
-    arxiv_id: str = "",
-    methods: list[str] | str | None = None,
-    mode: str = "survey",
-    date_min: str = "",
-    date_max: str = "",
-    seen: list[str] | None = None,
-    effort: str = "standard",
-    area_id: str = "",
-    arxiv_ids: list[str] | None = None,
-    people: list[dict[str, Any]] | None = None,
-) -> str:
-    """
-    Retrieve and read one area, returning the papers worth reading and an id for the ranking.
-
-    This is the main tool. It searches the corpus, ranks by position in the citation graph, holds
-    the result to the area, cuts to the field's current era and has a reader grade every candidate
-    as foundational, core, frontier, adjacent, survey or unrelated.
-
-    Pick a mode. `survey` casts a wide net weighted to what the field cites, `frontier` a wide net
-    weighted to what it is doing now, `ancestry` what led to one paper and `evolution` what came
-    of it. Pass `arxiv_id` to start from that paper instead of the question; ancestry and
-    evolution always start from a paper, the closest one to the question when none is named, and
-    that paper leads the reply. `date_min` and `date_max` bound the dates, iso, both open when
-    empty, so ancestry usually caps at the paper's date and evolution starts from it.
-
-    Pass `methods` from identify_areas to hold the search to that area. Pass every earlier
-    `query_id` as `seen`: the reply carries `new_share`, which is the share of this ranking
-    nothing earlier already found, and a value near zero means you have renamed an area rather
-    than opened a new one. Keep the `query_id` and pass it to mine and write_report.
-
-    Pass an `area_id` from identify_areas, or `arxiv_ids`, to search the field around those papers
-    from their own mean vector, with `question` defaulting to the area's name. Most of what comes
-    back was written by others, so each paper says `given` when it is one of the papers passed.
-    An `area_id` identify_areas made from `people` is not searched: their own papers are the
-    ranking.
-
-    Pass `people`, as identify_areas takes them, with a `question` to ask whether they work on it.
-    Their papers in the topic closest to the question come back as the ranking, or `related`
-    false with no ranking when the reader finds none of them about it. Keep the person out of
-    `question`, since no paper names its own author.
-    """
-    return retrieving.retrieve(
-        load(),
-        question,
-        arxiv_id,
-        methods,
-        mode,
-        date_min,
-        date_max,
-        seen,
-        effort,
-        area_id,
-        arxiv_ids,
-        people,
+    args = {"description": description, "filter": filter}
+    return await logged(
+        session,
+        "recall_paper",
+        args,
+        lambda run: recall.recall_paper(load(), description, held(filter)),
     )
 
 
-@tool()
-def mine(
-    query_id: str = "",
-    arxiv_ids: list[str] | None = None,
-    question: str = "",
-    mode: str = "survey",
-    effort: str = "standard",
-    area_id: str = "",
+@mcp.tool()
+async def search_papers(  # noqa: D417
+    query: str = "",
+    arxiv_id: str = "",
+    mode: Literal["focused", "survey", "frontier", "consensus"] = "focused",
+    filter: dict[str, Any] | None = None,
+    limit: int = 20,
+    session: Session = None,  # type: ignore[assignment]
 ) -> str:
     """
-    Read the citation graph around a set of papers for what the field argues about.
+    Finds the papers answering a research question, or closest to a paper, among 3 million on arXiv
 
-    Pass the `query_id` a retrieve call returned, an `area_id` from identify_areas to read an
-    author's or a list's own papers, or name papers yourself with `arxiv_ids` and a `question`.
-    Returns the magnets, which are the papers this set takes positions on, with the counts per
-    intent; the lineages, which are dated paths through the graph showing how the field
-    got here; the disputes, which are the sentences in which one paper says another is wrong; the
-    successors, which are recent papers citing this set and so need no citations of their own; and
-    the connectors, which are papers that bridge two papers in the set without being in it.
+    One search covers one topic, so a question spanning two fields wants one search per field.
+    With authors in the filter and no query, it lists those authors' papers, newest first.
+    Pass `arxiv_id` instead of `query` to search around that paper.
+    Modes:
+    - focused: the papers that best match the query, for a specific or recent question; use it by
+      default.
+    - survey: what a field is built on, the work its reviews cite.
+    - frontier: what a broad field is working on now.
+    - consensus: what several reviews of a field all cite.
+
+    Args:
+        query: A phrase describing what the papers do, without words the whole area shares such as
+        "language model".
+        arxiv_id: A paper to search around, in place of the query.
+        mode: focused, survey, frontier or consensus.
+        filter: Optional. {"exclude": [arxiv ids], "authors": [names, any of them], "date_range":
+        [start or null, end or null]}.
+        limit: How many papers, at most 50.
+
+    Returns:
+        One entry per paper, best first: id, date, title, authors, topic, then the opening of its
+        abstract.
     """
-    return mining.mine(load(), query_id, arxiv_ids, question, mode, effort, area_id)
+    args = {"query": query, "arxiv_id": arxiv_id, "mode": mode, "filter": filter, "limit": limit}
+    return await logged(
+        session,
+        "search_papers",
+        args,
+        lambda run: search.search_papers(load(), run, query, arxiv_id, mode, held(filter), limit),
+    )
 
 
-@tool()
-def read_paper(
+@mcp.tool()
+async def read_paper(  # noqa: D417
     arxiv_ids: list[str],
-    schema: list[dict[str, Any]] | dict[str, Any] | None = None,
+    question: str,
+    schema: dict[str, Any] | None = None,
+    session: Session = None,  # type: ignore[assignment]
+) -> str:
+    """
+    Reads papers' full text and answers a question about each, with verbatim quotes
+
+    Pass several ids at once: four are read in parallel, so a batch of four costs about one.
+    Each claim in the reply carries a marker like [Karpukhin7] and the quote behind it.
+    Cite a claim in your report with its marker, and the saved report shows the quote with it.
+    Ask one specific question per batch, such as "what data, what metric, what number against which
+    baseline, what fails".
+
+    To compare methods, pass a `schema`, and each paper comes back as a table row instead of an
+    answer:
+    {"columns": [{"name": "retrieval_type", "kind": "choice", "description": "how candidates are
+    found", "options": ["dense", "sparse", "hybrid"]}, {"name": "result", "kind": "value",
+    "description": "headline number and benchmark"}]}
+    A choice column lists the options a method picks from, a value column holds a number and what it
+    was measured on, and a text column holds a short phrase.
+
+    Args:
+        arxiv_ids: The papers to read.
+        question: What you need from each.
+        schema: Optional table columns, to fill one row per method instead of answering.
+    """
+    args = {"arxiv_ids": arxiv_ids, "question": question, "schema": schema}
+    return await logged(
+        session,
+        "read_paper",
+        args,
+        lambda run: read.read_paper(load(), run, arxiv_ids, question, read.parse_schema(schema)),
+    )
+
+
+@mcp.tool()
+async def list_citations(  # noqa: D417
+    arxiv_id: str,
+    direction: Literal["cited_by", "cites"] = "cited_by",
+    intents: list[str] | None = None,
+    limit: int = 30,
+    session: Session = None,  # type: ignore[assignment]
+) -> str:
+    """
+    Lists the papers citing a paper, or the ones it cites, with each citation's intent and sentence
+
+    Intents are critiques, extends, compares, uses, motivates and background, labeled by a
+    classifier, so judge the sentence.
+    Use cited_by with critiques, extends and compares to see who took a position on a paper, and
+    what came after it.
+    Use cites to see what a paper built on.
+
+    Args:
+        arxiv_id: The paper.
+        direction: cited_by or cites.
+        intents: Optional intents to keep.
+        limit: How many papers, at most 100.
+    """
+    args = {"arxiv_id": arxiv_id, "direction": direction, "intents": intents, "limit": limit}
+    return await logged(
+        session,
+        "list_citations",
+        args,
+        lambda run: citations.list_citations(
+            load().dsn, run, arxiv_id, direction, intents or [], limit
+        ),
+    )
+
+
+@mcp.tool()
+async def trace_lineages(  # noqa: D417
+    arxiv_ids: list[str],
     question: str = "",
-    want: str | list[str] = "",
+    session: Session = None,  # type: ignore[assignment]
 ) -> str:
     """
-    Read the full text of papers, at whichever depth you need.
+    Traces how a field developed through a set of papers: which work led to which, oldest first
 
-    With neither `schema` nor `want`, returns each paper's section list so you can see what it
-    holds. With `want`, one or more keywords such as "limitations" or "threat model, defenses",
-    returns the sections whose titles carry any of them, and when no title does, the sentences
-    that carry the most of them. With `schema`, you invent the fields and this fills them from
-    each paper's own method and results sections: a list of entries with a name, a description and
-    optional `options` to force a closed answer, or a mapping of name to description. Use the
-    schema form to compare papers on axes you chose. Anything the paper does not say comes back as
-    "n/a" rather than guessed.
+    Pass a whole search, 20 to 50 papers on one topic: a handful of papers rarely cite each other,
+    so they give no lines.
+    The lines are kept for the report, which shows each as a figure.
+
+    Args:
+        arxiv_ids: The papers.
+        question: What you are working on, which keeps the lines on your topic.
     """
-    return reading.read_paper(load(), arxiv_ids, schema, question, want)
+    args = {"arxiv_ids": arxiv_ids, "question": question}
+    return await logged(
+        session,
+        "trace_lineages",
+        args,
+        lambda run: lineages.trace_lineages(load(), run, arxiv_ids, question),
+    )
 
 
-@tool(writes=True)
-def write_report(
-    query_ids: list[str],
-    title: str = "",
-    sections: list[dict[str, str] | str] | str | None = None,
-    effort: str = "standard",
-    end: bool = True,
-    question: str = "",
+async def save_report(  # noqa: D417
+    question: str,
+    markdown: str,
+    session: Session = None,  # type: ignore[assignment]
 ) -> str:
     """
-    Assemble the document and write it to disk.
+    Checks your report against what this session read, and saves it with everything it did
 
-    Pass every `query_id` from this session, and the question as the reader asked it as `question`,
-    since the report is mined, written and answered against it, while `title` names the document
-    and stands in for the question when it is empty. The report carries what the area
-    currently is with each paper's role, how it got here as dated lineages, a table comparing the
-    methods on axes this question decides, what has just appeared against it, and what is
-    contested in the citing authors' own words. Pass your own prose as `sections`, each a title
-    and a body or markdown with headings, and it is carried as written. Every arXiv id is then
-    checked against the corpus: a typo is corrected and an id no paper carries is cut out. Setting
-    `end` false keeps the session open for a follow-up.
+    The report may open, after its title, on a TL;DR paragraph: "TL;DR: " and the answer in one
+    sentence of at most 40 words, citing its strongest evidence.
+    Write one whenever a sentence can answer the question; for a list or a history, name two or
+    three of the strongest papers and leave the rest to the body.
+    It opens the saved report and is checked like every other line, so it must cite.
+    The check is mechanical:
+    - every marker like [Karpukhin7] must be one a read_paper reply gave, and [Chen3, Karpukhin7]
+      cites two,
+    - a number on a cited line must appear in the paragraph behind one of its markers,
+    - a quote on a line must sit in the paragraph its marker names,
+    - every paper cited in the body must have been read; unread papers go under a final "## Further
+      reading" heading,
+    - a line stating a finding carries a marker, or starts with "Inference:" when it is your own
+      reasoning.
+    A report that fails is still saved, flagged, and the reply lists each fault, so fix them and
+    call again.
+    Comparison tables and lineages from this session are added to the saved report by the server; do
+    not retype them.
+
+    Args:
+        question: The question the report answers.
+        markdown: The report, opening on its TL;DR when it has one.
     """
-    return writing.write_report(load(), query_ids, title, sections, effort, end, question)
+    session_id = session_of(session)
+    run = runs.current(session_id)
+    began = time.time()
+    found = read_records(load().dsn, further_ids(markdown))
+    titles = {a: f"{r.title} ({r.date.year})" for a, r in found.items()}
+    markdown = relist(markdown, titles, set(run.papers))
+    evidence = {m: e.text for m, e in run.evidence.items()}
+    queries = {str(c["args"].get("query") or "") for c in run.calls if c["tool"] == "search_papers"}
+    tldr, markdown = split_tldr(markdown)
+    whole = f"{tldr}\n\n{markdown}"
+    verdict = check(whole, evidence, set(run.papers), run.served, sources(run), queries)
+    if tldr and not MARKER.search(tldr):
+        verdict.faults.insert(0, {"kind": "TL;DR cites nothing", "where": "", "line": tldr})
+    words = len(MARKER.sub("", tldr).split())
+    if words > TLDR_WORDS:
+        verdict.faults.insert(
+            0, {"kind": f"TL;DR over {TLDR_WORDS} words", "where": f"at {words}", "line": tldr}
+        )
+    if not any(MARKER.search(line) for line, further in body_lines(markdown) if not further):
+        verdict.faults.insert(
+            0, {"kind": "report body cites nothing", "where": "", "line": markdown}
+        )
+    labels = {m.strip() for group in MARKER.findall(whole) for m in group.split(",")}
+    cited = {run.evidence[m].arxiv_id for m in labels if m in run.evidence}
+    run.graph = graph.citation_graph(load(), run.served, set(run.papers), cited)
+    out = runs.write(load().runs, run, question, markdown, verdict.as_dict(), tldr)
+    reply = summary(verdict) + f"\nSaved to {out.name}."
+    args = {"question": question, "markdown": markdown, "tldr": tldr}
+    run.log("save_report", args, reply, began)
+    runs.dump_calls(out, run)
+    if verdict.passed:
+        runs.close(session_id)
+    return reply
 
 
-@tool()
-def what_cites(
-    arxiv_id: str, intents: list[str] | None = None, since: str = "", limit: int = 20
-) -> str:
+# an instance set read only registers nothing that writes a file, which is save_report alone
+if os.environ.get("GRAPHIV_READONLY") != "1":
+    mcp.tool()(save_report)
+
+
+@dataclass(frozen=True)
+class Serving:
     """
-    Who cited one paper and what they said about it.
-
-    Returns the citing paper, the intent and the sentence. `extends` names the work that built on
-    it, `critiques` names the objections the field has already written down, and `compares` names
-    who benchmarked against it. Call this on any paper that keeps appearing, to find out whether
-    it is famous for working or famous for not working.
+    The transport half of the config, which needs neither the store nor the graph
     """
-    return citing.what_cites(load(), arxiv_id, intents, since, limit)
+
+    host: str
+    api_port: int
+    frontend_port: int
+    allowed_hosts: list[str]
+    runs: Path
+    pdfs: Path
+    fetch: bool
 
 
-@tool()
-def search_papers(text: str, limit: int = 20, before: str = "", after: str = "") -> str:
+def serving() -> Serving:
     """
-    Plain closeness search over the corpus, with no citation graph and no reader.
+    The ports and paths, read without opening the corpus
 
-    Use this to turn a paper you know by name into an id, or to check whether a field is genuinely
-    empty when retrieve came back thin. To find papers from what they did or argued, use
-    recall_paper instead.
+    Returns:
+        The settings.
     """
-    return searching.search_papers(load(), text, limit, before, after)
+    config = load_config(str(config_path()))
+    block = dict(config["serve"])
+    return Serving(
+        host=str(block["HOST"]),
+        api_port=int(block["API_PORT"]),
+        frontend_port=int(block["FRONTEND_PORT"]),
+        allowed_hosts=[str(one) for one in block.get("ALLOWED_HOSTS", [])],
+        runs=Path(str(block["RUNS_PATH"])),
+        pdfs=Path(str(config["dataset"]["PDF_PATH"])),
+        fetch=bool(block.get("FETCH", False)),
+    )
 
 
-@tool()
-def recall_paper(
-    description: str, author: str = "", before: str = "", after: str = "", limit: int = 10
-) -> str:
+def secure(server: FastMCP, settings: Serving) -> None:
     """
-    Find particular papers from a description of what they did, found or argued.
+    Binds one server to its interface, and to the names it answers to
 
-    Use this rather than retrieve when the user wants specific papers, such as "papers showing X"
-    or "the paper that claimed Y", since retrieve ranks what a whole field cites and can bury a few
-    recent papers on a narrow claim. A model writes the abstract such a paper would have, the
-    corpus is searched with it and with the description, and a reader picks the matches. Pass a
-    name the user remembers as `author`. Returns the matches first, each with its abstract.
+    Args:
+        server: The server to configure.
+        settings: The transport settings.
     """
-    return recalling.recall_paper(load(), description, author, before, after, limit)
-
-
-@tool()
-def find_runs(question: str = "", slug: str = "", limit: int = 10) -> str:
-    """
-    Find a report this server already wrote, and read it back.
-
-    Call this before doing the work: a question this corpus was already asked has a document on
-    disk, and reading it costs nothing. With `question`, returns the past runs closest to it by
-    meaning, each with its slug, the question it answered, its date, its paper count and its link.
-    With `slug`, returns that run's document and the papers behind it. With neither, returns the
-    newest runs. A close match is the report to build on rather than repeat.
-    """
-    return finding.find_runs(load(), question, slug, limit)
+    server.settings.host = settings.host
+    if settings.allowed_hosts:
+        server.settings.transport_security = TransportSecuritySettings(
+            allowed_hosts=settings.allowed_hosts,
+            allowed_origins=[f"https://{one}" for one in settings.allowed_hosts],
+        )
 
 
 def run(http: bool = False, role: str = "both") -> None:
     """
-    Serves the tools, over stdio by default
+    Serves the tools over stdio, or the tools and the webui over streamable http
 
-    The frontend role serves a second server carrying no tools at all, so it opens neither the
-    store nor the graph and cannot reach the corpus.
+    The frontend role serves a second server with no tools, which opens neither the store nor the
+    graph.
 
     Args:
-        http: Serve streamable-http instead of stdio.
-        role: api for the tools, frontend for the dashboard, both for one listener carrying each.
+        http: Serve streamable http instead of stdio.
+        role: api for the tools, frontend for the webui, both for one listener carrying each.
     """
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
     settings = serving()
@@ -302,11 +428,10 @@ def run(http: bool = False, role: str = "both") -> None:
         mcp.run()
         return
     if role == "frontend":
-        page = FastMCP("graphiv-dashboard")
+        page = FastMCP("graphiv-webui")
         secure(page, settings)
         page.settings.port = settings.frontend_port
-        mount(page, settings.runs, settings.pdfs)
-        LOG.info("serving the dashboard on %s:%d", page.settings.host, page.settings.port)
+        mount(page, settings.runs, settings.pdfs, settings.fetch)
         page.run(transport="streamable-http")
         return
     secure(mcp, settings)
@@ -315,29 +440,9 @@ def run(http: bool = False, role: str = "both") -> None:
         mount(mcp, settings.runs, settings.pdfs, settings.fetch)
     _ = load()
     LOG.info(
-        "serving %d tools on %s:%d, read only %s",
+        "serving %d tools on %s:%d",
         len(mcp._tool_manager.list_tools()),
         mcp.settings.host,
         mcp.settings.port,
-        READONLY,
     )
     mcp.run(transport="streamable-http")
-
-
-def secure(server: FastMCP, settings: Serving) -> None:
-    """
-    Binds one server to its interface, and to the names it answers to
-
-    A transport with no allowed host answers only what it is bound to, which is what rejects a
-    proxy that forwards its own name.
-
-    Args:
-        server: The server to configure.
-        settings: The transport half of the config.
-    """
-    server.settings.host = settings.host
-    if settings.allowed_hosts:
-        server.settings.transport_security = TransportSecuritySettings(
-            allowed_hosts=settings.allowed_hosts,
-            allowed_origins=[f"https://{one}" for one in settings.allowed_hosts],
-        )

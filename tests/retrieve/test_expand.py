@@ -96,3 +96,12 @@ def test_expander_respects_the_limit(graph: GraphExport, pool: list[Paper]) -> N
     """
     expander = AncestorExpander(graph, "unused", top_k=2, hop_limit=1)
     assert expander.get_neighbor_ids(pool[:2]) == ["p4"]
+
+
+def test_expander_never_returns_a_blocked_paper(graph: GraphExport, pool: list[Paper]) -> None:
+    """
+    p4 is what the core cites, and a case that blocks it gets only p5
+    """
+    expander = AncestorExpander(graph, "unused", top_k=2)
+    expander.blocked = ["p4"]
+    assert expander.get_neighbor_ids(pool[:2]) == ["p5"]

@@ -1,0 +1,18 @@
+# This config tunes short questions with a few answers
+
+dataset = "pasa" # Tuned on PaSa AutoScholarQuery (median key = 2 papers)
+train = "train" # split the exponents are fit on
+val = "val" # split the core and exponents are picked on
+k = 20 # recall cutoff the fit maximizes
+cores = [200] # the grid of core configs
+terms = ["rec", "anc", "fro", "anc2", "fro2", "anc_decay", "fro_decay", "cocite", "couple", "bm25", "hub"] # exponents the fit may move
+start = 0.25 # starting value of every free exponent
+
+# The exponent fit
+[fit]
+steps = 600 # gradient steps
+batch = 128 # train cases per step
+trials = 200 # CMA-ES trials
+search_cases = 2000 # train cases each trial scores (0 means all)
+seed = 0 # random seed
+train_cases = 0 # train cases cached (0 means all)

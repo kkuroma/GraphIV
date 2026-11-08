@@ -2,17 +2,6 @@ method = "boundedfield"
 dataset = "frontiermatch"
 split = "test"
 
-[fit]
-train = "pasa"
-val = "val"
-shards = 34
-steps = 600
-batch = 128
-k = 20
-seed = 0
-start = { cos = 1.0, rec = 0.25, anc = 0.25, cocite = 0.25 }
-
 [run]
 ks = [100, 1000]
-# the survey recipe with its weights replaced by the fit
-recipe = "survey"
+recipe = "focused"

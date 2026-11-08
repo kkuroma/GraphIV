@@ -1,8 +1,7 @@
-# where every path below is read from, relative to this directory
+# Benchmark configuration for what the root config.toml does not state
+
+# Where things live, relative to this directory
 [paths]
-# every source, cache, fit and run
-DATA = "data"
-# the GraphIV checkout whose environment runs src/graphiv/
-ROOT = ".."
-# what make_table.py writes
-TABLES = "data/tables.md"
+DATA = "data" # sources caches fits runs and tuning
+ROOT = ".." # the GraphIV checkout
+TABLES = "data/tables.md" # tables make_table.py writes

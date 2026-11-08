@@ -1,175 +1,158 @@
-# GraphIV global configuration. Local configurations live in TBA
+# GraphIV global configuration. Local configurations live in benchmarks/config.toml
 
+# The store
 [database]
-PG_DEST = "host=.pg port=5433 dbname=arxivkg"
+PG_DEST = "host=.pg port=5433 dbname=arxivkg" # connection string of the store
 
+# Where the corpus comes from
 [source]
-SOURCE_URL = "https://www.kaggle.com/api/v1/datasets/download/Cornell-University/arxiv"
-SOURCE_PATH = "data/arxiv.json"
-PDF_BASE_URL = "https://storage.googleapis.com/arxiv-dataset/arxiv/arxiv/pdf"
-PDF_LEGACY_BASE_URL = "https://storage.googleapis.com/arxiv-dataset/arxiv"
-HTML_BASE_URL = "https://arxiv.org/html"
-HTML_FALLBACK_URL = "https://ar5iv.labs.arxiv.org/html"
+SOURCE_URL = "https://www.kaggle.com/api/v1/datasets/download/Cornell-University/arxiv" # Kaggle arXiv snapshot
+SOURCE_PATH = "data/arxiv.json" # snapshot on disk
+PDF_BASE_URL = "https://storage.googleapis.com/arxiv-dataset/arxiv/arxiv/pdf" # bulk PDF mirror
+PDF_LEGACY_BASE_URL = "https://storage.googleapis.com/arxiv-dataset/arxiv" # bulk PDF mirror for old slash ids
+HTML_BASE_URL = "https://arxiv.org/html" # arXiv HTML
+HTML_FALLBACK_URL = "https://ar5iv.labs.arxiv.org/html" # ar5iv HTML when arXiv has none
 
-# aria2c batching against the arXiv bulk mirror on Google Cloud Storage
+# Bulk downloads
 [download]
-PDF_BATCH = 500
-PDF_N_PARALLEL = 8
-# permits a second across every worker, and a paper costs two when the first source misses
-HTML_RATE = 8.0
-HTML_BATCH = 200
-HTML_N_PARALLEL = 16
+PDF_BATCH = 500 # papers per PDF batch
+PDF_N_PARALLEL = 8 # PDF downloads at once
+HTML_RATE = 8.0 # HTML requests per second
+HTML_BATCH = 200 # papers per HTML batch
+HTML_N_PARALLEL = 16 # HTML downloads at once
 
+# Where the corpus and the graph live
 [dataset]
-PDF_PATH = "data/arxiv/pdfs"
-HTML_PATH = "data/arxiv/html"
-GRAPH_PATH = "data/citation_graph_export.npy"
+PDF_PATH = "data/arxiv/pdfs" # downloaded PDFs
+HTML_PATH = "data/arxiv/html" # downloaded HTML
+GRAPH_PATH = "data/citation_graph_export.npy" # citation graph export
 
-# The daemon: the ports it listens on, and the paths it reads and writes
-# A paper the corpus never had is fetched into HTML_PATH or PDF_PATH, under its own YYMM
+# The tool server and the dashboard
 [serve]
-HOST = "127.0.0.1"
-API_PORT = 6767
-FRONTEND_PORT = 6969
-# hosts the streamable-http transport answers to, empty meaning loopback only
-ALLOWED_HOSTS = []
-RECIPE_PATH = "retrieval_recipes"
-RUNS_PATH = "data/runs"
-CACHE_PATH = "data/cache"
-FETCH = true
+HOST = "127.0.0.1" # address both servers bind
+API_PORT = 6767 # port of the tool server
+FRONTEND_PORT = 6969 # port of the dashboard
+ALLOWED_HOSTS = [] # hosts the HTTP transport answers to (empty means loopback only)
+RECIPE_PATH = "retrieval_recipes" # directory of the mode recipes
+RUNS_PATH = "data/runs" # where each report is written
+CACHE_PATH = "data/cache" # model replies cached by prompt
+FETCH = true # fetch a paper the corpus lacks
+PDFTOTEXT = "pdftotext" # pdf text extractor
 
-# The manager, one page running every stage below, keeping its jobs and charts in STATE_PATH
+# The retrieval pipeline every recipe runs
+[retrieve]
+COSINE_LIMIT = 5000 # papers the cosine retriever returns
+EXPANSION_LIMIT = 20000 # most papers each expander appends
+DEPTH = 4 # hops the decay terms reach
+DECAY = 0.5 # weight kept per hop in the decay terms
+
+# The miner that turns a ranking into lines
+[miner]
+FOCUS = 4.0 # exponent on closeness when scoring an argued-with paper
+WALK_PREFIX = 30 # head of the ranking the walks run on
+CONNECTORS = 40 # most bridging papers kept
+DECAY = 0.5 # weight kept per hop of a paper's reach
+KNOCKDOWN = 0.4 # weight left on a paper once a line takes it
+SEEDS = 10 # papers the walks start from
+WALKS = 50 # walks per seed
+BRANCH = 1 # papers a walk steps to at a time
+ARGUES = ["extends", "critiques", "compares"] # intents that count as arguing with a paper
+SUCCESSOR_DAYS = 240 # days before the cap a successor may date from
+SUCCESSOR_FLOOR = 0.60 # lowest intent score a successor's citation needs
+
+# Weight of each citation intent in the miner
+[miner.weights]
+extends = 1.0
+critiques = 1.0
+compares = 0.8
+uses = 0.4
+motivates = 0.15
+background = 0.0
+
+# The pipeline manager
 [manager]
-PORT = 6868
-STATE_PATH = "data/manager"
-# the Hugging Face token the publish stage uploads with, empty for none
-HF_TOKEN_PATH = ""
+PORT = 6868 # port of the manager page
+STATE_PATH = "data/manager" # jobs and cached charts
+HF_TOKEN_PATH = "" # Hugging Face token file for publishing (empty means none)
 
-# What leaves the store: graphiv-<date>.dump, the full backup, and graphiv-<date>/, the Parquet release
+# Store dumps and public releases
 [export]
-EXPORT_PATH = "data/export"
-# the Hugging Face repos the publish stage uploads to, empty to skip one
-DATA_REPO = "kkuroma/GraphIV"
-CITATION_REPO = "kkuroma/GraphIV-citation-intent"
-SURVEY_REPO = "kkuroma/GraphIV-survey"
-BENCHMARK_REPO = "kkuroma/GraphIV_benchmarks"
-# each benchmark question the model wrote, cached by its input so a re-export keeps it
-QUERY_CACHE = "data/cache/queries"
+EXPORT_PATH = "data/export" # where dumps and releases are written
+DATA_REPO = "kkuroma/GraphIV" # Hugging Face repo of the paper release
+CITATION_REPO = "kkuroma/GraphIV-citation-intent" # Hugging Face repo of the intent labeler
+SURVEY_REPO = "kkuroma/GraphIV-survey" # Hugging Face repo of the review classifier
+BENCHMARK_REPO = "kkuroma/GraphIV_benchmarks" # Hugging Face repo of the benchmarks
+QUERY_CACHE = "data/cache/queries" # benchmark questions cached by input
 
+# Model endpoints
 [endpoints]
-EMBED_API = "http://127.0.0.1:11434/embedding/nomic-embed-text-v2-moe"
-EMBED_NAME = "nomic-embed-text-v2-moe"
-EMBED_PARALLEL = 1
-EMBED_BATCH = 256
-EMBED_MAX_SEQ = 512
-EMBED_PREFIX = "search_document: "
-LLM_API = "http://localhost:11434/v1"
-LLM_NAME = "Gemma-4-26B-Batched"
+EMBED_API = "http://127.0.0.1:11434/embedding/nomic-embed-text-v2-moe" # embedding endpoint
+EMBED_NAME = "nomic-embed-text-v2-moe" # embedding model
+EMBED_PARALLEL = 1 # embedding batches in flight
+EMBED_BATCH = 256 # papers per embedding batch
+EMBED_MAX_SEQ = 512 # token budget per document
+EMBED_PREFIX = "search_document: " # prefix on every embedded document
+LLM_API = "http://localhost:11434/v1" # chat model endpoint
+LLM_NAME = "Wordslop-Qwen3.6-27B" # chat model
 
-# The literature review scorer, whose checkpoint and recipe live in MODEL_PATH
+# The review classifier
 [survey]
-MODEL_PATH = "data/survey_detection"
-BATCH = 64
-CHUNK = 50000
+MODEL_PATH = "data/survey_detection" # classifier checkpoint
+BATCH = 64 # papers per forward pass
+CHUNK = 50000 # papers per commit
 
+# The UMAP projection
 [umap]
-UMAP_MODEL_PATH = "data/umap_50.joblib"
-UMAP_SAMPLE = 400000
-UMAP_SEED = 69420
-UMAP_DIM = 50
-UMAP_BATCH = 50000
-# transform processes, each loading its own 4.1GB copy of the model
-UMAP_WORKERS = 4
+UMAP_MODEL_PATH = "data/umap_50.joblib" # fitted model
+UMAP_SAMPLE = 400000 # papers the fit reads
+UMAP_SEED = 69420 # random seed
+UMAP_DIM = 50 # projected dimensions
+UMAP_BATCH = 50000 # papers per transform batch
+UMAP_WORKERS = 4 # transform processes
 
+# The topic tree
 [topics]
-TREE_METHODS = ["kmeans", "kmeans", "kmeans"]
-TREE_K = 16
-TREE_MIN_CLUSTER_SIZE = 60
-TREE_N_PARALLEL = 8
-TREE_BATCH = 50000
-TREE_SEED = 69420
-# Papers shown to the namer, taken nearest the leaf centroid rather than at random
-N_TOPIC_LABEL = 10
-TOPIC_BATCH = 8
+TREE_METHODS = ["kmeans", "kmeans", "kmeans"] # clustering method per level
+TREE_K = 16 # clusters per node
+TREE_MIN_CLUSTER_SIZE = 60 # smallest cluster hdbscan keeps
+TREE_N_PARALLEL = 8 # groups clustered at once
+TREE_BATCH = 50000 # rows per write
+TREE_SEED = 69420 # random seed
+N_TOPIC_LABEL = 10 # papers shown to the namer per topic
+TOPIC_BATCH = 8 # topics named at once
 
+# The citation intent labeler
 [citation_labeler]
-LABELER_PATH = "data/citation_labeler"
-LABELER_MODEL = "distilbert/distilbert-base-uncased"
-LABELER_BATCH = 48             # the resident llama models leave under 400MB of the 3090
-LABELER_MAX_SEQ = 256
-LABELER_APE_MODEL = "Gemma-4-26B-Batched"
-LABELER_APE_GENERATIONS = 6
-LABELER_APE_PARALLEL = 4
-LABELER_TEACHER_SAMPLE = 10000
-LABELER_SEED = 0
-LABELER_SPLITS = [0.8, 0.1, 0.1]
-LABELER_EPOCHS = 12
-LABELER_TRAIN_BATCH = 64
-LABELER_LR = 2e-5
+LABELER_PATH = "data/citation_labeler" # checkpoint directory
+LABELER_MODEL = "distilbert/distilbert-base-uncased" # student base model
+LABELER_BATCH = 48 # citations per forward pass
+LABELER_MAX_SEQ = 256 # token budget per citation
+LABELER_APE_MODEL = "Wordslop-Qwen3.6-27B" # teacher model
+LABELER_APE_GENERATIONS = 6 # prompt search generations
+LABELER_APE_PARALLEL = 4 # teacher calls in flight
+LABELER_TEACHER_SAMPLE = 10000 # citations the teacher labels
+LABELER_SEED = 0 # random seed
+LABELER_SPLITS = [0.8, 0.1, 0.1] # train val and test shares
+LABELER_EPOCHS = 12 # student training epochs
+LABELER_TRAIN_BATCH = 64 # citations per training step
+LABELER_LR = 2e-5 # student learning rate
 
-# Review case selection, grouping by a tree node then keeping one mutually similar set per node
+# Review case selection
 [surveymatch]
-SURVEY_THRESHOLD = 0.5
-# roughly p95 of the within-node cosine, which leaves the graph sparse enough for an exact clique
-MUTUAL_COSINE_THRESHOLD = 0.65
-SURVEYMATCH_LEVEL = 2
+SURVEY_THRESHOLD = 0.5 # review score floor
+MUTUAL_COSINE_THRESHOLD = 0.65 # closeness the reviews of one case share
+SURVEYMATCH_LEVEL = 2 # tree level cases group by
 
-
-# The published benchmarks, versioned by CUTOFF, the last day a mined review may carry
+# The published benchmarks
 [benchmarks]
-CUTOFF = "2026-10-22"
-# resolved references a review needs, per benchmark
-SURVEYMATCH_FLOOR = 100
-FRONTIERMATCH_FLOOR = 25
-CONSENSUSMATCH_FLOOR = 25
-# the survey classifier floor, where precision is 0.937 against 0.787 at 0.5
-SURVEY_THRESHOLD = 0.95
-# the widest gap between two reviews that still counts as the same moment
-GAP_DAYS = 190
-FRONTIER_COSINE = 0.80
-FRONTIER_MIN_KEY = 10
-# how far before the earlier review a frontier answer may have been published
-FRONTIER_WINDOW_DAYS = 730
-CONSENSUS_COSINE = 0.75
-CONSENSUS_MIN_KEY = 5
-
-# Recipe tuning and evaluation on graphiv-benchmarks-<CUTOFF> under EXPORT_PATH, one run directory per split and metric
-[recipe_tuning]
-RECIPE_PATH = "retrieval_recipes"
-OUTPUT_PATH = "benchmarks/data/recipe_tuning"
-# each case's pool and terms, cached once per version and split for the fit
-CACHE_PATH = "data/cache/recipe_tuning"
-RETURN_LIMIT = 1000
-BUDGETS = [100, 200, 500, 1000]
-# train to tune on, val to choose, test to report
-SPLIT = "val"
-# the most cases a run reads from its split, every case at 0
-MAX_SAMPLES = 0
-# the judge, which calls a paper related when it shares the leaf or a reviewer of that leaf cites it
-PRECISION_LEVEL = 2
-
-# Which recipes each benchmark runs and compares, relative to RECIPE_PATH
-[recipe_tuning.recipes]
-SurveyMatch = [
-  "survey.toml",
-  "anc_only.toml",
-  "survey_no_forward.toml",
-  "all_terms.toml",
-  "no_expansion.toml",
-  "cosine_only.toml",
-]
-FrontierMatch = [
-  "frontier.toml",
-  "survey.toml",
-  "frontier_no_forward.toml",
-  "all_terms.toml",
-  "cosine_only.toml",
-]
-ConsensusMatch = [
-  "consensus.toml",
-  "consensus_no_forward.toml",
-  "survey.toml",
-  "all_terms.toml",
-  "cosine_only.toml",
-]
-PrecisionMatch = ["survey.toml", "frontier.toml", "cosine_only.toml"]
+CUTOFF = "2026-10-22" # last day a mined review may carry
+SURVEYMATCH_FLOOR = 100 # resolved references a SurveyMatch review needs
+FRONTIERMATCH_FLOOR = 25 # resolved references a FrontierMatch review needs
+CONSENSUSMATCH_FLOOR = 25 # resolved references a ConsensusMatch review needs
+SURVEY_THRESHOLD = 0.95 # review classifier score a review needs
+GAP_DAYS = 190 # widest gap between the reviews of one case
+FRONTIER_COSINE = 0.80 # closeness the two FrontierMatch reviews need
+FRONTIER_MIN_KEY = 10 # smallest FrontierMatch key
+FRONTIER_WINDOW_DAYS = 730 # days before the earlier review an answer may date from
+CONSENSUS_COSINE = 0.75 # closeness the ConsensusMatch reviews need
+CONSENSUS_MIN_KEY = 5 # smallest ConsensusMatch key

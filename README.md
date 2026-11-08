@@ -52,7 +52,7 @@ uv run python scripts/citation_preprocess/stage0_create_citation.py --workers 16
 uv run python scripts/citation_preprocess/stage1_label_citation.py
 ```
 
-The two labelers the build loads are trained by [`scripts/citation_labeler/`](scripts/citation_labeler/README.md) and described on their cards, [GraphIV-citation-intent](https://huggingface.co/kkuroma/GraphIV-citation-intent) and [GraphIV-survey](https://huggingface.co/kkuroma/GraphIV-survey). The four retrieval benchmarks, defined in [`docs/benchmarks.md`](docs/benchmarks.md) and published at [GraphIV_benchmarks](https://huggingface.co/datasets/kkuroma/GraphIV_benchmarks), are fit and rerun by [`scripts/recipe_tuning/`](scripts/recipe_tuning/README.md), which writes every case and every ranking under [`experiments/retrieve/`](experiments/retrieve), and every figure on this page and on the cards is redrawn from those files by `direnv exec . uv run python assets/run.py`.
+The two labelers the build loads are trained by [`scripts/citation_labeler/`](scripts/citation_labeler/README.md) and described on their cards, [GraphIV-citation-intent](https://huggingface.co/kkuroma/GraphIV-citation-intent) and [GraphIV-survey](https://huggingface.co/kkuroma/GraphIV-survey). The four retrieval benchmarks, defined in [`docs/benchmarks.md`](docs/benchmarks.md) and published at [GraphIV_benchmarks](https://huggingface.co/datasets/kkuroma/GraphIV_benchmarks), are tuned and rerun by [`benchmarks/`](benchmarks/README.md), which writes every case and every ranking under its own data directory, and every figure on this page and on the cards is drawn by `direnv exec . uv run python assets/run.py`.
 
 ### Self-hosting
 
@@ -61,7 +61,7 @@ GraphIV ships as an MCP server, which any agent that speaks MCP can drive, plus 
 | Tier | What you get | What it needs |
 |---|---|---|
 | data | the three tables | a Hugging Face login and 6.1 GB of download, see [the dataset card](https://huggingface.co/datasets/kkuroma/GraphIV) |
-| server | the ten MCP tools and the dashboard | Postgres 17 with pgvector holding the 90 GB store, about 1 GB of RAM for the citation graph and a ranking, an embedding endpoint serving nomic-embed-text-v2-moe through llama-server (0.9 GB of VRAM), and any OpenAI-compatible chat endpoint, here Gemma 4 26B A4B in MXFP4 with a 131k context (18.8 GB of VRAM) |
+| server | the six MCP tools and the dashboard | Postgres 17 with pgvector holding the 90 GB store, about 1 GB of RAM for the citation graph and a ranking, an embedding endpoint serving nomic-embed-text-v2-moe through llama-server (0.9 GB of VRAM), and any OpenAI-compatible chat endpoint, here Wordslop-Qwen3.6-27B in IQ2_M with a 262k context (about 19 GB of VRAM) |
 | updates | the rebuild every two weeks | the server tier, plus the manager, the GPU for both labelers (2,012 citations and 214 papers a second) and the embeddings, and the chat endpoint for naming 4,368 topics |
 | build | everything from scratch | the update tier, plus 496 GB of HTML and 5.6 TB of PDF for the full text |
 
@@ -105,21 +105,18 @@ LeyLine walks the papers a field takes positions on, drawing every step by how m
 
 ![One question through the six MCP tools, each with what it returned](assets/figures/research-pipeline.png)
 
-The agent owns the loop, and the server answers one call at a time while holding the corpus, the tuned constants and the rankings. A two-area standard run measured 139 seconds end to end over MCP, where 59 went to the two `retrieve` calls and 71 to `write_report`.
+The agent owns the loop and writes the report, and the server answers one call at a time while holding the corpus, the tuned recipes and the rankings. It logs every call into the session's run and checks the report mechanically when the agent saves it. Over the nine public questions, a standard run took 385 seconds on average, 232 of them in `read_paper` and 137 in the agent's own turns.
 
 | Tool | What it answers |
 |---|---|
-| `refine` | what focused question this corpus can answer, tagged survey or frontier |
-| `identify_areas` | which areas a question has to be searched as separately |
-| `retrieve` | what one area or one paper's neighborhood is, graded by role, plus an id for the ranking |
-| `mine` | what it argues with, how it got here, what bridges it, and what has appeared since |
-| `read_paper` | a paper's sections, or a schema the caller invented, filled from its full text |
-| `write_report` | the document, grounded and written to disk |
-| `what_cites` | who took a position on one paper, and the sentence they used |
-| `search_papers` | plain cosine, to turn a title into an id |
-| `find_runs` | which report this server already wrote for a question, and the document itself |
+| `recall_paper` | the one paper a description points at, or that none matches |
+| `search_papers` | BoundedField from a question or a paper in one of four modes, or an author's papers |
+| `read_paper` | answers from the paragraphs a question needs, every claim under a quote label like [Karpukhin7], or one table row per method from a schema |
+| `list_citations` | a paper's citers or references, each with its intent and labeled sentence |
+| `trace_lineages` | LeyLine's lines through a set of papers, oldest first, with labeled citing sentences |
+| `save_report` | the mechanical check on the agent's report, and the saved run |
 
-Five modes pick the recipe: `survey`, `frontier` and `consensus` are each tuned on their own benchmark, and `ancestry` and `evolution` start from one paper, with the score's forward or backward terms set to zero. [`src/mcp/README.md`](src/mcp/README.md) covers the tools and the three efforts.
+Four modes pick the recipe, `focused`, `survey`, `frontier` and `consensus`, each tuned on its own benchmark. [`src/mcp/README.md`](src/mcp/README.md) covers the tools, the skills and connecting opencode.
 
 ## Repository Layout
 
@@ -127,8 +124,8 @@ Five modes pick the recipe: `survey`, `frontier` and `consensus` are each tuned 
 |---|---|
 | [`src/`](src/README.md) | the library, in layers: [`core`](src/core/README.md), [`retrieve`](src/retrieve/README.md) (BoundedField), [`miner`](src/miner/README.md) (LeyLine), [`report`](src/report/README.md), [`mcp`](src/mcp/README.md) and [`webui`](src/webui/README.md) |
 | [`scripts/`](scripts/README.md) | the build stages, the labelers, the benchmarks, the export, the manager and `serve.py` |
-| [`retrieval_recipes/`](retrieval_recipes) | one toml per mode, the only place an exponent or a miner constant lives |
-| [`experiments/`](experiments/findings/README.md) | what the benchmarks last wrote, and the findings of every experiment since deleted |
+| [`retrieval_recipes/`](retrieval_recipes) | one toml per mode, its core and its exponents, as `benchmarks/tune.py` wrote them |
+| [`benchmarks/`](benchmarks/README.md) | the recipe tuning, and GraphIV's retrieval against the baselines on our three benchmarks, PaSa, SurGE and ScholarCatalyst |
 | [`assets/`](assets/README.md) | every figure here and on the cards, and the code that draws them |
 | [`docs/`](docs/README.md) | the methods, the benchmarks and the runbooks |
 | [`nix/`](nix/README.md) | the package and the NixOS module |
@@ -141,7 +138,7 @@ Five modes pick the recipe: `survey`, `frontier` and `consensus` are each tuned 
 - My vision is to eventually unify the web of science into a singular graph database, where querying becomes a simple graph operation, and arXiv is the first part.
 - Anyone should be able to host the server, which needs a loader from the Hugging Face release into Postgres that fetches the citation sentences from arXiv's HTML.
 - A paper too new to be cited is still the open problem: the successors reached 136 of 557 such papers that later took off, and BoundedField's top 20 none.
-- The reports have no end-to-end evaluation yet, and the `ancestry` and `evolution` modes are untuned.
+- The reports pass a mechanical check, yet over the nine public questions an outside judge finds 9% to 21% of their cited sentences unsupported by the quotes behind them, against 3% for Consensus on the six both answered.
 
 ### Acknowledgments
 
@@ -150,7 +147,8 @@ Thank you to arXiv for use of its open access interoperability. GraphIV is built
 | Model | Used for |
 |---|---|
 | [nomic-ai/nomic-embed-text-v2-moe](https://huggingface.co/nomic-ai/nomic-embed-text-v2-moe), served from [its GGUF](https://huggingface.co/nomic-ai/nomic-embed-text-v2-moe-GGUF) | every embedding |
-| [google/gemma-4-26B-A4B-it](https://huggingface.co/google/gemma-4-26B-A4B-it) | the topic names, both labelers' training labels, and every model call of the pipeline |
+| Wordslop-Qwen3.6-27B | the research agent, and every model call of the MCP tools and the stages |
+| [google/gemma-4-26B-A4B-it](https://huggingface.co/google/gemma-4-26B-A4B-it) | the topic names, both labelers' training labels and the benchmark questions of the current release |
 | [Qwen/Qwen3.6-35B-A3B](https://huggingface.co/Qwen/Qwen3.6-35B-A3B) and [zai-org/GLM-4.7-Flash](https://huggingface.co/zai-org/GLM-4.7-Flash) | checking the survey labels against two other model families |
 | [distilbert/distilbert-base-uncased](https://huggingface.co/distilbert/distilbert-base-uncased) | both labelers |
 

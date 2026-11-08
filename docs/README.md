@@ -1,7 +1,7 @@
 # docs
 
 What GraphIV's methods are, and how to build or restore it.
-The code's own structure is in each package README, and measurements live in `experiments/`.
+The code's own structure is in each package README.
 
 ```
 retrieval.md     BoundedField, the retriever and reranker: its pool, its score, its tuning and its benchmarks

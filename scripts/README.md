@@ -35,12 +35,8 @@ uv run python scripts/citation_preprocess/stage0_create_citation.py --workers 16
 
 ## Benchmarks
 
-`recipe_tuning/` fits BoundedField's recipes on the published benchmarks and scores every recipe on them.
-`config.toml` lists which recipes each one compares, and recipes that share a retrieval prefix share one pool, so six recipes cost one retrieval.
-
-```sh
-uv run python scripts/recipe_tuning/stage2_evaluate.py --split test
-```
+`export/stage2_export_benchmarks.py` mines and writes the published benchmarks.
+Tuning and scoring the recipes on them lives in `benchmarks/`, which writes `retrieval_recipes/`.
 
 ## Export
 
@@ -64,8 +60,8 @@ uv run python scripts/graphiv_manager/main.py
 
 ```sh
 uv run python scripts/serve.py                         # stdio
-uv run python scripts/serve.py --http --role api       # the nine tools
+uv run python scripts/serve.py --http --role api       # the six tools
 uv run python scripts/serve.py --http --role frontend  # the dashboard, with no tools at all
 ```
 
-The agent runs the loop, so nothing here answers a question on its own.
+The agent runs the loop and writes the report, so nothing here answers a question on its own.

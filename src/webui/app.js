@@ -1,66 +1,45 @@
-// The whole dashboard: a library, a run with five tabs, and one fetch each, with no build step
+// The research library: every saved run, its report with every citation opened to its paragraph,
+// the tables and lineages the server kept, and the process of every tool call and thought that made it
 const PALETTES = ["haruhana", "natsumikan", "akiba", "fuyuyuki"];
 const SEEDS = { haruhana: "#F07898", natsumikan: "#E08030", akiba: "#C84040", fuyuyuki: "#78B4E8" };
-const TABS = ["report", "methods", "references", "graph", "topics", "details"];
-const AID = /arxiv\.org\/abs\/([\w.\/-]+?)(?:v\d+)?$/;
-const ROLE_ORDER = ["foundational", "core", "frontier", "survey", "adjacent", "unrelated", "connector", "ungraded"];
-const LINE_COLORS = ["--yellow", "--sky", "--green", "--secondary", "--primary", "--red", "--tertiary"];
-
-// a citation edge reads as a sentence, the citing paper first
-const INTENTS = {
-  extends: "builds on",
-  uses: "uses",
-  compares: "compares itself against",
-  critiques: "critiques",
-  motivates: "was motivated by",
-  background: "mentions",
+const TABS = ["report", "papers", "process", "timeline", "check"];
+const MARKER = /\[([A-Z][A-Za-z]*\d+(?:\s*,\s*[A-Z][A-Za-z]*\d+)*)\]/g;
+// the palettes repeat hues across their tokens, so tools take their own categorical set from style.css
+const TOOL_COLORS = {
+  search_papers: "--t-search",
+  recall_paper: "--t-recall",
+  read_paper: "--t-read",
+  list_citations: "--t-citations",
+  trace_lineages: "--t-lineages",
+  save_report: "--t-save",
 };
+// a term's color in a search's why-ranked bars, the rest grouped as other
+const TERM_COLORS = { cos: "--sky", bm25: "--secondary", anc: "--green", cocite: "--yellow", rec: "--primary", other: "--overlay1", hub: "--red" };
+const INTENTS = { extends: "extends", critiques: "critiques", compares: "compares with", uses: "uses", motivates: "is motivated by" };
 
 let runs = [];
-let page = 0;
-let per = 15;
 let filter = "";
 let run = null;
-let papers = [];
-let byId = {};
-let nodeById = {};
-let lineNames = [];
+let cites = {};
 
-const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) =>
-  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
-
-// arXiv metadata carries TeX, and a title is read rather than typeset
-const deTeX = (s) => String(s ?? "")
-  .replace(/\$([^$]*)\$/g, "$1")
-  .replace(/\\(?:text|mathrm|mathbf|emph|textit|textbf|underline)\{([^}]*)\}/g, "$1")
-  .replace(/[{}\\]/g, "")
-  .trim();
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+// a client may pass its effort along with the question, which is not part of what was asked
+const asked = (q) => String(q ?? "").replace(/\s*Effort:\s*\w+\.?\s*$/i, "");
+const deTeX = (s) => String(s ?? "").replace(/\$([^$]*)\$/g, "$1").replace(/[{}\\]/g, "").trim();
 
 function authors(a) {
-  const parts = deTeX(a).split(/,\s*|\s+and\s+/).filter(Boolean);
+  const parts = deTeX(a).split(/,\s*/).filter(Boolean);
   return parts.length > 3 ? parts.slice(0, 3).join(", ") + " et al." : parts.join(", ");
 }
 
-const capital = (s) => (s ? s[0].toUpperCase() + s.slice(1) : "");
-const titleOf = (id) => deTeX((byId[id] || nodeById[id] || {}).title || id);
-const yearOf = (id) => String((byId[id] || nodeById[id] || {}).date || "").slice(0, 4);
-const lineName = (n) => lineNames[n - 1] || `Line ${n}`;
-const lineColor = (n) => `var(${LINE_COLORS[(n - 1) % LINE_COLORS.length]})`;
-
-function longDate(iso) {
-  const d = new Date(iso + "T00:00:00");
-  return isNaN(d) ? iso || "" : d.toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" });
-}
-
 function duration(seconds) {
-  const s = Math.round(seconds);
+  const s = Math.round(Number(seconds) || 0);
   return s < 60 ? `${s} s` : `${Math.floor(s / 60)} min ${s % 60} s`;
 }
 
-// the writer cites as arXiv:<id> in plain text, which is linked here so the hover card finds it
-function linkPlain(markdown) {
-  return String(markdown || "").replace(/(?<![\[\/])arXiv:(\d{4}\.\d{4,5}|[a-z][a-z.\-]+\/\d{7})(?![\]\w])/g,
-    (_, id) => `[arXiv:${id}](https://arxiv.org/abs/${id})`);
+function when(iso) {
+  const d = new Date(iso);
+  return isNaN(d) ? iso || "" : d.toLocaleString("en-US", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
 }
 
 // -- theme -----------------------------------------------------------------------------------
@@ -72,9 +51,7 @@ function apply(palette, mode) {
     localStorage.setItem("graphiv.palette", palette);
     localStorage.setItem("graphiv.mode", mode);
   } catch (e) { /* a private window forgets, which costs nothing */ }
-  for (const b of document.querySelectorAll(".swatch")) {
-    b.setAttribute("aria-pressed", String(b.dataset.palette === palette));
-  }
+  for (const b of document.querySelectorAll(".swatch")) b.setAttribute("aria-pressed", String(b.dataset.palette === palette));
 }
 
 function theme() {
@@ -84,6 +61,10 @@ function theme() {
     palette = localStorage.getItem("graphiv.palette") || palette;
     mode = localStorage.getItem("graphiv.mode") || mode;
   } catch (e) { /* as above */ }
+  // a link can fix the theme, which is how one url captures any of the eight
+  const asked = new URLSearchParams(location.search);
+  if (PALETTES.includes(asked.get("palette"))) palette = asked.get("palette");
+  if (["light", "dark"].includes(asked.get("mode"))) mode = asked.get("mode");
   const holder = document.getElementById("swatches");
   for (const name of PALETTES) {
     const b = document.createElement("button");
@@ -95,8 +76,7 @@ function theme() {
     holder.append(b);
   }
   document.getElementById("mode").onclick = () =>
-    apply(document.documentElement.dataset.palette,
-      document.documentElement.dataset.mode === "dark" ? "light" : "dark");
+    apply(document.documentElement.dataset.palette, document.documentElement.dataset.mode === "dark" ? "light" : "dark");
   apply(palette, mode);
 }
 
@@ -104,807 +84,566 @@ function theme() {
 
 function library() {
   const wanted = filter.trim().toLowerCase();
-  const shown = runs.filter((r) => !wanted || r.question.toLowerCase().includes(wanted));
-  const pages = Math.max(1, Math.ceil(shown.length / per));
-  page = Math.min(page, pages - 1);
-  const held = shown.slice(page * per, page * per + per);
-  const cards = held.map((r) => `
-    <a class="card" href="#/run/${encodeURIComponent(r.slug)}">
-      <h2>${esc(r.question)}</h2>
+  const shown = runs.filter((r) => !wanted || `${r.question} ${r.tldr || ""}`.toLowerCase().includes(wanted));
+  const cards = shown.map((r) => `
+    <a class="card" href="#/run/${encodeURIComponent(r.slug)}/report">
+      <h2>${esc(asked(r.question))}</h2>
+      ${r.tldr ? `<p class="card-tldr">${esc(r.tldr.replace(MARKER, "").replace(/\s+([.,;])/g, "$1"))}</p>` : ""}
       <div class="meta">
-        <span class="chip mode">${esc(capital(r.mode))}</span>
-        <span class="chip">${r.papers} papers</span>
-        <span class="chip">${esc(capital(r.effort))} depth</span>
-        <span>${esc(longDate(r.asked))}</span>
+        <span class="chip ${r.passed ? "ok" : "warn"}">${r.passed ? "checked" : unverified(r.unverified)}</span>
+        <span class="chip">${duration(r.seconds)}</span>
+        <span class="chip">${r.papers} papers read</span>
+        ${r.tables ? `<span class="chip">${r.tables} table${r.tables > 1 ? "s" : ""}</span>` : ""}
+        ${r.lineages ? `<span class="chip">${r.lineages} lineage${r.lineages > 1 ? "s" : ""}</span>` : ""}
       </div>
+      <div class="byline">${esc(when(r.saved))}</div>
     </a>`).join("");
   document.getElementById("view").innerHTML = `
-    <header class="hero">
-      <h1>Research Library</h1>
-      <p class="sub" id="count">${runs.length} ${runs.length === 1 ? "report" : "reports"}, every citation checked against the arXiv corpus</p>
-      <div class="searchwrap">
-        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
-        <input type="search" id="q" placeholder="Search past questions&hellip;" value="${esc(filter)}">
-      </div>
-    </header>
-    <div class="controls">
-      <span class="pager">
-        <button class="pill sm" id="prev"${page ? "" : " disabled"}>&larr;</button>
-        <span>${shown.length ? page * per + 1 : 0}&ndash;${Math.min(shown.length, (page + 1) * per)} of ${shown.length}</span>
-        <button class="pill sm" id="next"${page + 1 < pages ? "" : " disabled"}>&rarr;</button>
-      </span>
-      <select class="pill sm" id="per">
-        ${[15, 30, 60, 100000].map((n) =>
-          `<option value="${n}"${n === per ? " selected" : ""}>${n > 999 ? "Show all" : n + " per page"}</option>`).join("")}
-      </select>
-    </div>
-    <div class="grid">${cards || '<p class="empty">No past question matches that.</p>'}</div>`;
-
+    <section class="hero">
+      <h1>Research library</h1>
+      <p class="sub">Every report GraphIV saved, each citation traced to the paragraph it came from.</p>
+      <div class="searchwrap"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="Search questions" value="${esc(filter)}"></div>
+    </section>
+    <div class="grid">${cards || '<p class="empty">No saved runs yet.</p>'}</div>`;
   const box = document.getElementById("q");
-  box.addEventListener("input", (e) => { filter = e.target.value; page = 0; library(); box.focus(); });
-  box.setSelectionRange(filter.length, filter.length);
-  document.getElementById("prev").onclick = () => { page--; library(); };
-  document.getElementById("next").onclick = () => { page++; library(); };
-  document.getElementById("per").onchange = (e) => { per = +e.target.value; page = 0; library(); };
+  box.oninput = () => { filter = box.value; library(); document.getElementById("q").focus(); };
 }
 
-// -- the panel and the hover card ------------------------------------------------------------
+// -- one run ---------------------------------------------------------------------------------
 
-function closePanel() { document.getElementById("panel").classList.remove("open"); }
-
-async function openPanel(o) {
-  const panel = document.getElementById("panel");
-  panel.classList.add("open");
-  document.getElementById("panel-t").textContent = o.title || "";
-  document.getElementById("panel-m").innerHTML = o.meta || "";
-  const links = document.getElementById("panel-l");
-  const body = document.getElementById("panel-b");
-  body.innerHTML = '<div class="panel-msg">Loading the paper&hellip;</div>';
-  let there = false;
-  try { there = (await fetch(o.url, { method: "HEAD" })).ok; } catch (e) { there = false; }
-  const shown = there ? o.url : o.remote;
-  links.innerHTML =
-    `<a class="pill sm" target="_blank" href="${o.ext}">arXiv &#8599;</a>` +
-    `<a class="pill sm" target="_blank" href="${shown}">Open in a new tab &#8599;</a>`;
-  body.innerHTML = `<iframe src="${shown}"></iframe>`;
+function paperOf(id) {
+  return (run.papers || {})[id] || null;
 }
 
-function openPaper(id) {
-  hidePop();
-  hideTip();
-  const p = byId[id] || nodeById[id];
-  openPanel({
-    title: p ? deTeX(p.title) : "arXiv:" + id,
-    meta: p ? esc([authors(p.authors), p.year || yearOf(id), p.category, id].filter(Boolean).join(" · ")) : esc(id),
-    url: "pdf/" + id,
-    remote: "https://arxiv.org/pdf/" + id,
-    ext: "https://arxiv.org/abs/" + id,
+// every quote label gets a number in reading order, the way a paper numbers its references
+const unverified = (k) => `${k} line${k === 1 ? "" : "s"} unverified`;
+
+// a run whose last save failed keeps its report, each line the check faulted grouped once
+function faultGroups() {
+  const c = run.check || {};
+  if (c.passed) return [];
+  const by = new Map();
+  for (const f of c.faults || []) {
+    const line = String(f.line || "").trim();
+    if (!by.has(line)) by.set(line, []);
+    by.get(line).push(f.where ? `${f.kind}: ${f.where}` : f.kind);
+  }
+  return [...by].map(([line, kinds]) => ({ line, kinds }));
+}
+
+// a token after each faulted line, inside a table row's last cell, which faultTags turns into a tag
+function markFaults(md, groups) {
+  groups.forEach((g, i) => {
+    const at = g.line ? md.indexOf(g.line) : -1;
+    if (at < 0) return;
+    const end = at + (g.line.endsWith("|") ? g.line.lastIndexOf("|") : g.line.length);
+    md = `${md.slice(0, end)}@@F${i}@@${md.slice(end)}`;
   });
+  return md;
 }
 
-function roleChip(role) {
-  return role ? `<span class="rolechip role-${role}">${role}</span>` : "";
+function faultTags(html, groups) {
+  return html.replace(/ ?@@F(\d+)@@/g, (_, i) => `<span class="unver" title="${esc(groups[+i].kinds.join("\n"))}">unverified</span>`);
 }
 
-let pop = null;
-let popTimer = null;
-function hidePop() { if (pop) { pop.remove(); pop = null; } }
-function hidePopSoon() { popTimer = setTimeout(hidePop, 250); }
-
-function showPop(anchor, id) {
-  clearTimeout(popTimer);
-  hidePop();
-  const p = byId[id];
-  const buttons = `<div class="cp-b">
-    <button class="pill sm" onclick="openPaper('${id}')">Read</button>
-    <a class="pill sm" target="_blank" href="https://arxiv.org/abs/${id}">arXiv &#8599;</a>
-    <span class="tech mono">${esc(id)}</span></div>`;
-  pop = document.createElement("div");
-  pop.className = "citepop";
-  pop.innerHTML = p
-    ? `<div class="cp-t">${esc(deTeX(p.title))}</div>
-       <div class="cp-m">${esc(authors(p.authors))}${p.authors ? " · " : ""}${p.year || ""}
-       ${roleChip(p.role)}</div>
-       ${p.abstract ? `<div class="cp-s">${esc(deTeX(p.abstract))}</div>` : ""}${buttons}`
-    : `<div class="cp-m mono">arXiv:${esc(id)}</div>${buttons}`;
-  const box = anchor.getBoundingClientRect();
-  pop.style.left = Math.max(scrollX + 8, Math.min(box.left + scrollX, scrollX + innerWidth - 420)) + "px";
-  pop.style.top = box.bottom + scrollY + 6 + "px";
-  pop.addEventListener("mouseenter", () => clearTimeout(popTimer));
-  pop.addEventListener("mouseleave", hidePopSoon);
-  document.body.append(pop);
+function numberMarkers(markdown) {
+  cites = {};
+  let next = 1;
+  return markdown.replace(MARKER, (_, group) => group.split(",").map((raw) => {
+    const label = raw.trim();
+    if (!cites[label]) cites[label] = next++;
+    return `<button class="cite" type="button" data-m="${label}">${cites[label]}</button>`;
+  }).join(""));
 }
 
-function hookCitations(el) {
-  for (const a of el.querySelectorAll('a[href*="arxiv.org/abs/"]')) {
-    const found = (a.getAttribute("href") || "").match(AID);
-    if (!found) continue;
-    const id = found[1];
-    a.addEventListener("click", (e) => {
-      if (e.ctrlKey || e.metaKey) return;
-      e.preventDefault();
-      openPaper(id);
-    });
-    a.addEventListener("mouseenter", () => showPop(a, id));
-    a.addEventListener("mouseleave", hidePopSoon);
+function evidenceCard(label) {
+  const ev = (run.evidence || {})[label];
+  if (!ev) return `<p class="cp-s">No stored quote for ${esc(label)}.</p>`;
+  const id = ev.arxiv_id;
+  const p = paperOf(id);
+  const head = p
+    ? `<div class="ins-sec"><div class="cp-t">${esc(deTeX(p.title))}</div><div class="cp-m">${esc(authors(p.authors))} &middot; ${esc(p.date)} &middot; <a href="https://arxiv.org/abs/${id}" target="_blank">arXiv ${id}</a> &middot; <a href="pdf/${id}" target="_blank">pdf</a></div></div>`
+    : `<div class="ins-sec"><div class="cp-t">arXiv ${esc(id)}</div></div>`;
+  const where = ev.pid.startsWith("c-") ? `citing sentence about ${esc(ev.pid.slice(2))}` : `${esc(ev.section || "body")}, paragraph ${esc(ev.pid.slice(1))}`;
+  if (ev.text.includes("\n") && ev.text.includes(" | ")) return head + `<div class="ins-sec"><div class="cp-s">${where}</div>${chunkTable(ev.text, ev.quote)}</div>`;
+  let text = esc(proseTeX(ev.text));
+  const quote = esc(proseTeX(ev.quote || ""));
+  const at = quote ? text.toLowerCase().indexOf(quote.toLowerCase()) : -1;
+  if (at >= 0) text = text.slice(0, at) + `<mark>${text.slice(at, at + quote.length)}</mark>` + text.slice(at + quote.length);
+  return head + `<div class="ins-sec"><div class="cp-s">${where}</div><p class="cp-b">${text}</p></div>`;
+}
+
+const ARROWS = { uparrow: "\u2191", downarrow: "\u2193", to: "\u2192", pm: "\u00b1", in: "\u2208", times: "\u00d7", leq: "\u2264", geq: "\u2265", approx: "\u2248" };
+const cellTeX = (s) => deTeX(String(s).replace(/\\h(?:dash)?line/g, "").replace(/\\(?:text|mathrm|mathbf|textbf|bf)\{([^}]*)\}/g, "$1").replace(/\\(uparrow|downarrow|to|pm|in|times|leq|geq|approx)\b/g, (_, w) => ARROWS[w])).replace(/[_^]/g, "");
+
+// prose keeps its own underscores, so only the math spans in it are cleaned
+const proseTeX = (s) => String(s ?? "").replace(/\$([^$]*)\$/g, (_, m) => cellTeX(m));
+
+// a table chunk is its caption over one row a line, cells split by a bar, and a row the quote touches is marked
+function chunkTable(text, quote) {
+  const [caption, ...rows] = text.split("\n");
+  const folded = (s) => cellTeX(s).toLowerCase().replace(/\s+/g, " ");
+  const q = folded(quote || "");
+  const body = rows.map((r) => {
+    const cells = r.split(" | ");
+    const hit = q && (q.includes(folded(r)) || folded(r).includes(q) || (cells.length > 1 && q.includes(folded(cells[0])) && q.includes(folded(cells[1]))));
+    return `<tr class="${hit ? "hit" : ""}">${cells.map((c) => `<td>${esc(cellTeX(c))}</td>`).join("")}</tr>`;
+  }).join("");
+  return `<p class="cp-b">${esc(cellTeX(caption))}</p><div class="tablewrap"><table class="chunk">${body}</table></div>`;
+}
+
+// the inspector follows the citation under the pointer, and a click pins it until the next click
+let pinned = null;
+
+function inspect(label) {
+  const box = document.getElementById("inspector");
+  if (!box) return;
+  const ev = (run.evidence || {})[label];
+  const siblings = ev ? Object.entries(run.evidence || {}).filter(([l, e]) => e.arxiv_id === ev.arxiv_id && l !== label && e.claim) : [];
+  const more = siblings.length
+    ? `<div class="ins-sec ins-more"><div class="ins-h">Also from this paper</div>${siblings.slice(0, 8).map(([l, e]) => `<div class="ins-claim"><button class="cite" type="button" data-m="${esc(l)}">${esc(l)}</button> ${esc(e.claim)}</div>`).join("")}</div>`
+    : "";
+  box.innerHTML = `<div class="ins-label">${esc(label)}${pinned === label ? ' <span class="dim">pinned</span>' : ""}</div>${evidenceCard(label)}${ev && ev.claim ? `<div class="ins-sec"><div class="ins-h">The reader's claim</div><p class="ins-c">${esc(ev.claim)}</p></div>` : ""}${more}`;
+  box.classList.add("on");
+  wire(box);
+}
+
+function clearInspector() {
+  pinned = null;
+  const box = document.getElementById("inspector");
+  if (box) {
+    box.classList.remove("on");
+    box.innerHTML = '<p class="dim">Point at a numbered citation to see the paragraph it rests on. Click to keep it here.</p>';
   }
 }
 
-// -- the report ------------------------------------------------------------------------------
-
-function decorate(article) {
-  for (const table of article.querySelectorAll("table")) {
-    const wrap = document.createElement("div");
-    wrap.className = "tablewrap";
-    table.replaceWith(wrap);
-    wrap.append(table);
+function wire(root) {
+  for (const a of root.querySelectorAll(".cite")) {
+    a.onmouseenter = () => { if (!pinned) inspect(a.dataset.m); };
+    a.onclick = () => { pinned = pinned === a.dataset.m ? null : a.dataset.m; inspect(a.dataset.m); };
   }
-  hookCitations(article);
 }
 
-const SECTIONS = [
-  ["about", "Overview"],
-  ["facts", "What the papers show"],
-  ["methods", "Methods"],
-  ["active", "Current work"],
-  ["open", "Open questions"],
-  ["disagree", "Disagreements"],
-];
+function cell(c) {
+  const value = esc(c.value || "n/a");
+  return c.label ? `${value} <button class="cite" type="button" data-m="${c.label}">&para;</button>` : `<span class="dim">${value}</span>`;
+}
 
-// one strip of buttons over one panel, which is how a section holds several things at one depth
-function subtabs(host, items, draw) {
-  if (!items.length) return;
-  const strip = document.createElement("div");
-  strip.className = "subtabs";
-  const panel = document.createElement("div");
-  panel.className = "subpanel";
-  const show = (i) => {
-    for (const [j, b] of [...strip.children].entries()) b.classList.toggle("on", i === j);
-    panel.replaceChildren(draw(items[i], i));
+// a gap is a pair of options each used somewhere that no method combines
+function untried(table) {
+  const choice = table.schema.columns.filter((c) => c.kind === "choice");
+  const out = [];
+  for (let i = 0; i < choice.length; i++) {
+    for (let j = i + 1; j < choice.length; j++) {
+      const a = choice[i], b = choice[j];
+      const used = (col) => new Set(table.rows.map((r) => ((r.cells[col.name] || {}).value || "").toLowerCase()).filter((v) => v && v !== "n/a"));
+      const ua = used(a), ub = used(b);
+      const seen = new Set(table.rows.map((r) => `${((r.cells[a.name] || {}).value || "").toLowerCase()}|${((r.cells[b.name] || {}).value || "").toLowerCase()}`));
+      const rows = [...ua].map((x) => `<tr><th>${esc(x)}</th>${[...ub].map((y) => {
+        const n = table.rows.filter((r) => ((r.cells[a.name] || {}).value || "").toLowerCase() === x && ((r.cells[b.name] || {}).value || "").toLowerCase() === y).length;
+        return `<td class="${n ? "" : "gap"}">${n || "untried"}</td>`;
+      }).join("")}</tr>`).join("");
+      if (ua.size && ub.size) out.push(`<h4>${esc(a.name)} &times; ${esc(b.name)}</h4><div class="tablewrap"><table class="cross"><thead><tr><th></th>${[...ub].map((y) => `<th>${esc(y)}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div>`);
+      void seen;
+    }
+  }
+  return out.join("");
+}
+
+function tablesHtml() {
+  return (run.tables || []).map((t, n) => {
+    const cols = t.schema.columns;
+    const head = `<tr><th>method</th>${cols.map((c) => `<th title="${esc(c.description || "")}">${esc(c.name.replace(/_/g, " "))}</th>`).join("")}</tr>`;
+    const body = t.rows.map((r) => {
+      const p = paperOf(r.arxiv_id);
+      const year = p ? String(p.date).slice(0, 4) : "";
+      return `<tr><td><b>${esc(r.method)}</b><div class="dim">${esc(r.arxiv_id)}${year ? ", " + year : ""}</div></td>${cols.map((c) => `<td>${cell(r.cells[c.name] || {})}</td>`).join("")}</tr>`;
+    }).join("");
+    const gaps = untried(t);
+    return `<h3>Table ${n + 1}</h3><div class="tablewrap"><table>${"<thead>" + head + "</thead><tbody>" + body + "</tbody>"}</table></div>
+      ${gaps ? `<details class="gaps"><summary>Combinations no method in this table tries</summary><p class="dim">An empty cell is a lead, not a finding: the table holds only the papers this run read.</p>${gaps}</details>` : ""}`;
+  }).join("");
+}
+
+function citedPapers() {
+  const used = new Set();
+  const text = `${run.tldr || ""}\n${run.report || ""}`;
+  for (const m of text.matchAll(MARKER)) for (const l of m[1].split(",")) { const ev = (run.evidence || {})[l.trim()]; if (ev) used.add(ev.arxiv_id); }
+  return used;
+}
+
+// papers by year, cited ones in the primary color and read-only ones recessive
+function yearsChart() {
+  const papers = Object.values(run.papers || {});
+  if (papers.length < 2) return "";
+  const cited = citedPapers();
+  const years = {};
+  for (const p of papers) { const y = String(p.date).slice(0, 4); (years[y] ||= { c: 0, r: 0 })[cited.has(p.arxiv_id) ? "c" : "r"]++; }
+  const keys = Object.keys(years).sort();
+  const top = Math.max(...keys.map((k) => years[k].c + years[k].r));
+  const w = 26, gap = 10, h = 110, width = keys.length * (w + gap);
+  const bars = keys.map((k, i) => {
+    const x = i * (w + gap), c = years[k].c, r = years[k].r;
+    const hc = (h * c) / top, hr = (h * r) / top;
+    return `<g><title>${k}: ${c} cited, ${r} read only</title>
+      <rect x="${x}" y="${h - hc - hr}" width="${w}" height="${Math.max(hr - (hr && hc ? 2 : 0), 0)}" rx="4" fill="var(--surface2)"/>
+      <rect x="${x}" y="${h - hc}" width="${w}" height="${hc}" rx="4" fill="var(--primary)"/>
+      <text x="${x + w / 2}" y="${h + 14}" text-anchor="middle">${k.slice(2)}</text></g>`;
+  }).join("");
+  return `<div class="ov-card"><div class="ov-h">Papers read, by year</div>
+    <svg class="chart" viewBox="-4 -4 ${width + 8} ${h + 22}" preserveAspectRatio="xMinYMid meet">${bars}</svg>
+    <div class="legend"><span><i style="background:var(--primary)"></i>cited</span><span><i style="background:var(--surface2)"></i>read only</span></div></div>`;
+}
+
+function topicsChart() {
+  const counts = {};
+  for (const p of Object.values(run.papers || {})) if (p.topic) counts[p.topic] = (counts[p.topic] || 0) + 1;
+  const rows = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  if (!rows.length) return "";
+  const top = rows[0][1];
+  return `<div class="ov-card"><div class="ov-h">Where they sit in the topic tree</div>${rows.map(([t, n]) => `<div class="hbar"><span class="hbar-t" title="${esc(t)}">${esc(t)}</span><span class="hbar-b"><span style="width:${(100 * n) / top}%"></span></span><span class="hbar-n">${n}</span></div>`).join("")}</div>`;
+}
+
+// every measured result a read reported, one row per paper, filterable by what it was measured on
+let resultsOn = "";
+
+function resultsTable() {
+  const all = Object.entries(run.evidence || {}).filter(([, e]) => e.value);
+  if (!all.length) return "";
+  const sets = {};
+  for (const [, e] of all) for (const d of (e.dataset || "").split(/,\s*(?:and\s+)?|\s+and\s+/)) if (d.trim()) sets[d.trim()] = (sets[d.trim()] || 0) + 1;
+  const shared = Object.entries(sets).filter(([, n]) => n > 1).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  const shown = resultsOn ? all.filter(([, e]) => (e.dataset || "").includes(resultsOn)) : all;
+  const byPaper = {};
+  for (const [l, e] of shown) (byPaper[e.arxiv_id] ||= []).push([l, e]);
+  const rows = Object.entries(byPaper).sort((a, b) => String((paperOf(a[0]) || {}).date).localeCompare(String((paperOf(b[0]) || {}).date))).map(([id, list]) => {
+    const p = paperOf(id);
+    const name = p ? deTeX(p.title) : id;
+    const known = (d) => d && !/^(not specified|unspecified|n\/a|none|unknown)$/i.test(d.trim());
+    const items = list.map(([l, e]) => `<div class="res"><span class="r-val">${esc(e.value)}</span> ${esc(e.metric)}${known(e.dataset) ? ` <span class="dim">on ${esc(e.dataset)}</span>` : ""} <button class="cite" type="button" data-m="${esc(l)}">${esc(l)}</button></div>`).join("");
+    return `<tr><td class="r-paper"><span title="${esc(name)}">${esc(name)}</span>${p ? ` <span class="dim">${String(p.date).slice(0, 4)}</span>` : ""}</td><td>${items}</td></tr>`;
+  }).join("");
+  const chips = shared.length ? `<div class="r-filter">${["", ...shared.map(([d]) => d)].map((d) => `<button class="pill sm ${d === resultsOn ? "on" : ""}" data-set="${esc(d)}">${d ? esc(d) : "all"}</button>`).join("")}</div>` : "";
+  return `<div class="ov-card wide" id="results"><div class="ov-h">Reported results <span class="dim">${all.length} from ${new Set(all.map(([, e]) => e.arxiv_id)).size} papers, each tied to its paragraph</span></div>${chips}
+    <div class="tablewrap"><table class="results"><tbody>${rows}</tbody></table></div></div>`;
+}
+
+function wireResults() {
+  for (const b of document.querySelectorAll(".r-filter button")) b.onclick = () => {
+    resultsOn = b.dataset.set;
+    document.getElementById("results").outerHTML = resultsTable();
+    wireResults();
+    wire(document.getElementById("results"));
   };
-  items.forEach((item, i) => {
-    const b = document.createElement("button");
-    b.className = "subtab";
-    b.innerHTML = item.label;
-    b.onclick = () => show(i);
-    strip.append(b);
-  });
-  host.append(strip, panel);
-  show(0);
 }
 
-function prose(markdown) {
-  const el = document.createElement("div");
-  el.className = "prose";
-  el.innerHTML = marked.parse(linkPlain(markdown));
-  decorate(el);
-  return el;
+// the palettes repeat hues across their tokens, so intents take their own set from style.css
+const INTENT_COLORS = { extends: "--i-extends", critiques: "--i-critiques", compares: "--i-compares", uses: "--i-uses", motivates: "--i-motivates", background: "--i-background" };
+
+// one line as a vertical timeline, oldest first, each step marked with the intent its citer gave
+function lineageGraph(line, label) {
+  const steps = new Map(line.steps.map((s) => [`${s.citer}>${s.cited}`, s]));
+  const rows = line.papers.map((p, i) => {
+    const prev = i ? line.papers[i - 1].arxiv_id : null;
+    const s = prev ? steps.get(`${p.arxiv_id}>${prev}`) || steps.get(`${prev}>${p.arxiv_id}`) : null;
+    const link = i
+      ? `<div class="tl-link ${s ? "" : "quiet"}" style="${s ? `--c:var(${INTENT_COLORS[s.intent] || "--overlay1"})` : ""}">${s ? `<span class="tl-intent">${esc(s.intent)}</span>${s.label ? ` <button class="cite" type="button" data-m="${esc(s.label)}">${esc(s.label)}</button>` : ""}` : ""}</div>`
+      : "";
+    const title = deTeX(p.title);
+    return `${link}<div class="tl-node ${p.yours ? "" : "outside"}"><span class="tl-year">${esc(p.year)}</span><span class="tl-dot"></span><a class="tl-title" href="https://arxiv.org/abs/${esc(p.arxiv_id)}" target="_blank" title="${esc(title)}">${esc(title)}</a></div>`;
+  }).join("");
+  return `<div class="ln2"><div class="ov-h">Line ${esc(label)}</div><div class="vline">${rows}</div></div>`;
 }
 
-function paperLine(p, extra) {
-  return `<li>
-    ${roleChip(p.role || "ungraded")}
-    <span class="pl-date">${esc(p.date || "")}</span>
-    <a href="https://arxiv.org/abs/${p.arxiv_id}">${esc(deTeX(p.title || p.arxiv_id))}</a>
-    ${extra || ""}</li>`;
+function lineagesCard() {
+  const lines = (run.lineages || []).flatMap((call, c) => call.lines.map((line, i) => lineageGraph(line, `${c + 1}.${i + 1}`)));
+  if (!lines.length) return "";
+  const legend = Object.entries(INTENT_COLORS).map(([k, c]) => `<span><i style="background:var(${c})"></i>${k}</span>`).join("");
+  return `<div class="ov-card wide"><div class="ov-h">How the field developed <span class="dim">filled dots are papers the run searched, hollow ones were reached through citations</span></div><div class="lines">${lines.join("")}</div><div class="legend">${legend}</div></div>`;
 }
 
-function answerBox(text) {
-  const box = document.createElement("div");
-  box.className = "answer";
-  box.innerHTML = `<div class="answer-k">TL;DR</div>`;
-  box.append(prose(text));
-  return box;
+// each section of the report as its own card, opened, so a reader can fold what they have read
+function sections(md) {
+  const parts = md.split(/\n(?=## )/);
+  return parts.map((part) => {
+    const m = part.match(/^## (.*)\n?([\s\S]*)$/);
+    const title = m ? m[1] : "";
+    const html = marked.parse(m ? m[2] : part).replace(/<(p|li)>(Inference:)/g, '<$1 class="inference"><span class="inf-tag">Inference</span>');
+    return title ? `<details class="sec" open><summary>${esc(title)}</summary><div class="sec-b">${html}</div></details>` : `<div class="sec-b">${html}</div>`;
+  }).join("");
 }
 
 function reportTab() {
-  const panel = document.getElementById("p-report");
-  const got = run.sections || {};
-  const column = document.createElement("div");
-  column.className = "sections";
-
-  const block = (key, title, lead) => {
-    const el = document.createElement("section");
-    el.id = "s-" + key;
-    el.className = "rsection";
-    el.innerHTML = `<h2>${title}</h2>${lead ? `<p class="lead">${lead}</p>` : ""}`;
-    column.append(el);
-    return el;
-  };
-
-  // 1, the answer and the overview
-  if (got.answer) column.append(answerBox(got.answer));
-  const about = block("about", "Overview");
-  about.append(prose(got.opening || "This report has no overview. Quick runs skip the written sections."));
-
-  // 2, one tab per claim the review makes
-  const facts = block("facts", "What the papers show",
-    "Each tab is one claim about the field, argued from the papers behind it.");
-  const claims = (got.claims || []).map((c) => ({ label: esc(c.title), ...c }));
-  if (claims.length) subtabs(facts, claims, (c) => prose(`### ${c.title}\n\n${c.body}`));
-  else facts.append(prose("Nothing was written for this report."));
-
-  // 3, the methods, whose full view is its own tab
-  const methods = block("methods", "Methods",
-    "The methods these papers use, compared on the questions that matter here.");
-  const m = got.methods || {};
-  if (m.table) {
-    const go = document.createElement("p");
-    go.innerHTML = `<button class="ab-btn" onclick="tab('methods')">Filter and compare in the Methods tab &rarr;</button>`;
-    methods.append(prose(m.table), go);
-  } else methods.append(prose("No method table for this report. Quick runs skip it."));
-
-  // 4, one tab per area and one for what has just appeared
-  const active = block("active", "Current work",
-    "The papers each area is built on right now, and newer papers responding to them.");
-  const areas = (got.areas || []).map((a) => ({ label: esc(a.question), ...a }));
-  const tabs = [...areas];
-  if ((got.successors || []).length) tabs.push({ label: "Newer papers", fresh: true });
-  subtabs(active, tabs, (t) => {
-    const el = document.createElement("div");
-    if (t.fresh) {
-      el.innerHTML = `<p class="lead">Each of these cites papers above and extends, critiques or compares
-        against them, so it shows up here before anyone has cited it.</p>
-        <ul class="papers">${got.successors.map((s) => paperLine(
-          { ...s, role: "frontier" },
-          `<span class="tech">${esc(capital(s.intents.join(", ")))}, responding to ${s.reach} ${s.reach === 1 ? "paper" : "papers"} here</span>
-           ${s.sentence ? `<blockquote>${esc(s.sentence)}</blockquote>` : ""}`)).join("")}</ul>`;
-      hookCitations(el);
-      return el;
-    }
-    const held = t.papers.map((id) => byId[id]).filter(Boolean);
-    el.innerHTML = `<ul class="papers">${byRoleList(held, t.seed)}</ul>`;
-    hookCitations(el);
-    return el;
-  });
-
-  // 5, one tab per area
-  const open = block("open", "Open questions",
-    "Taken from the limitations and future work sections of the papers themselves.");
-  const withOpen = areas.filter((a) => (a.unanswered || []).length);
-  if (withOpen.length) {
-    subtabs(open, withOpen, (a) => {
-      const el = document.createElement("div");
-      el.innerHTML = `<ul class="opens">${a.unanswered.map((q) => `<li>${linkIds(esc(q))}</li>`).join("")}</ul>`;
-      hookCitations(el);
-      return el;
-    });
-  } else open.append(prose("None of these papers had a limitations section on file."));
-
-  // 6, one paper telling another it is wrong
-  const dis = block("disagree", "Disagreements",
-    "Places where one paper says another falls short, in its own words.");
-  const rows = got.disputes || [];
-  const list = document.createElement("div");
-  list.innerHTML = rows.length
-    ? `<ul class="disputes">${rows.map((d) => `<li>
-        <div class="d-head"><a href="https://arxiv.org/abs/${d.by}">${esc(titleOf(d.by))}</a>
-        <span class="chip">${esc(INTENTS[d.intent] || d.intent)}</span>
-        <a href="https://arxiv.org/abs/${d.arxiv_id}">${esc(titleOf(d.arxiv_id))}</a></div>
-        <blockquote>${esc(d.sentence)}</blockquote></li>`).join("")}</ul>`
-    : '<p class="lead">No paper here disputes another.</p>';
-  hookCitations(list);
-  dis.append(list);
-
-  const nav = document.createElement("nav");
-  nav.className = "toc";
-  nav.innerHTML = SECTIONS.map(([k, t], i) =>
-    `<a href="#" data-s="s-${k}"><span class="tocn">${i + 1}</span><span>${t}</span></a>`).join("");
-  for (const a of nav.children) {
-    a.onclick = (e) => {
-      e.preventDefault();
-      document.getElementById(a.dataset.s).scrollIntoView({ block: "start" });
-    };
-  }
-  const grid = document.createElement("div");
-  grid.className = "readwrap";
-  grid.append(nav, column);
-  panel.replaceChildren(grid);
-  spy(nav, column);
+  // the page already carries the question as its title, and the TL;DR has its own card
+  const raw = (run.report || "").replace(/^\s*>\s*\*\*TL;DR\*\*[^\n]*\n+/, "").replace(/^\s*#\s[^\n]*\n/, "");
+  const groups = faultGroups();
+  const md = numberMarkers(markFaults(`${run.tldr || ""}\n\n@@@\n\n${raw}`, groups));
+  const [tldr, body] = md.split("\n\n@@@\n\n");
+  const answer = run.tldr ? `<div class="answer"><div class="ov-h">The answer</div><p>${faultTags(marked.parseInline(tldr), groups)}</p></div>` : "";
+  const tables = tablesHtml();
+  const overview = [resultsTable(), yearsChart(), topicsChart(), lineagesCard(), tables ? `<div class="ov-card wide"><div class="ov-h">Methods compared</div>${tables}</div>` : ""].join("");
+  const calls = run.calls || [];
+  const count = (tool) => calls.filter((c) => c.tool === tool).length;
+  const n = (k, word) => `${k} ${word}${k === 1 ? "" : "s"}`;
+  const made = `<div class="made">Made from ${n(count("search_papers"), "search")}, ${n(count("recall_paper"), "lookup")} and ${n(count("read_paper"), "read")} of ${Object.keys(run.papers || {}).length} papers in ${duration(run.seconds)}, ${Object.keys(run.evidence || {}).length} quotes kept, ${(run.check || {}).passed ? "every citation checked" : `${unverified(groups.length)}, each marked where it sits`}. <a href="#/run/${encodeURIComponent(run.slug)}/process">See how</a></div>`;
+  return `${answer}${made}<div class="overview">${overview}</div><article class="prose report">${faultTags(sections(body), groups)}</article>`;
 }
 
-// the id in an open question is written bare, so it is linked here rather than by the writer
-function linkIds(text) {
-  return text.replace(/\[((?:[a-z][a-z.\-]+\/\d{7}|\d{4}\.\d{4,5}))\]/gi,
-    (_, id) => `<a href="https://arxiv.org/abs/${id}">${id}</a>`);
-}
-
-// the paper a seeded search started from leads its area, whatever the reader graded it
-function byRoleList(list, seed = "") {
-  const rank = (p) => (p.arxiv_id === seed ? -1 : ROLE_ORDER.indexOf(p.role || "ungraded"));
-  return [...list]
-    .sort((a, b) => rank(a) - rank(b))
-    .map((p) => paperLine(p, p.cited ? '<span class="cited-b">CITED</span>' : ""))
-    .join("");
-}
-
-function spy(nav, column) {
-  const seen = new Map();
-  const mark = () => {
-    let best = null;
-    for (const [el, ratio] of seen) if (ratio > 0 && (!best || el.offsetTop < best.offsetTop)) best = el;
-    for (const a of nav.children) a.classList.toggle("here", best && a.dataset.s === best.id);
-  };
-  const watch = new IntersectionObserver((rows) => {
-    for (const r of rows) seen.set(r.target, r.intersectionRatio);
-    mark();
-  }, { rootMargin: "-70px 0px -60% 0px", threshold: [0, 0.01] });
-  for (const s of column.children) watch.observe(s);
-}
-
-// -- methods ---------------------------------------------------------------------------------
-
-let methodData = null;
-let methodPicks = {};
-let methodQuery = "";
-let methodSort = { key: "year", dir: -1 };
-let crossA = "";
-let crossB = "";
-
-const NA = (v) => !v || /^(n\/?a|none|unknown|-)$/i.test(String(v).trim());
-const axisLabel = (name) => capital(String(name).replace(/_/g, " "));
-
-// an older run carries the table only as markdown, so the rows are read back out of it
-function readMethods(m) {
-  if ((m.rows || []).length && (m.columns || []).length) {
-    return { columns: m.columns, rows: m.rows };
-  }
-  const lines = String(m.table || "").split("\n").filter((l) => l.trim().startsWith("|"));
-  if (lines.length < 3) return null;
-  const cells = (l) => l.trim().replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
-  const head = cells(lines[0]);
-  const names = head.slice(2, -1);
-  const described = {};
-  for (const found of String(m.spread || "").matchAll(/\*\*([^*]+)\*\*, ([^\n]+)/g)) described[found[1]] = found[2];
-  // the spread only lists the columns that group, so a column missing from it is free text
-  const columns = names.map((n) => ({ name: n, kind: n in described ? "choice" : "text", description: described[n] || "", options: [] }));
-  const rows = lines.slice(2).map((l) => {
-    const c = cells(l);
-    return {
-      name: c[0],
-      year: c[1],
-      values: Object.fromEntries(names.map((n, i) => [n, c[i + 2] || ""])),
-      papers: [...(c[c.length - 1] || "").matchAll(/(\d{4}\.\d{4,5}|[a-z][a-z.\-]+\/\d{7})/g)].map((x) => x[1]),
-    };
-  });
-  return { columns, rows };
-}
-
-// a run written before columns carried their kind still lists options for exactly the ones that group
-const grouped = (c) => (c.kind ? c.kind === "choice" : (c.options || []).length >= 2);
-
-function optionsOf(column) {
-  const seen = new Map();
-  for (const o of column.options || []) seen.set(o, 0);
-  for (const r of methodData.rows) {
-    const v = r.values[column.name];
-    if (!NA(v)) seen.set(v, (seen.get(v) || 0) + 1);
-  }
-  return [...seen.entries()].sort((a, b) => b[1] - a[1]);
-}
-
-function methodShown() {
-  return methodData.rows.filter((r) => {
-    for (const [axis, picked] of Object.entries(methodPicks)) {
-      if (picked.size && !picked.has(r.values[axis])) return false;
-    }
-    if (methodQuery) {
-      const hay = `${r.name} ${Object.values(r.values).join(" ")}`.toLowerCase();
-      if (!hay.includes(methodQuery)) return false;
-    }
-    return true;
-  });
-}
-
-function methodsTab() {
-  const host = document.getElementById("p-methods");
-  methodData = readMethods((run.sections || {}).methods || {});
-  if (!methodData || !methodData.rows.length) {
-    host.innerHTML = '<p class="empty">No method table for this report. Quick runs skip it.</p>';
-    return;
-  }
-  methodPicks = {};
-  methodQuery = "";
-  const axes = methodData.columns.filter(grouped);
-  crossA = axes[0]?.name || "";
-  crossB = axes[1]?.name || crossA;
-  host.innerHTML = `
-    <p class="lead mlead">Each row is one method, and each column is a question the methods answer
-      differently. Click a value to show only the methods that share it.</p>
-    <div class="mwrap">
-      <aside class="mfilters" id="mfilters"></aside>
-      <div class="mmain">
-        <div class="rtools">
-          <input type="search" id="mq" placeholder="Search methods&hellip;">
-          <button class="pill sm" id="mclear">Clear filters</button>
-          <span class="byline" id="mcount"></span>
-        </div>
-        <div class="tablewrap"><table class="mtable" id="mtable"></table></div>
-        <h3 class="mh">Combinations nobody has tried</h3>
-        <p class="lead">Pick two questions. Each cell counts the methods that combine the two answers, and an empty cell is a combination no paper here tried.</p>
-        <div class="rtools">
-          <select class="pill sm" id="xa"></select><span class="byline">against</span><select class="pill sm" id="xb"></select>
-        </div>
-        <div class="tablewrap" id="mcross"></div>
-      </div>
-    </div>`;
-  const pick = (id, current) => methodData.columns.filter(grouped).map((c) =>
-    `<option value="${esc(c.name)}"${c.name === current ? " selected" : ""}>${esc(axisLabel(c.name))}</option>`).join("");
-  document.getElementById("xa").innerHTML = pick("xa", crossA);
-  document.getElementById("xb").innerHTML = pick("xb", crossB);
-  document.getElementById("xa").onchange = (e) => { crossA = e.target.value; drawCross(); };
-  document.getElementById("xb").onchange = (e) => { crossB = e.target.value; drawCross(); };
-  document.getElementById("mq").oninput = (e) => { methodQuery = e.target.value.toLowerCase(); drawMethods(); };
-  document.getElementById("mclear").onclick = () => {
-    methodPicks = {};
-    methodQuery = "";
-    document.getElementById("mq").value = "";
-    drawMethods();
-  };
-  drawMethods();
-}
-
-function toggleMethod(axis, value) {
-  if (!methodPicks[axis]) methodPicks[axis] = new Set();
-  const held = methodPicks[axis];
-  if (held.has(value)) held.delete(value); else held.add(value);
-  drawMethods();
-}
-
-function drawMethods() {
-  const shown = methodShown();
-  const total = methodData.rows.length;
-  // the filter chips count what the other filters leave, so a zero means that choice empties the table
-  document.getElementById("mfilters").innerHTML = methodData.columns.filter(grouped).map((c) => {
-    const options = optionsOf(c);
-    const most = Math.max(1, ...options.map(([, n]) => n));
-    return `<div class="mgroup">
-      <div class="mgroup-t">${esc(axisLabel(c.name))}</div>
-      ${c.description ? `<div class="mgroup-d">${esc(capital(c.description))}</div>` : ""}
-      ${options.map(([v, n]) => {
-        const on = methodPicks[c.name] && methodPicks[c.name].has(v);
-        return `<button class="mchip${on ? " on" : ""}${n ? "" : " zero"}" data-a="${esc(c.name)}" data-v="${esc(v)}">
-          <span>${esc(v)}</span><b>${n}</b><i style="width:${(100 * n) / most}%"></i></button>`;
-      }).join("")}
+// the run pivoted by paper: what each one was read for, and whether the report leaned on it
+function papersTab() {
+  const cited = citedPapers();
+  const byPaper = {};
+  for (const [label, ev] of Object.entries(run.evidence || {})) (byPaper[ev.arxiv_id] ||= []).push([label, ev]);
+  const list = Object.values(run.papers || {}).sort((a, b) => (cited.has(b.arxiv_id) - cited.has(a.arxiv_id)) || String(a.date).localeCompare(String(b.date)));
+  const rows = list.map((p) => {
+    const evs = (byPaper[p.arxiv_id] || []).filter(([, ev]) => !ev.pid.startsWith("c-"));
+    const claims = evs.map(([label, ev]) => `<li><button class="cite" type="button" data-m="${esc(label)}">${esc(label)}</button> ${esc(ev.claim || ev.quote)}${ev.value ? ` <span class="r-val">${esc(ev.value)}</span>` : ""}</li>`).join("");
+    return `<div class="pcard ${cited.has(p.arxiv_id) ? "cited" : ""}">
+      <div class="ref-t"><a href="https://arxiv.org/abs/${esc(p.arxiv_id)}" target="_blank">${esc(deTeX(p.title))}</a>${cited.has(p.arxiv_id) ? '<span class="cited-b">CITED</span>' : ""}</div>
+      <div class="ref-m">${esc(authors(p.authors))} &middot; ${esc(p.date)} &middot; ${esc(p.arxiv_id)}${p.topic ? " &middot; " + esc(p.topic) : ""}</div>
+      ${claims ? `<ul class="ref-q">${claims}</ul>` : '<div class="dim">read, nothing kept</div>'}
     </div>`;
   }).join("");
-  for (const b of document.querySelectorAll(".mchip")) b.onclick = () => toggleMethod(b.dataset.a, b.dataset.v);
-
-  const key = methodSort.key;
-  const sorted = [...shown].sort((a, b) => {
-    const x = key === "name" ? a.name : key === "year" ? a.year : a.values[key] || "";
-    const y = key === "name" ? b.name : key === "year" ? b.year : b.values[key] || "";
-    return String(x).localeCompare(String(y), undefined, { numeric: true }) * methodSort.dir;
-  });
-  const arrow = (k) => (methodSort.key === k ? (methodSort.dir > 0 ? " &uarr;" : " &darr;") : "");
-  const heads = [["name", "Method"], ["year", "Year"], ...methodData.columns.map((c) => [c.name, axisLabel(c.name)])];
-  const table = document.getElementById("mtable");
-  table.innerHTML = `<thead><tr>${heads.map(([k, l]) =>
-      `<th data-k="${esc(k)}" title="Sort by this column">${esc(l)}${arrow(k)}</th>`).join("")}<th>Papers</th></tr></thead>
-    <tbody>${sorted.map((r) => `<tr>
-      <td>${esc(r.name)}</td><td class="mono">${esc(r.year)}</td>
-      ${methodData.columns.map((c) => {
-        const v = r.values[c.name];
-        if (NA(v)) return '<td><span class="tech">not stated</span></td>';
-        if (!grouped(c)) return `<td class="mfree">${esc(v)}</td>`;
-        const on = methodPicks[c.name] && methodPicks[c.name].has(v);
-        return `<td><button class="mval${on ? " on" : ""}" data-a="${esc(c.name)}" data-v="${esc(v)}">${esc(v)}</button></td>`;
-      }).join("")}
-      <td>${r.papers.map((id) => `<a class="mono" href="https://arxiv.org/abs/${id}">${id}</a>`).join("<br>")}</td>
-    </tr>`).join("") || `<tr><td colspan="${heads.length + 1}" class="tech">No method matches every filter.</td></tr>`}</tbody>`;
-  for (const th of table.querySelectorAll("th[data-k]")) {
-    th.onclick = () => {
-      const k = th.dataset.k;
-      methodSort = { key: k, dir: methodSort.key === k ? -methodSort.dir : 1 };
-      drawMethods();
-    };
-  }
-  for (const b of table.querySelectorAll(".mval")) b.onclick = () => toggleMethod(b.dataset.a, b.dataset.v);
-  hookCitations(table);
-  document.getElementById("mcount").textContent = shown.length === total
-    ? `${total} methods` : `${shown.length} of ${total} methods`;
-  drawCross();
+  return `<div><p class="dim">${list.length} papers read, ${cited.size} of them cited in the report, ${Object.keys(run.evidence || {}).length} labeled quotes.</p><div class="pgrid">${rows}</div></div>`;
 }
 
-function drawCross() {
-  const host = document.getElementById("mcross");
-  const a = methodData.columns.find((c) => c.name === crossA);
-  const b = methodData.columns.find((c) => c.name === crossB);
-  if (!a || !b || a === b) {
-    host.innerHTML = '<p class="tech" style="padding:12px">Pick two different questions.</p>';
-    return;
-  }
-  const rowsA = optionsOf(a).map(([v]) => v);
-  const colsB = optionsOf(b).map(([v]) => v);
-  const count = (x, y) => methodData.rows.filter((r) => r.values[a.name] === x && r.values[b.name] === y).length;
-  const most = Math.max(1, ...rowsA.flatMap((x) => colsB.map((y) => count(x, y))));
-  host.innerHTML = `<table class="mcross"><thead><tr><th></th>${colsB.map((y) => `<th>${esc(y)}</th>`).join("")}</tr></thead>
-    <tbody>${rowsA.map((x) => `<tr><th>${esc(x)}</th>${colsB.map((y) => {
-      const n = count(x, y);
-      return n
-        ? `<td class="hit" style="--k:${(0.15 + (0.6 * n) / most).toFixed(2)}" data-x="${esc(x)}" data-y="${esc(y)}" title="Show these ${n}">${n}</td>`
-        : '<td class="gap" title="No paper here combines these">none</td>';
-    }).join("")}</tr>`).join("")}</tbody></table>`;
-  for (const td of host.querySelectorAll("td.hit")) {
-    td.onclick = () => {
-      methodPicks = { [a.name]: new Set([td.dataset.x]), [b.name]: new Set([td.dataset.y]) };
-      drawMethods();
-      document.getElementById("mtable").scrollIntoView({ block: "start" });
-    };
-  }
+// each term's share of a paper's log score, as one stacked bar per paper
+function whyRanked(search) {
+  if (!search) return "";
+  const groups = (terms) => {
+    const out = { cos: 0, bm25: 0, anc: 0, cocite: 0, rec: 0, other: 0, hub: 0 };
+    for (const [t, v] of Object.entries(terms || {})) out[t in out ? t : "other"] += v;
+    return out;
+  };
+  const rows = search.papers.slice(0, 12).map((p) => ({ p, g: groups(p.terms) }));
+  const most = Math.max(0.0001, ...rows.map((r) => Object.entries(r.g).filter(([t]) => t !== "hub").reduce((a, [, v]) => a + v, 0)));
+  const bars = rows.map(({ p, g }) => {
+    const parts = Object.entries(g).filter(([t, v]) => t !== "hub" && v > 0)
+      .map(([t, v]) => `<span title="${t} ${v.toFixed(2)}" style="width:${(100 * v) / most}%;background:var(${TERM_COLORS[t]})"></span>`).join("");
+    return `<div class="why-row"><span class="why-t">${esc(deTeX(p.title))}</span><span class="why-bar">${parts}</span></div>`;
+  }).join("");
+  const legend = Object.entries(TERM_COLORS).filter(([t]) => t !== "hub").map(([t, c]) => `<span><i style="background:var(${c})"></i>${t}</span>`).join("");
+  return `<div class="why"><div class="why-legend">${esc(search.mode)} recipe: ${legend}</div>${bars}</div>`;
 }
 
-// -- references ------------------------------------------------------------------------------
-
-const REF_DEFAULT = () => ({
-  query: "", roles: new Set(), cited: "all", found: "all", area: "", line: "", from: "", to: "",
-  category: "", sort: "relevance",
-});
-let refs = REF_DEFAULT();
-
-function refItem(p) {
-  const node = nodeById[p.arxiv_id] || {};
-  const meta = [authors(p.authors), p.year, p.category].filter(Boolean).join(" · ");
-  const facts = [
-    node.cited_by != null ? `cited ${node.cited_by.toLocaleString()} times` : "",
-    p.cosine != null ? `closeness ${p.cosine.toFixed(2)}` : "",
-    ...(node.lines || []).map((n) => `on ${esc(lineName(n))}`),
-  ].filter(Boolean).join(" · ");
-  return `<div class="ref">
-    <div class="ref-main">
-      <div class="ref-t"><a href="https://arxiv.org/abs/${p.arxiv_id}">${esc(deTeX(p.title))}</a>${p.cited ? '<span class="cited-b">CITED</span>' : ""}</div>
-      <div class="ref-m">${esc(meta)}${roleChip(p.role)}${p.retrieved ? "" : '<span class="chip">found through citations</span>'}</div>
-      <div class="tech">${esc(p.arxiv_id)}${facts ? " · " + facts : ""}</div>
-      ${p.abstract ? `<p class="ref-s">${esc(deTeX(p.abstract))}</p>` : ""}
-    </div>
-    <div class="ref-side">
-      <button class="pill sm" onclick="openPaper('${p.arxiv_id}')">Read</button>
-      <a class="pill sm" target="_blank" href="https://arxiv.org/abs/${p.arxiv_id}">arXiv &#8599;</a>
-    </div></div>`;
-}
-
-function refMatches(p) {
-  const node = nodeById[p.arxiv_id] || {};
-  const role = p.role || (p.retrieved ? "ungraded" : "connector");
-  if (refs.roles.size && !refs.roles.has(role)) return false;
-  if (refs.cited === "cited" && !p.cited) return false;
-  if (refs.cited === "uncited" && p.cited) return false;
-  if (refs.found === "search" && !p.retrieved) return false;
-  if (refs.found === "graph" && p.retrieved) return false;
-  if (refs.area !== "") {
-    const area = (run.areas || [])[+refs.area];
-    if (!area || !area.papers.includes(p.arxiv_id)) return false;
-  }
-  if (refs.line === "any" && !(node.lines || []).length) return false;
-  if (refs.line && refs.line !== "any" && !(node.lines || []).includes(+refs.line)) return false;
-  if (refs.from && String(p.year) < refs.from) return false;
-  if (refs.to && String(p.year) > refs.to) return false;
-  if (refs.category && p.category !== refs.category) return false;
-  if (refs.query && !`${p.title} ${p.authors} ${p.abstract} ${p.arxiv_id}`.toLowerCase().includes(refs.query)) return false;
-  return true;
-}
-
-function referencesTab() {
-  const host = document.getElementById("p-references");
-  if (!papers.length) { host.innerHTML = '<p class="empty">This report recorded no papers.</p>'; return; }
-  const years = [...new Set(papers.map((p) => String(p.year)).filter(Boolean))].sort();
-  const cats = Object.entries(papers.reduce((o, p) => ((o[p.category] = (o[p.category] || 0) + 1), o), {}))
-    .filter(([c]) => c && c !== "undefined").sort((a, b) => b[1] - a[1]);
-  const roles = ROLE_ORDER.filter((r) => papers.some((p) => (p.role || (p.retrieved ? "ungraded" : "connector")) === r));
-  const lines = ((run.sections || {}).lineages || []).map((_, i) => i + 1);
-  const opt = (v, l, cur) => `<option value="${esc(v)}"${String(v) === String(cur) ? " selected" : ""}>${esc(l)}</option>`;
-  const seg = (name, items) => `<span class="seg" data-f="${name}">${items.map(([v, l]) =>
-    `<button class="${refs[name] === v ? "on" : ""}" data-v="${v}">${l}</button>`).join("")}</span>`;
-  host.innerHTML = `
-    <div class="rtools">
-      <input type="search" id="rq" placeholder="Search titles, authors and abstracts&hellip;" value="${esc(refs.query)}">
-      <select class="pill sm" id="rsort">
-        ${[["relevance", "Most relevant"], ["new", "Newest"], ["old", "Oldest"], ["cosine", "Closest to the question"],
-          ["cited_by", "Most cited"]].map(([v, l]) => opt(v, l, refs.sort)).join("")}
-      </select>
-      <button class="pill sm" id="rclear">Clear filters</button>
-      <span class="byline" id="rcount"></span>
-    </div>
-    <div class="rfilters">
-      <div class="rf"><span class="rf-k">Role</span><span class="rf-v">${roles.map((r) =>
-        `<button class="grole${refs.roles.has(r) ? " picked" : ""}" data-role="${r}"><i class="role-dot role-${r}"></i>${r}</button>`).join("")}</span></div>
-      <div class="rf"><span class="rf-k">In the report</span>${seg("cited", [["all", "Any"], ["cited", "Cited"], ["uncited", "Not cited"]])}</div>
-      <div class="rf"><span class="rf-k">Found by</span>${seg("found", [["all", "Either"], ["search", "The search"], ["graph", "Following citations"]])}</div>
-      <div class="rf"><span class="rf-k">Area</span><select class="pill sm" id="rarea">${opt("", "Every area", refs.area)}${(run.areas || []).map((a, i) =>
-        opt(i, a.question.length > 70 ? a.question.slice(0, 68) + "..." : a.question, refs.area)).join("")}</select></div>
-      <div class="rf"><span class="rf-k">Line</span><select class="pill sm" id="rline">${opt("", "Any paper", refs.line)}${opt("any", "On any line", refs.line)}${lines.map((n) =>
-        opt(n, lineName(n), refs.line)).join("")}</select></div>
-      <div class="rf"><span class="rf-k">Published</span><select class="pill sm" id="rfrom">${opt("", "From any year", refs.from)}${years.map((y) =>
-        opt(y, "From " + y, refs.from)).join("")}</select><select class="pill sm" id="rto">${opt("", "To any year", refs.to)}${years.map((y) =>
-        opt(y, "To " + y, refs.to)).join("")}</select></div>
-      <div class="rf"><span class="rf-k">Category</span><select class="pill sm" id="rcat">${opt("", "Any category", refs.category)}${cats.map(([c, n]) =>
-        opt(c, `${c} (${n})`, refs.category)).join("")}</select></div>
-    </div>
-    <div class="reflist" id="reflist"></div>`;
-
-  const box = document.getElementById("rq");
-  box.oninput = (e) => { refs.query = e.target.value.toLowerCase(); drawRefs(); };
-  document.getElementById("rsort").onchange = (e) => { refs.sort = e.target.value; drawRefs(); };
-  document.getElementById("rclear").onclick = () => { refs = REF_DEFAULT(); referencesTab(); };
-  for (const b of host.querySelectorAll(".rf .grole")) {
-    b.onclick = () => {
-      const r = b.dataset.role;
-      if (refs.roles.has(r)) refs.roles.delete(r); else refs.roles.add(r);
-      b.classList.toggle("picked");
-      drawRefs();
-    };
-  }
-  for (const s of host.querySelectorAll(".seg")) {
-    for (const b of s.children) {
-      b.onclick = () => {
-        refs[s.dataset.f] = b.dataset.v;
-        for (const o of s.children) o.classList.toggle("on", o === b);
-        drawRefs();
-      };
+// a title for an id from any reply that listed it, since only read papers are stored with metadata
+function titles() {
+  const out = {};
+  for (const p of Object.values(run.papers || {})) out[p.arxiv_id] = deTeX(p.title);
+  for (const c of run.calls || []) {
+    for (const line of String(c.reply).split("\n")) {
+      const m = line.match(/^\s*(\d{4}\.\d{4,5}|[a-z.-]+\/\d{7})\s*(?:\||\(\d{4}\))\s*(?:[\d-]+\s*\|\s*)?([^|]+)/);
+      if (m && !out[m[1]]) out[m[1]] = deTeX(m[2].trim());
     }
   }
-  const bind = (id, key) => { document.getElementById(id).onchange = (e) => { refs[key] = e.target.value; drawRefs(); }; };
-  bind("rarea", "area");
-  bind("rline", "line");
-  bind("rfrom", "from");
-  bind("rto", "to");
-  bind("rcat", "category");
-  drawRefs();
+  return out;
 }
 
-function drawRefs() {
-  let shown = papers.filter(refMatches);
-  const cited = (p) => (nodeById[p.arxiv_id] || {}).cited_by ?? -1;
-  const s = refs.sort;
-  shown = [...shown].sort((a, b) =>
-    s === "relevance" ? (b.relevance ?? -9) - (a.relevance ?? -9) || (b.cosine ?? 0) - (a.cosine ?? 0)
-    : s === "new" ? String(b.date).localeCompare(String(a.date))
-    : s === "old" ? String(a.date).localeCompare(String(b.date))
-    : s === "cited_by" ? cited(b) - cited(a)
-    : (b[s] ?? -1e9) - (a[s] ?? -1e9));
-  const list = document.getElementById("reflist");
-  list.innerHTML = shown.map(refItem).join("") || '<p class="empty">No paper matches every filter.</p>';
-  hookCitations(list);
-  document.getElementById("rcount").textContent =
-    `${shown.length} of ${papers.length} papers, ${shown.filter((p) => p.cited).length} cited in the report`;
-}
+const clip = (s, n) => (s.length > n ? s.slice(0, n).trimEnd() + "…" : s);
+const listed = (reply) => String(reply).split("\n").filter((l) => /^(\d{4}\.\d{4,5}|[a-z.-]+\/\d{7}) \|/.test(l)).length;
 
-// -- the graph -------------------------------------------------------------------------------
-
-let hiddenRoles = new Set();
-// the two most common intents bury the rest, so they start hidden
-let hiddenIntents = new Set(["background", "uses"]);
-let pickedLine = 1;
-let focusedNode = null;
-
-const linesOf = () => ((run.sections || {}).lineages || []).map((l, i) => ({ n: i + 1, ...l }));
-
-// the citations between one line's own papers, which older runs did not store with the line
-function lineEdges(line) {
-  const held = new Set(line.papers.map((p) => p.arxiv_id));
-  const all = line.edges || ((run.graph || {}).edges || []).filter((e) => held.has(e.source) && held.has(e.target));
-  // a paper that cites another three times in its text is still one citation between them
-  const seen = new Map();
-  for (const e of all) {
-    const k = `${e.source}|${e.target}|${e.intent}`;
-    if (!seen.has(k)) seen.set(k, e);
+// what one call did, in a sentence a reader without the tool docs can follow
+function describe(c, title) {
+  const a = c.args || {};
+  const first = String(c.reply).split("\n")[0];
+  const named = (id) => (title[id] ? `“${esc(clip(title[id], 90))}”` : esc(id));
+  switch (c.tool) {
+    case "search_papers": {
+      const by = a.filter && a.filter.authors && a.filter.authors.length;
+      const head = by ? `Listed papers by ${esc(a.filter.authors.join(", "))}`
+        : a.arxiv_id ? `Searched for papers around ${named(a.arxiv_id)}, ${esc(a.mode)} mode`
+        : `Searched “${esc(a.query)}”, ${esc(a.mode)} mode`;
+      return [head, `${listed(c.reply)} papers returned`];
+    }
+    case "recall_paper":
+      return [`Looked for the paper described as “${esc(a.description)}”`, listed(c.reply) ? `found ${named(first.split(" | ")[0])}` : "no paper matched"];
+    case "read_paper": {
+      const ids = a.arxiv_ids || [];
+      return [`Read ${ids.length} paper${ids.length === 1 ? "" : "s"} for “${esc(clip(a.question || "", 140))}”`, ids.map(named).join(", ")];
+    }
+    case "list_citations":
+      return [`Listed ${a.direction === "cited_by" ? "the papers citing" : "the references of"} ${named(a.arxiv_id)}`, esc(first)];
+    case "trace_lineages":
+      return [`Traced how ${(a.arxiv_ids || []).length} papers connect through their citations`, esc(first)];
+    case "save_report":
+      return [`Submitted the report for the check`, esc(first)];
+    default:
+      return [esc(c.tool), esc(first)];
   }
-  return [...seen.values()];
 }
 
-function intentChips(edges) {
-  const counted = {};
-  for (const e of edges) counted[e.intent] = (counted[e.intent] || 0) + 1;
-  const order = Object.keys(INTENTS).filter((i) => counted[i]);
-  if (!order.length) return '<span class="tech">no citations between its papers</span>';
-  return order.map((i) => `<span class="ichip"><i class="idot intent-${i}"></i>${counted[i]} ${esc(INTENTS[i])}</span>`).join("");
+// what the model was doing outside any tool call, which includes composing the next call's arguments
+const THINK = "--overlay1";
+const WRITE = "--text";
+
+const clock = (s) => { const t = Math.max(0, Math.round(s)); return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}`; };
+
+function callNode(c, title, search) {
+  const [head, sub] = describe(c, title);
+  const params = Object.entries(c.args || {}).filter(([, v]) => v !== null && v !== "")
+    .map(([k, v]) => `<tr><th>${esc(k)}</th><td>${k === "markdown" ? `<pre>${esc(v)}</pre>` : esc(typeof v === "string" ? v : JSON.stringify(v))}</td></tr>`).join("");
+  const body = `<div class="st-h">Parameters</div><table class="st-params">${params}</table>
+    ${search ? `<div class="st-h">Why each paper ranked</div>${whyRanked(search)}` : ""}
+    <div class="st-h">Response</div><pre>${esc(c.reply)}</pre>`;
+  return { start: c.start || 0, color: TOOL_COLORS[c.tool] || "--overlay1", kind: c.tool, label: `Tool: ${c.tool}`, head, sub: `${sub} &middot; ${duration(c.seconds || 0)}`, body };
 }
 
-function graphTab() {
-  const graph = run.graph;
-  const host = document.getElementById("p-graph");
-  if (!graph || !graph.nodes || !graph.nodes.length) {
-    host.innerHTML = '<p class="empty">This report has no graph.</p>';
-    return;
+function sayNode(e, start) {
+  const thinking = e.kind === "reasoning";
+  const text = String(e.text).trim();
+  return { start, color: thinking ? THINK : WRITE, kind: thinking ? "thinking" : "writing", label: `Action: ${thinking ? "thinking" : "writing"}`, head: esc(clip(text.split("\n")[0], 180)), sub: "", body: `<div class="st-text">${esc(text)}</div>` };
+}
+
+// the run as columns in the order things happened, calls sent together sharing one column
+function processColumns() {
+  const calls = run.calls || [];
+  const searches = (run.searches || []).slice();
+  // a search that returned papers starts its reply with an arXiv id, and only those were kept
+  const searchOf = (c) => (c.tool === "search_papers" && /^(\d{4}\.\d{4,5}|[a-z.-]+\/\d{7})/.test(String(c.reply)) ? searches.shift() : null);
+  const title = titles();
+  const cols = [];
+  if (!run.session) {
+    // without the client's transcript, calls whose times overlap are taken as sent together
+    let end = -1;
+    for (const c of calls) {
+      const node = callNode(c, title, searchOf(c));
+      if (cols.length && (c.start || 0) < end) cols[cols.length - 1].push(node);
+      else cols.push([node]);
+      end = Math.max(end, (c.start || 0) + (c.seconds || 0));
+    }
+    return cols;
   }
-  const roles = ROLE_ORDER.filter((r) => graph.nodes.some((n) => n.role === r));
-  const intents = Object.keys(INTENTS).filter((i) => graph.edges.some((e) => e.intent === i));
-  const tally = (i) => graph.edges.filter((e) => e.intent === i).length;
-  const lines = linesOf();
-  if (pickedLine > lines.length) pickedLine = lines.length ? 1 : 0;
-  const cur = lines[pickedLine - 1];
-  host.innerHTML = `
-    ${lines.length ? `<div class="glinetabs" role="tablist">${lines.map((l) =>
-      `<button class="glt${l.n === pickedLine ? " on" : ""}" data-n="${l.n}" style="--c:${lineColor(l.n)}"><i></i>${esc(lineName(l.n))}</button>`).join("")}
-      <button class="glt${pickedLine ? "" : " on"}" data-n="0">No line</button></div>` : ""}
-    ${cur ? `<div class="glinehead" style="--c:${lineColor(cur.n)}">
-      <div class="glh-t">Line ${cur.n} &middot; ${cur.papers.length} papers, ${cur.papers[0]?.date.slice(0, 4)} to ${cur.papers[cur.papers.length - 1]?.date.slice(0, 4)}, found by ${cur.runs} ${cur.runs === 1 ? "walk" : "walks"}</div>
-      ${cur.description ? `<p>${esc(cur.description)}</p>` : ""}
-      <div class="ichips">${intentChips(lineEdges(cur))}</div></div>` : ""}
-    <div class="gpanel">
-      <div class="gfield"><span class="rf-k">Roles</span>
-        <span class="glegend">${roles.map((r) =>
-          `<button class="grole${hiddenRoles.has(r) ? " off" : ""}" data-r="${r}"><i class="role-dot role-${r}"></i>${r}</button>`).join("")}</span></div>
-      <div class="gfield"><span class="rf-k">Citations</span>
-        <span class="glegend">${intents.map((i) =>
-          `<button class="grole${hiddenIntents.has(i) ? " off" : ""}" data-i="${i}"><i class="idot intent-${i}"></i>${INTENTS[i]} <span class="tech">${tally(i)}</span></button>`).join("")}</span></div>
-      <div class="gfield"><span class="rf-k">Find</span><input type="search" id="gq" placeholder="A title or an arXiv id&hellip;"></div>
+  const pending = calls.slice();
+  const take = (tool) => { const i = pending.findIndex((c) => c.tool === tool); return i < 0 ? null : pending.splice(i, 1)[0]; };
+  const started = calls.length ? calls[0].tool : "";
+  // the client's clock starts before the server's, so the first paired call sets the offset
+  let open = false, offset = 0, before = [], group = null;
+  const say = (e) => { group = null; cols.push([sayNode(e, Math.max(0, e.at - offset))]); };
+  for (const e of run.session.events) {
+    if (e.kind !== "tool") {
+      if (open) say(e); else before.push(e);
+      continue;
+    }
+    // a session can hold earlier runs, so only the thinking right before this run's first call is its planning
+    if (!open && e.tool !== started) { before = []; continue; }
+    if (!open) { open = true; offset = e.at - (calls[0].start || 0); before.forEach(say); }
+    const c = take(e.tool);
+    if (!c) continue;
+    if (!group) { group = []; cols.push(group); }
+    group.push(callNode(c, title, searchOf(c)));
+  }
+  for (const c of pending) cols.push([callNode(c, title, searchOf(c))]);
+  return cols;
+}
+
+let procCols = [];
+let procAt = null;
+
+function processTab() {
+  const calls = run.calls || [];
+  procCols = processColumns();
+  procAt = null;
+  const total = Math.max(1, run.seconds || 0, ...calls.map((c) => (c.start || 0) + (c.seconds || 0)));
+  const spans = calls.map((c) => [c.start || 0, Math.min(total, (c.start || 0) + (c.seconds || 0))]);
+  const parts = [["thinking", total - covered(spans), THINK], ...Object.keys(TOOL_COLORS).map((t) => [t, covered(spans.filter((_, k) => calls[k].tool === t)), TOOL_COLORS[t]])]
+    .filter(([, v]) => v >= 0.5).sort((a, b) => b[1] - a[1]);
+  const bar = parts.map(([name, v, c]) => `<span style="width:${(100 * v) / total}%;background:var(${c})" title="${name}, ${duration(v)}"></span>`).join("");
+  const key = parts.map(([name, v, c]) => `<span><i style="background:var(${c})"></i>${name} <b>${duration(v)}</b></span>`).join("");
+  const nodes = procCols.flat();
+  const kinds = [...new Map(nodes.map((n) => [n.kind, n.color])).entries()];
+  const legend = kinds.map(([k, c]) => `<span><i style="background:var(${c})"></i>${k}</span>`).join("");
+  return `<div class="process"><h2>Thinking process</h2>
+    <p class="dim">A breakdown of how this response was generated.</p>
+    <div class="proc-top">
+      <div class="proc-stats"><div><b>${calls.length}</b> tool calls</div><div><b>${run.session ? nodes.filter((n) => n.kind === "thinking").length : "n/a"}</b> thinking loops</div><div><b>${duration(total)}</b> spent</div></div>
+      <div class="proc-time"><div class="st-h">Where the time went</div><div class="pt-bar">${bar}</div><div class="pt-key">${key}</div></div>
     </div>
-    <div class="gwrap" id="gwrap"></div>
-    <p class="byline gcap">Older papers sit left and papers closer to the question sit higher. A bigger dot is cited more.
-      The picked line is drawn in its color with every citation between its papers, whatever the filters above hide.
-      Hover a dot or a citation to see what it is, and click to open the paper.</p>
-    <div id="paths"></div>`;
-  for (const b of host.querySelectorAll(".grole[data-r]")) {
-    b.onclick = () => {
-      const r = b.dataset.r;
-      if (hiddenRoles.has(r)) hiddenRoles.delete(r); else hiddenRoles.add(r);
-      graphTab();
-    };
-  }
-  for (const b of host.querySelectorAll(".grole[data-i]")) {
-    b.onclick = () => {
-      const i = b.dataset.i;
-      if (hiddenIntents.has(i)) hiddenIntents.delete(i); else hiddenIntents.add(i);
-      graphTab();
-    };
-  }
-  for (const b of host.querySelectorAll(".glt")) b.onclick = () => { pickedLine = +b.dataset.n; graphTab(); };
-  const box = document.getElementById("gq");
-  box.oninput = (e) => {
-    const q = e.target.value.trim().toLowerCase();
-    focusedNode = q ? (graph.nodes.find((n) => n.title.toLowerCase().includes(q) || n.arxiv_id.includes(q)) || {}).arxiv_id : null;
-    drawGraph(graph);
-    document.getElementById("gq").focus();
-  };
-  drawGraph(graph);
-  pathList();
+    <div class="tree-legend">${legend}<span class="dim">Hover a dot for what it did, click it or use the arrow keys for everything.</span></div>
+    <div class="tree" id="tree"></div>
+    <div class="tree-panel" id="tree-panel"><p class="dim">Click a dot to see what was passed, what came back and what the model thought.</p></div></div>`;
 }
 
-// a path is a claim about how the field moved, so it is readable rather than only drawn
-function pathList() {
-  const host = document.getElementById("paths");
+const STEP = 32;
+const LANE = 26;
+const DOT = 8;
+
+// the tree is drawn at the width it has, wrapping onto a new row like a line of text
+function drawTree() {
+  const host = document.getElementById("tree");
   if (!host) return;
-  const lines = linesOf();
-  if (!lines.length) { host.innerHTML = ""; return; }
-  host.innerHTML = `<h3 class="pathh">Every line through this field</h3>` + lines.map((line) => {
-    const edges = lineEdges(line);
-    const first = line.papers[0]?.date.slice(0, 4);
-    const last = line.papers[line.papers.length - 1]?.date.slice(0, 4);
-    const at = Object.fromEntries(line.papers.map((p, i) => [p.arxiv_id, i]));
-    const steps = line.papers.map((p, i) => {
-      const out = edges.filter((e) => e.source === p.arxiv_id && at[e.target] != null)
-        .sort((a, b) => at[b.target] - at[a.target]);
-      const into = edges.filter((e) => e.target === p.arxiv_id && at[e.source] != null && at[e.source] < i);
-      const said = [
-        ...out.map((e) => `<span class="ichip" title="${esc(e.sentence || "")}"><i class="idot intent-${e.intent}"></i>${esc(INTENTS[e.intent] || e.intent)} ${esc(yearOf(e.target))} &ldquo;${esc(titleOf(e.target).slice(0, 38))}&rdquo;</span>`),
-        ...into.map((e) => `<span class="ichip back" title="${esc(e.sentence || "")}"><i class="idot intent-${e.intent}"></i>cited by ${esc(yearOf(e.source))} as ${esc(e.intent)}</span>`),
-      ].join("");
-      return `<li><span class="pl-date">${p.date}</span>
-        <div><a href="https://arxiv.org/abs/${p.arxiv_id}">${esc(deTeX(p.title))}</a>
-        ${said ? `<div class="stepcites">${said}</div>` : ""}</div></li>`;
-    }).join("");
-    return `<details class="path" style="--c:${lineColor(line.n)}">
-      <summary class="pathtop">
-        <div class="pt-row"><i class="pathdot"></i><b>${esc(lineName(line.n))}</b>
-          <span class="tech">${line.papers.length} papers, ${first} to ${last}</span>
-          <button class="pill sm pt-show" data-n="${line.n}">${pickedLine === line.n ? "On the chart" : "Show on the chart"}</button></div>
-        ${line.description ? `<p class="pdesc">${esc(line.description)}</p>` : ""}
-        <div class="ichips">${intentChips(edges)}</div>
-      </summary>
-      <ol class="pathsteps">${steps}</ol>
-    </details>`;
-  }).join("");
-  for (const b of host.querySelectorAll(".pt-show")) {
-    b.onclick = (e) => {
-      e.preventDefault();
-      pickedLine = +b.dataset.n;
-      graphTab();
-      document.getElementById("gwrap").scrollIntoView({ block: "center" });
-    };
+  const width = host.clientWidth || 1000;
+  const edge = DOT + 4;
+  const per = Math.max(4, Math.floor((width - 2 * edge) / STEP) + 1);
+  // the run spans the whole width, and one too long for it wraps at the narrowest spacing
+  const gap = (width - 2 * edge) / Math.max(1, Math.min(per, procCols.length) - 1);
+  const rows = [];
+  for (let i = 0; i < procCols.length; i += per) rows.push(procCols.slice(i, i + per));
+  let y = 0;
+  const parts = [];
+  const pos = [];
+  rows.forEach((row, r) => {
+    const tall = Math.max(...row.map((c) => c.length));
+    const mid = y + edge + ((tall - 1) * LANE) / 2;
+    // a single column, or the shorter last row of a wrapped run, sits in the middle
+    const left = (width - (row.length - 1) * gap) / 2;
+    row.forEach((col, k) => {
+      const ci = r * per + k;
+      const x = left + k * gap;
+      pos[ci] = col.map((_, j) => [x, mid + (j - (col.length - 1) / 2) * LANE]);
+      if (k) {
+        const curve = ([ax, ay], [bx, by]) => `<path class="tr-edge" d="M${ax},${ay} C${(ax + bx) / 2},${ay} ${(ax + bx) / 2},${by} ${bx},${by}"/>`;
+        const from = pos[ci - 1];
+        const to = pos[ci];
+        // one side single is a branch or a join, and two groups in a row meet at one point between them
+        if (from.length === 1 || to.length === 1) for (const a of from) for (const b of to) parts.push(curve(a, b));
+        else {
+          const hub = [x - gap / 2, mid];
+          for (const a of from) parts.push(curve(a, hub));
+          for (const b of to) parts.push(curve(hub, b));
+        }
+      }
+    });
+    y += 2 * edge + (tall - 1) * LANE + 12;
+  });
+  const dots = procCols.map((col, ci) => col.map((n, j) => `<circle class="tr-dot" data-c="${ci}" data-j="${j}" cx="${pos[ci][j][0]}" cy="${pos[ci][j][1]}" r="${DOT}" style="fill:var(${n.color})"/>`).join("")).join("");
+  host.innerHTML = `<svg width="${width}" height="${y}" role="img" aria-label="The run's steps in order">${parts.join("")}${dots}</svg>`;
+  for (const d of host.querySelectorAll(".tr-dot")) {
+    const at = [+d.dataset.c, +d.dataset.j];
+    d.onmouseenter = (e) => { const n = procCols[at[0]][at[1]]; showTip(e, `<div class="tip-k" style="color:var(${n.color})">${esc(n.label)} &middot; ${clock(n.start)}</div><div>${n.head}</div>${n.sub ? `<div class="dim">${n.sub}</div>` : ""}`); };
+    d.onmousemove = (e) => showTip(e);
+    d.onmouseleave = hideTip;
+    d.onclick = () => pick(at[0], at[1]);
   }
-  hookCitations(host);
+  if (procAt) mark();
 }
+
+function mark() {
+  for (const d of document.querySelectorAll(".tr-dot")) d.classList.toggle("on", procAt && +d.dataset.c === procAt[0] && +d.dataset.j === procAt[1]);
+}
+
+function pick(c, j) {
+  const n = procCols[c] && procCols[c][j];
+  if (!n) return;
+  procAt = [c, j];
+  mark();
+  const group = procCols[c].length > 1 ? ` &middot; ${j + 1} of ${procCols[c].length} sent together` : "";
+  document.getElementById("tree-panel").innerHTML = `<div class="tp-head" style="--c:var(${n.color})"><span class="st-kind">${esc(n.label)}</span><span class="dim"> at ${clock(n.start)}, step ${c + 1} of ${procCols.length}${group}</span></div>
+    <div class="st-head">${n.head}</div>${n.sub ? `<div class="st-sub">${n.sub}</div>` : ""}<div class="st-body">${n.body}</div>`;
+}
+
+window.addEventListener("resize", () => { drawTree(); drawGraph(); });
+
+// arrows walk the tree once a dot is picked: across the run, and within calls sent together
+document.addEventListener("keydown", (e) => {
+  if (!procAt || !document.getElementById("tree") || /input|textarea/i.test(e.target.tagName)) return;
+  const [c, j] = procAt;
+  const moves = { ArrowRight: [c + 1, 0], ArrowLeft: [c - 1, 0], ArrowDown: [c, j + 1], ArrowUp: [c, j - 1] };
+  const to = moves[e.key];
+  if (!to || !procCols[to[0]] || !procCols[to[0]][to[1]]) return;
+  e.preventDefault();
+  pick(to[0], to[1]);
+});
 
 let tip = null;
 function hideTip() { if (tip) tip.style.display = "none"; }
@@ -912,149 +651,141 @@ function hideTip() { if (tip) tip.style.display = "none"; }
 function showTip(e, html) {
   if (!tip) {
     tip = document.createElement("div");
-    tip.className = "gtip";
+    tip.className = "ptip";
     document.body.append(tip);
   }
-  tip.innerHTML = html;
+  if (html !== undefined) tip.innerHTML = html;
   tip.style.display = "block";
   const w = tip.offsetWidth;
   const h = tip.offsetHeight;
-  let x = e.clientX + 16;
-  let y = e.clientY + 16;
-  if (x + w > innerWidth - 8) x = e.clientX - w - 16;
-  if (y + h > innerHeight - 8) y = Math.max(8, e.clientY - h - 16);
-  tip.style.left = x + "px";
-  tip.style.top = y + "px";
+  let x = e.clientX + 14;
+  let y = e.clientY + 14;
+  if (x + w > innerWidth - 8) x = e.clientX - w - 14;
+  if (y + h > innerHeight - 8) y = Math.max(8, e.clientY - h - 14);
+  tip.style.left = `${x}px`;
+  tip.style.top = `${y}px`;
 }
 
-function nodeTip(n) {
-  const p = byId[n.arxiv_id] || {};
-  const facts = [
-    `${n.cited_by.toLocaleString()} citations`,
-    n.cosine != null ? `closeness ${n.cosine.toFixed(2)}` : "",
-  ].filter(Boolean).join(" · ");
-  return `<div class="cp-t">${esc(deTeX(n.title))}</div>
-    <div class="cp-m">${esc(authors(p.authors))}${p.authors ? " · " : ""}${esc(longDate(n.date))} ${roleChip(n.role)}</div>
-    <div class="cp-m">${facts}</div>
-    ${n.lines.length ? `<div class="gtip-lines">${n.lines.map((l) =>
-      `<span style="--c:${lineColor(l)}"><i></i>${esc(lineName(l))}</span>`).join("")}</div>` : ""}
-    ${p.abstract ? `<div class="cp-s">${esc(deTeX(p.abstract))}</div>` : ""}`;
+// spans merged so parallel calls count once
+function merged(spans) {
+  const out = [];
+  for (const [a, b] of spans.slice().sort((x, y) => x[0] - y[0])) {
+    if (out.length && a <= out[out.length - 1][1]) out[out.length - 1][1] = Math.max(out[out.length - 1][1], b);
+    else out.push([a, b]);
+  }
+  return out;
+}
+const covered = (spans) => merged(spans).reduce((t, [a, b]) => t + b - a, 0);
+
+// -- the citation graph among the run's papers --
+
+const ROLES = { cited: "--primary", read: "--t-read", found: "--overlay1" };
+const ROLE_WORDS = { cited: "cited in the report", read: "read", found: "returned, not read" };
+// the two most common intents bury the rest, so they start hidden
+let hiddenIntents = new Set(["background", "uses"]);
+let hiddenRoles = new Set();
+let pickedLine = "";
+let focusId = "";
+
+const linesOf = () => (run.lineages || []).flatMap((call, c) => (call.lines || []).map((line, i) => ({ id: `${c + 1}.${i + 1}`, papers: line.papers.map((p) => p.arxiv_id) })));
+
+function timelineTab() {
+  const g = run.graph;
+  if (!g || !(g.nodes || []).length) return '<div class="prose"><p class="dim">This run has no citation graph.</p></div>';
+  const tally = (i) => g.edges.filter((e) => e.intent === i).length;
+  const intents = Object.keys(INTENT_COLORS).filter(tally);
+  const roles = Object.keys(ROLES).filter((r) => g.nodes.some((n) => n.role === r));
+  const lines = linesOf();
+  const chip = (attr, key, on, color, text) => `<button type="button" class="gchip${on ? "" : " off"}" ${attr}="${key}"><i style="background:var(${color})"></i>${text}</button>`;
+  return `<div class="cgraph"><h2>Citation graph</h2>
+    <p class="dim">Every paper a tool returned in this run, ${g.nodes.length} in all, and the ${g.edges.length.toLocaleString()} citations among them. Older papers sit left and more cited papers sit higher.</p>
+    <div class="gpanel">
+      <div class="gfield"><span class="st-h">Papers</span>${roles.map((r) => chip("data-r", r, !hiddenRoles.has(r), ROLES[r], `${ROLE_WORDS[r]} <span class="dim">${g.nodes.filter((n) => n.role === r).length}</span>`)).join("")}</div>
+      <div class="gfield"><span class="st-h">Citations</span>${intents.map((i) => chip("data-i", i, !hiddenIntents.has(i), INTENT_COLORS[i], `${i} <span class="dim">${tally(i)}</span>`)).join("")}</div>
+      ${lines.length ? `<div class="gfield"><span class="st-h">Lines</span><select id="gline"><option value="">none</option>${lines.map((l) => `<option value="${l.id}"${l.id === pickedLine ? " selected" : ""}>Line ${l.id}, ${l.papers.length} papers</option>`).join("")}</select></div>` : ""}
+      <div class="gfield"><span class="st-h">Find</span><input type="search" id="gq" placeholder="A title or an arXiv id" value="${esc(focusId)}"></div>
+    </div>
+    <div class="gwrap" id="gwrap"></div></div>`;
 }
 
-function edgeTip(e) {
-  return `<div class="gtip-edge"><b>${esc(titleOf(e.source))}</b> <span class="tech">${yearOf(e.source)}</span></div>
-    <div class="gtip-verb intent-${e.intent}">${esc(INTENTS[e.intent] || e.intent)}</div>
-    <div class="gtip-edge"><b>${esc(titleOf(e.target))}</b> <span class="tech">${yearOf(e.target)}</span></div>
-    ${e.sentence ? `<blockquote>${esc(e.sentence.replace(/\[CITE\]/g, "[this paper]"))}</blockquote>` : ""}`;
-}
-
-function drawGraph(graph) {
+function drawGraph() {
   const host = document.getElementById("gwrap");
-  const lineRows = ((run.sections || {}).lineages || []);
-  const cur = linesOf()[pickedLine - 1];
-  const onLine = new Set(cur ? cur.papers.map((p) => p.arxiv_id) : []);
-  const shown = graph.nodes.filter((n) => !hiddenRoles.has(n.role) || onLine.has(n.arxiv_id));
-  if (!shown.length) { host.innerHTML = '<p class="empty">Every role is hidden.</p>'; return; }
-  const held = new Set(shown.map((n) => n.arxiv_id));
-  const at = shown.map((n) => Date.parse(n.date));
-  const cos = shown.map((n) => n.cosine ?? 0);
-  const t0 = Math.min(...at);
-  const t1 = Math.max(Math.max(...at), t0 + 8.64e7);
-  const c0 = Math.min(...cos);
-  const c1 = Math.max(Math.max(...cos), c0 + 0.01);
-  const years = (t1 - t0) / 3.156e10;
-  // the whole span has to be visible without scrolling, since the paths are read left to right
-  const room = host.clientWidth || 1100;
-  const tight = room < 560;
-  const pad = { l: tight ? 40 : 66, r: tight ? 14 : 30, t: 22, b: 52 };
-  const floor = Math.min(900, room - 2);
-  const width = Math.max(floor, Math.min(room - 2, Math.round(years * 150) + pad.l + pad.r));
-  const height = tight ? 420 : 620;
-  const X = (d) => pad.l + ((Date.parse(d) - t0) / (t1 - t0)) * (width - pad.l - pad.r);
-  const Y = (c) => pad.t + (1 - ((c ?? 0) - c0) / (c1 - c0)) * (height - pad.t - pad.b);
-  const R = (n) => 3.5 + 7 * Math.sqrt(Math.min(1, (n.cited_by || 0) / 400));
-  const byId2 = Object.fromEntries(shown.map((n) => [n.arxiv_id, n]));
-
+  const g = run.graph;
+  if (!host || !g) return;
+  const line = linesOf().find((l) => l.id === pickedLine);
+  const onLine = new Set(line ? line.papers : []);
+  const shown = g.nodes.filter((n) => !hiddenRoles.has(n.role) || onLine.has(n.arxiv_id));
+  if (!shown.length) { host.innerHTML = '<p class="dim">Every kind of paper is hidden.</p>'; return; }
+  const at = Object.fromEntries(shown.map((n) => [n.arxiv_id, n]));
+  const t = shown.map((n) => Date.parse(n.date));
+  const t0 = Math.min(...t);
+  const t1 = Math.max(Math.max(...t), t0 + 8.64e7);
+  const lg = (n) => Math.log10(1 + (n.cited_by || 0));
+  const c1 = Math.max(1, ...shown.map(lg));
+  const width = host.clientWidth || 1100;
+  const height = Math.max(420, Math.min(680, Math.round(width * 0.5)));
+  const pad = { l: 58, r: 24, t: 18, b: 44 };
+  const X = (n) => pad.l + ((Date.parse(n.date) - t0) / (t1 - t0)) * (width - pad.l - pad.r);
+  const Y = (n) => pad.t + (1 - lg(n) / c1) * (height - pad.t - pad.b);
   const grid = [];
+  const years = (t1 - t0) / 3.156e10;
   const step = years > 24 ? 5 : years > 10 ? 2 : 1;
-  for (let y = new Date(t0).getFullYear(); y <= new Date(t1).getFullYear(); y += step) {
-    const x = X(`${y}-01-01`);
+  for (let yr = new Date(t0).getFullYear(); yr <= new Date(t1).getFullYear(); yr += step) {
+    const x = pad.l + ((Date.parse(`${yr}-01-01`) - t0) / (t1 - t0)) * (width - pad.l - pad.r);
     if (x < pad.l - 1 || x > width - pad.r) continue;
-    grid.push(`<line class="grid" x1="${x}" y1="${pad.t}" x2="${x}" y2="${height - pad.b}"/>
-      <text class="gaxis" x="${x}" y="${height - pad.b + 18}" text-anchor="middle">${y}</text>`);
+    grid.push(`<line class="ggrid" x1="${x}" y1="${pad.t}" x2="${x}" y2="${height - pad.b}"/><text class="gaxis" x="${x}" y="${height - pad.b + 18}" text-anchor="middle">${yr}</text>`);
   }
-  for (let i = 0; i <= 4; i++) {
-    const c = c0 + (i * (c1 - c0)) / 4;
-    const y = Y(c);
-    grid.push(`<line class="grid" x1="${pad.l}" y1="${y}" x2="${width - pad.r}" y2="${y}"/>
-      <text class="gaxis" x="${pad.l - 10}" y="${y + 4}" text-anchor="end">${c.toFixed(2)}</text>`);
+  for (const v of [0, 10, 100, 1000, 10000, 100000]) {
+    if (Math.log10(1 + v) > c1) break;
+    const y = pad.t + (1 - Math.log10(1 + v) / c1) * (height - pad.t - pad.b);
+    grid.push(`<line class="ggrid" x1="${pad.l}" y1="${y}" x2="${width - pad.r}" y2="${y}"/><text class="gaxis" x="${pad.l - 8}" y="${y + 4}" text-anchor="end">${v.toLocaleString()}</text>`);
   }
-  grid.push(`<text class="gaxis" x="${width / 2}" y="${height - 12}" text-anchor="middle">published &rarr;</text>`);
-  grid.push(`<text class="gaxis" transform="translate(${tight ? 11 : 16} ${height / 2}) rotate(-90)" text-anchor="middle">${tight ? "closeness &rarr;" : "closeness to the question &rarr;"}</text>`);
-
-  const edges = graph.edges
-    .map((e, i) => ({ ...e, i }))
-    .map((e) => ({ ...e, inline: onLine.has(e.source) && onLine.has(e.target) }))
-    .filter((e) => held.has(e.source) && held.has(e.target) && (e.inline || !hiddenIntents.has(e.intent)));
+  grid.push(`<text class="gaxis" transform="translate(14 ${height / 2}) rotate(-90)" text-anchor="middle">cited by &rarr;</text>`);
+  const edges = g.edges.map((e, i) => ({ ...e, i, inline: onLine.has(e.source) && onLine.has(e.target) }))
+    .filter((e) => at[e.source] && at[e.target] && (e.inline || !hiddenIntents.has(e.intent)));
   const edgeSvg = edges.map((e) => {
-    const a = byId2[e.source];
-    const b = byId2[e.target];
-    const d = `x1="${X(a.date)}" y1="${Y(a.cosine)}" x2="${X(b.date)}" y2="${Y(b.cosine)}"`;
-    return `<g class="gedge-g${e.inline ? " inline" : ""}" data-e="${e.i}" data-s="${e.source}" data-t="${e.target}">
-      <line class="gedge intent-${e.intent}" ${d}/><line class="ghit" ${d}/></g>`;
+    const d = `x1="${X(at[e.source])}" y1="${Y(at[e.source])}" x2="${X(at[e.target])}" y2="${Y(at[e.target])}"`;
+    return `<g class="gedge${e.inline ? " inline" : ""}" data-e="${e.i}" data-s="${e.source}" data-t="${e.target}"><line style="stroke:var(${INTENT_COLORS[e.intent] || "--overlay1"})" ${d}/><line class="ghit" ${d}/></g>`;
   }).join("");
-
-  // each line is drawn through its own papers in order, in its own color
-  const drawn = lineRows.map((l, i) => ({ n: i + 1, ...l })).filter((l) => l.n === pickedLine);
-  const lineSvg = drawn.map((l) => {
-    const pts = l.papers.filter((p) => held.has(p.arxiv_id)).map((p) => `${X(p.date)},${Y(byId2[p.arxiv_id].cosine)}`);
-    if (pts.length < 2) return "";
-    return `<g class="gline-g" data-l="${l.n}"><polyline class="gpath" points="${pts.join(" ")}" style="stroke:${lineColor(l.n)}"/>
-      <polyline class="ghit" points="${pts.join(" ")}"/></g>`;
-  }).join("");
-
-  const dots = shown.map((n) => {
-    const on = onLine.has(n.arxiv_id);
-    return `<g class="gnode${cur && !on ? " dim" : ""}" data-id="${n.arxiv_id}">
-      <circle class="role-fill role-${n.role}" cx="${X(n.date)}" cy="${Y(n.cosine)}" r="${R(n)}"
-        stroke="${on ? lineColor(pickedLine) : "var(--mantle)"}" stroke-width="${on ? 2.5 : 1}"/>
-    </g>`;
-  }).join("");
-
-  const placed = [];
-  const labels = shown
-    .filter((n) => (pickedLine ? n.lines.includes(pickedLine) : n.cited_by > 0))
-    .sort((a, b) => (b.cited_by || 0) - (a.cited_by || 0))
-    .map((n) => {
-      const x = X(n.date) + R(n) + 6;
-      const y = Y(n.cosine) + 4;
-      const cut = tight ? 16 : 30;
-      if (placed.some((p) => Math.abs(p.y - y) < (tight ? 24 : 13) && Math.abs(p.x - x) < cut * 7)) return "";
-      placed.push({ x, y });
-      return `<text class="glabel" data-id="${n.arxiv_id}" x="${x}" y="${y}">${esc(deTeX(n.title).slice(0, cut))}</text>`;
-    })
-    .filter(Boolean)
-    .slice(0, tight ? 4 : 18)
-    .join("");
-
-  host.innerHTML = `<svg width="${width}" height="${height}" role="img" id="gsvg"${cur ? ' class="picked"' : ""}>
-    ${grid.join("")}<g class="gedges">${edgeSvg}</g><g class="glines">${lineSvg}</g>${dots}${labels}</svg>`;
-  wireGraph(graph, edges);
-  if (focusedNode) spotlight(focusedNode);
+  const path = line ? line.papers.filter((a) => at[a]).map((a) => `${X(at[a])},${Y(at[a])}`).join(" ") : "";
+  const dots = shown.map((n) => `<circle class="gnode${line && !onLine.has(n.arxiv_id) ? " dim" : ""}${onLine.has(n.arxiv_id) ? " online" : ""}" data-id="${n.arxiv_id}" cx="${X(n)}" cy="${Y(n)}" r="${n.role === "found" ? 5.5 : 8}" style="fill:var(${ROLES[n.role]})"/>`).join("");
+  host.innerHTML = `<svg width="${width}" height="${height}" id="gsvg" role="img" aria-label="Citation graph">${grid.join("")}<g>${edgeSvg}</g>${path ? `<polyline class="gline" points="${path}"/>` : ""}${dots}</svg>`;
+  const byIndex = Object.fromEntries(edges.map((e) => [e.i, e]));
+  const svg = document.getElementById("gsvg");
+  const nameOf = (a) => esc(clip(deTeX((at[a] || {}).title || a), 70));
+  for (const c of svg.querySelectorAll(".gnode")) {
+    const n = at[c.dataset.id];
+    const html = `<div class="cp-t">${esc(deTeX(n.title))}</div><div class="cp-m">${esc(n.date)} &middot; ${esc(n.arxiv_id)} &middot; ${(n.cited_by || 0).toLocaleString()} citations</div><div class="cp-m">${ROLE_WORDS[n.role]}</div>`;
+    c.onmouseenter = (e) => { spot(n.arxiv_id); showTip(e, html); };
+    c.onmousemove = (e) => showTip(e);
+    c.onmouseleave = () => { unspot(); hideTip(); };
+    c.onclick = () => window.open(`https://arxiv.org/abs/${n.arxiv_id}`, "_blank");
+  }
+  for (const el of svg.querySelectorAll(".gedge")) {
+    const e = byIndex[el.dataset.e];
+    const html = `<div><b>${nameOf(e.source)}</b></div><div class="tip-k" style="color:var(${INTENT_COLORS[e.intent] || "--overlay1"})">${esc(e.intent)}</div><div><b>${nameOf(e.target)}</b></div>${e.sentence ? `<blockquote>${esc(e.sentence)}</blockquote>` : ""}`;
+    el.onmouseenter = (ev) => { spot(e.source, el); showTip(ev, html); };
+    el.onmousemove = (ev) => showTip(ev);
+    el.onmouseleave = () => { unspot(); hideTip(); };
+  }
+  if (focusId) {
+    const q = focusId.toLowerCase();
+    const hit = shown.find((n) => n.arxiv_id.includes(q) || n.title.toLowerCase().includes(q));
+    if (hit) spot(hit.arxiv_id);
+  }
 }
 
-// hovering lights up what a paper cites and what cites it, and dims the rest
-function spotlight(id, only) {
+// a paper under the pointer lights up what it cites and what cites it, and dims the rest
+function spot(id, only) {
   const svg = document.getElementById("gsvg");
   if (!svg) return;
   const near = new Set([id]);
-  for (const g of svg.querySelectorAll(".gedge-g")) {
+  for (const g of svg.querySelectorAll(".gedge")) {
     const hit = only ? g === only : g.dataset.s === id || g.dataset.t === id;
     g.classList.toggle("hi", hit);
     if (hit) { near.add(g.dataset.s); near.add(g.dataset.t); }
   }
-  for (const g of svg.querySelectorAll(".gnode")) g.classList.toggle("hi", near.has(g.dataset.id));
-  for (const t of svg.querySelectorAll(".glabel")) t.classList.toggle("hi", near.has(t.dataset.id));
+  for (const c of svg.querySelectorAll(".gnode")) c.classList.toggle("hi", near.has(c.dataset.id));
   svg.classList.add("focus");
 }
 
@@ -1063,450 +794,71 @@ function unspot() {
   if (!svg) return;
   svg.classList.remove("focus");
   for (const el of svg.querySelectorAll(".hi")) el.classList.remove("hi");
-  if (focusedNode) spotlight(focusedNode);
 }
 
-function wireGraph(graph, edges) {
-  const svg = document.getElementById("gsvg");
-  const nodes = Object.fromEntries(graph.nodes.map((n) => [n.arxiv_id, n]));
-  const byIndex = Object.fromEntries(edges.map((e) => [e.i, e]));
-  for (const g of svg.querySelectorAll(".gnode")) {
-    const n = nodes[g.dataset.id];
-    g.onmouseenter = (e) => { spotlight(n.arxiv_id); showTip(e, nodeTip(n)); };
-    g.onmousemove = (e) => showTip(e, nodeTip(n));
-    g.onmouseleave = () => { unspot(); hideTip(); };
-    g.onclick = () => openPaper(n.arxiv_id);
-  }
-  for (const g of svg.querySelectorAll(".gedge-g")) {
-    const e = byIndex[g.dataset.e];
-    g.onmouseenter = (ev) => { spotlight(e.source, g); showTip(ev, edgeTip(e)); };
-    g.onmousemove = (ev) => showTip(ev, edgeTip(e));
-    g.onmouseleave = () => { unspot(); hideTip(); };
-    g.onclick = () => openPaper(e.source);
-  }
-  const lineRows = (run.sections || {}).lineages || [];
-  for (const g of svg.querySelectorAll(".gline-g")) {
-    const n = +g.dataset.l;
-    const l = lineRows[n - 1];
-    const html = `<div class="gtip-lines"><span style="--c:${lineColor(n)}"><i></i><b>${esc(lineName(n))}</b></span></div>
-      <div class="cp-m">${l.papers.length} papers from ${l.papers[0].date.slice(0, 4)} to ${l.papers[l.papers.length - 1].date.slice(0, 4)}</div>
-      <ol class="gtip-steps">${l.papers.map((p) => `<li><span class="pl-date">${p.date.slice(0, 4)}</span> ${esc(deTeX(p.title))}</li>`).join("")}</ol>
-      ${l.description ? `<div class="cp-s">${esc(l.description)}</div>` : ""}
-      <div class="ichips">${intentChips(lineEdges({ n, ...l }))}</div>`;
-    g.onmouseenter = (e) => { g.classList.add("hi"); svg.classList.add("focus-line"); showTip(e, html); };
-    g.onmousemove = (e) => showTip(e, html);
-    g.onmouseleave = () => { g.classList.remove("hi"); svg.classList.remove("focus-line"); hideTip(); };
-  }
+function wireGraph() {
+  const root = document.querySelector(".cgraph");
+  if (!root) return;
+  for (const b of root.querySelectorAll("[data-r]")) b.onclick = () => { const r = b.dataset.r; hiddenRoles.has(r) ? hiddenRoles.delete(r) : hiddenRoles.add(r); b.classList.toggle("off"); drawGraph(); };
+  for (const b of root.querySelectorAll("[data-i]")) b.onclick = () => { const i = b.dataset.i; hiddenIntents.has(i) ? hiddenIntents.delete(i) : hiddenIntents.add(i); b.classList.toggle("off"); drawGraph(); };
+  const sel = document.getElementById("gline");
+  if (sel) sel.onchange = () => { pickedLine = sel.value; drawGraph(); };
+  document.getElementById("gq").oninput = (e) => { focusId = e.target.value.trim(); drawGraph(); };
+  drawGraph();
 }
 
-// -- details ---------------------------------------------------------------------------------
-
-const COUNT_WORDS = {
-  queries: "Searches",
-  papers: "Papers kept",
-  union: "Papers after following their references",
-  edges: "Citations between them",
-  lineages: "Lines found",
-  successors: "Newer papers responding to them",
-};
-const TIME_WORDS = {
-  "retrieve and read": "Searching and grading papers",
-  "mine and write": "Reading citations and writing",
-};
-
-function detailsTab() {
-  const counts = run.counts || {};
-  const seconds = run.seconds || {};
-  const row = (k, v) => `<div class="drow"><span>${esc(k)}</span><span>${esc(v)}</span></div>`;
-  const sec = run.sections || {};
-  const kept = { lineages: (sec.lineages || []).length, successors: (sec.successors || []).length };
-  const countRows = Object.entries(counts).filter(([k]) => k !== "magnets").map(([k, v]) => row(COUNT_WORDS[k] || capital(k),
-    Number(v).toLocaleString() + (k in kept && kept[k] < v ? `, ${kept[k]} shown` : ""))).join("");
-  const total = Object.values(seconds).reduce((a, b) => a + b, 0);
-  const timeRows = Object.entries(seconds).map(([k, v]) => row(TIME_WORDS[k] || capital(k), duration(v))).join("")
-    + (total ? row("Total", duration(total)) : "");
-  const areas = (run.areas || []).map((a) =>
-    `<div class="drow"><span>${esc(a.question)}</span><span>${a.papers.length} papers</span></div>`).join("");
-  const fixed = Object.keys(run.corrected || {}).length;
-  const cut = (run.cut || []).length;
-  document.getElementById("p-details").innerHTML = `<div class="dgrid">
-    <div class="dcard"><h3>Paper counts</h3>${countRows || row("Nothing recorded", "")}</div>
-    <div class="dcard"><h3>Time</h3>${timeRows || row("Nothing recorded", "")}</div>
-    <div class="dcard"><h3>Citation check</h3>
-      ${row("Citations verified", (run.cited || []).length)}
-      ${row("Mistyped ids fixed", fixed)}
-      ${row("Made-up ids removed", cut)}
-      <p class="tech dnote">Every arXiv id in the report is looked up in the corpus before it is saved.</p></div>
-    <div class="dcard"><h3>Areas searched</h3>${areas || row("The question was searched as one area", "")}</div>
-    <div class="dcard"><h3>Settings</h3>
-      ${row("Papers up to", longDate(run.asked))}
-      ${row("Mode", capital(run.mode))}
-      ${row("Depth", capital(run.effort))}
-      ${row("Searches", (run.queries || []).length)}
-    </div></div>`;
+function checkTab() {
+  const c = run.check || {};
+  const faults = (c.faults || []).map((f) => `<li><b>${esc(f.kind)}</b>${f.where ? ` <code>${esc(f.where)}</code>` : ""}: ${esc(f.line)}</li>`).join("");
+  return `<div class="prose"><p><span class="chip ${c.passed ? "ok" : "warn"}">${c.passed ? "passed" : unverified(faultGroups().length)}</span> ${c.markers || 0} citation markers.</p>
+    <p class="dim">The check is mechanical: every marker names a paragraph a read returned, every quote sits in that paragraph, every paper cited in the body was read, and every line stating a finding carries a marker or is labeled as inference.</p>
+    ${faults ? `<ul>${faults}</ul>` : ""}</div>`;
 }
 
-// -- where the run's papers sit in the topic tree ---------------------------------------------
-
-const TOPIC_ROW = 30;
-// a leaf name runs to two lines, and leaves hang below their parent where the width is
-const LEAF_ROW = 42;
-const TOPIC_GAP = 34;
-const TOPIC_COL = 12;
-const LEAF_INDENT = 30;
-const TOPIC_W = [150, 220, 240, 250];
-const TOPIC_MAX = [150, 300, 320, 400];
-const topics = { open: null, picked: "root", shown: new Map(), links: new Map(), at: new Map(), width: 0, watch: null };
-
-const roleOf = (p) => p.role || (p.retrieved ? "ungraded" : "connector");
-const topicX = (d) => TOPIC_W.slice(0, d).reduce((a, w) => a + w + TOPIC_GAP, 0);
-
-function topicData() {
-  const root = { id: "root", name: "This run", depth: 0, children: [], papers: [], up: null };
-  const byKey = { root };
-  for (const p of papers) {
-    if (!p.topic_id || p.topic_id.length !== 3) continue;
-    root.papers.push(p);
-    let up = root;
-    for (let d = 0; d < 3; d++) {
-      const code = p.topic_id.slice(0, d + 1).join(".");
-      let node = byKey["t" + code];
-      if (!node) {
-        node = { id: "t" + code, code, name: p.topic[d] || `topic ${code}`, depth: d + 1, children: [], papers: [], up };
-        byKey[node.id] = node;
-        up.children.push(node);
-      }
-      node.papers.push(p);
-      up = node;
-    }
-  }
-  // each top level topic keeps one line color for its branch
-  const sorted = [...root.children].sort((a, b) => b.papers.length - a.papers.length);
-  sorted.forEach((g, i) => { g.color = lineColor(i + 1); });
-  for (const node of Object.values(byKey)) {
-    let g = node;
-    while (g.depth > 1) g = g.up;
-    node.color = node.depth ? g.color : "var(--primary)";
-  }
-  return { root, byKey };
-}
-
-function topicLayout(root, width) {
-  const out = [];
-  let y = 0;
-  const pack = (run, d, x0, below) => {
-    if (!run.length) return;
-    const room = Math.max(TOPIC_W[d], width - x0 - 6);
-    const per = Math.max(1, Math.floor((room + TOPIC_COL) / (TOPIC_W[d] + TOPIC_COL)));
-    const w = Math.min(TOPIC_MAX[d], Math.floor((room - (per - 1) * TOPIC_COL) / per));
-    const h = d === 3 ? LEAF_ROW : TOPIC_ROW;
-    run.forEach((kid, i) => {
-      const c = i % per;
-      if (i && !c) y += h;
-      Object.assign(kid, { x: x0 + c * (w + TOPIC_COL), y: y + h / 2, w, h, kids: [], head: !c, below });
-      out.push(kid);
-    });
-    y += h;
-  };
-  const walk = (node) => {
-    const kids = topics.open.has(node.id) ? [...node.children].sort((a, b) => b.papers.length - a.papers.length) : [];
-    Object.assign(node, { x: topicX(node.depth), w: TOPIC_W[node.depth], h: TOPIC_ROW, kids, head: true, below: false });
-    out.push(node);
-    if (!kids.length || node.depth === 2) {
-      node.y = y + TOPIC_ROW / 2;
-      y += TOPIC_ROW;
-      pack(kids, node.depth + 1, node.x + LEAF_INDENT, true);
-      return;
-    }
-    let run = [];
-    for (const kid of kids) {
-      if (!topics.open.has(kid.id)) { run.push(kid); continue; }
-      pack(run, node.depth + 1, topicX(node.depth + 1), false);
-      run = [];
-      walk(kid);
-    }
-    pack(run, node.depth + 1, topicX(node.depth + 1), false);
-    node.y = (kids[0].y + kids[kids.length - 1].y) / 2;
-  };
-  walk(root);
-  return { nodes: out, height: y };
-}
-
-function topicLink(a, b) {
-  if (b.below) {
-    const x = a.x + 10;
-    const top = a.y + 10;
-    const r = Math.min(8, Math.max(0, b.y - top));
-    return `M${x},${top} L${x},${b.y - r} Q${x},${b.y} ${x + r},${b.y} L${b.x},${b.y}`;
-  }
-  const x1 = a.x + a.w;
-  const mid = (x1 + b.x) / 2;
-  return `M${x1},${a.y} C${mid},${a.y} ${mid},${b.y} ${b.x},${b.y}`;
-}
-
-function roleBar(list) {
-  const count = {};
-  for (const p of list) count[roleOf(p)] = (count[roleOf(p)] || 0) + 1;
-  return ROLE_ORDER.filter((r) => count[r]).map((r) => `<i class="role-fill role-${r}" style="flex:${count[r]}"></i>`).join("");
-}
-
-function roleTally(list) {
-  const count = {};
-  for (const p of list) count[roleOf(p)] = (count[roleOf(p)] || 0) + 1;
-  return ROLE_ORDER.filter((r) => count[r]).map((r) => `<span><i class="role-dot role-${r}"></i>${count[r]} ${r}</span>`).join("");
-}
-
-function topicsTab() {
-  const host = document.getElementById("p-topics");
-  const { root, byKey } = topicData();
-  if (!root.papers.length) {
-    host.innerHTML = '<p class="empty">This report was written before papers carried their place in the topic tree.</p>';
-    return;
-  }
-  // the top level opens, and a parent unfolds when it is picked, so the tree starts one screen tall
-  if (!topics.open) topics.open = new Set(Object.values(byKey).filter((n) => n.depth < 2).map((n) => n.id));
-  if (!byKey[topics.picked]) topics.picked = "root";
-  topics.root = root;
-  topics.byKey = byKey;
-  topics.shown = new Map();
-  topics.links = new Map();
-  topics.at = new Map();
-  const leaves = Object.values(byKey).filter((n) => n.depth === 3).length;
-  host.innerHTML = `<div class="tp-head">
-      <p>Where the ${root.papers.length} papers of this run sit in the corpus's own topic tree, ${root.children.length} top level topics down to ${leaves} leaves.
-        Each bar splits a topic's papers by the role the reader gave them. Click a topic to open it and list its papers, and its dot to fold it.</p>
-      <div class="tp-legend">${roleTally(root.papers)}</div></div>
-    <div class="tp-wrap"><div class="tp-tree" id="tpt"><svg class="tp-links" id="tpl"></svg></div></div>
-    <div class="tp-list" id="tpp"></div>`;
-  const tree = document.getElementById("tpt");
-  if (topics.watch) topics.watch.disconnect();
-  topics.width = 0;
-  topics.watch = new ResizeObserver(() => { if (Math.abs(tree.clientWidth - topics.width) > 1) drawTopics(); });
-  topics.watch.observe(tree);
-  drawTopics();
-  topicPapers();
-}
-
-function drawTopics() {
-  const host = document.getElementById("tpt");
-  const svg = document.getElementById("tpl");
-  if (!host) return;
-  topics.width = host.clientWidth;
-  const { nodes, height } = topicLayout(topics.root, topics.width);
-  host.style.height = `${height + 6}px`;
-  svg.setAttribute("height", String(height + 6));
-  const keep = new Set(nodes.map((node) => node.id));
-  for (const node of nodes) {
-    let el = topics.shown.get(node.id);
-    const internal = node.children.length > 0;
-    if (!el) {
-      el = document.createElement("div");
-      el.className = `tp-node d${node.depth}`;
-      const from = topics.at.get(node.up ? node.up.id : "root") || { x: node.x, y: node.y };
-      el.style.transform = `translate(${from.x}px, ${from.y - node.h / 2}px)`;
-      el.style.opacity = "0";
-      el.innerHTML = `<button class="tp-dot" aria-label="fold"></button><button class="tp-name"></button><span class="tp-n"></span><span class="tp-roles"></span>`;
-      el.querySelector(".tp-dot").onclick = () => {
-        if (!internal) return pickTopic(node.id);
-        if (topics.open.has(node.id)) {
-          const shut = (x) => { topics.open.delete(x.id); x.children.forEach(shut); };
-          shut(node);
-        } else topics.open.add(node.id);
-        drawTopics();
-      };
-      el.querySelector(".tp-name").onclick = () => pickTopic(node.id);
-      el.onmousemove = (e) => showTip(e, `<div class="cp-t">${esc(node.name)}</div>
-        <div class="cp-m">${node.papers.length} of this run's papers${node.up ? `, ${Math.round((100 * node.papers.length) / node.up.papers.length)}% of ${esc(node.up.name)}` : ""}</div>
-        <div class="tp-tally">${roleTally(node.papers)}</div>${node.code ? `<div class="cp-m tech">topic ${node.code}</div>` : ""}`);
-      el.onmouseleave = hideTip;
-      host.append(el);
-      topics.shown.set(node.id, el);
-    }
-    const open = topics.open.has(node.id) && internal;
-    el.style.setProperty("--c", node.color);
-    el.style.width = `${node.w}px`;
-    el.style.height = `${node.h}px`;
-    el.classList.toggle("open", open);
-    el.classList.toggle("leaf", !internal);
-    el.classList.toggle("tall", node.h === LEAF_ROW);
-    el.classList.toggle("picked", node.id === topics.picked);
-    el.querySelector(".tp-dot").innerHTML = internal ? (open ? "&minus;" : "+") : "";
-    el.querySelector(".tp-name").textContent = node.name;
-    el.querySelector(".tp-n").textContent = node.papers.length;
-    el.querySelector(".tp-roles").innerHTML = roleBar(node.papers);
-    requestAnimationFrame(() => {
-      el.style.transform = `translate(${node.x}px, ${node.y - node.h / 2}px)`;
-      el.style.opacity = "1";
-    });
-  }
-  for (const [id, el] of topics.shown) {
-    if (keep.has(id)) continue;
-    const node = topics.byKey[id];
-    let up = node.up;
-    while (up && !keep.has(up.id)) up = up.up;
-    if (up) el.style.transform = `translate(${up.x}px, ${up.y - node.h / 2}px)`;
-    el.style.opacity = "0";
-    el.style.pointerEvents = "none";
-    topics.shown.delete(id);
-    setTimeout(() => el.remove(), 320);
-  }
-  const want = new Set();
-  for (const node of nodes) {
-    for (const kid of node.kids) {
-      if (!kid.head) continue;
-      want.add(kid.id);
-      let path = topics.links.get(kid.id);
-      if (!path) {
-        path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        const start = kid.below ? { x: node.x + 10, y: node.y + 10, below: true } : { x: node.x + node.w, y: node.y };
-        path.style.d = `path("${topicLink(node, start)}")`;
-        svg.append(path);
-        topics.links.set(kid.id, path);
-      }
-      path.setAttribute("class", "tp-link");
-      path.style.setProperty("--c", kid.color);
-      const d = `path("${topicLink(node, kid)}")`;
-      requestAnimationFrame(() => { path.style.d = d; });
-    }
-  }
-  for (const [id, path] of topics.links) {
-    if (want.has(id)) continue;
-    path.style.opacity = "0";
-    topics.links.delete(id);
-    setTimeout(() => path.remove(), 320);
-  }
-  topics.at = new Map(nodes.map((node) => [node.id, { x: node.x, y: node.y }]));
-}
-
-function pickTopic(id) {
-  topics.picked = id;
-  const node = topics.byKey[id];
-  if (node && node.children.length && !topics.open.has(id)) {
-    topics.open.add(id);
-    drawTopics();
-  }
-  for (const [key, el] of topics.shown) el.classList.toggle("picked", key === id);
-  topicPapers();
-}
-
-function topicPapers() {
-  const node = topics.byKey[topics.picked] || topics.root;
-  const rank = (p) => ROLE_ORDER.indexOf(roleOf(p));
-  const list = [...node.papers].sort((a, b) => rank(a) - rank(b) || String(b.date).localeCompare(String(a.date)));
-  const path = [];
-  for (let n = node; n && n.depth; n = n.up) path.unshift(n.name);
-  document.getElementById("tpp").innerHTML = `<div class="tp-lh" style="--c:${node.color}"><i></i>
-      <span>${esc(path.length ? path.join(" / ") : "Every paper in this run")}</span><span class="tech">${list.length} papers</span></div>
-    <ul>${list.map((p) => `<li><i class="role-dot role-${roleOf(p)}" title="${roleOf(p)}"></i>
-      <span class="tp-y">${esc(String(p.date || "").slice(0, 4))}</span>
-      <button class="tp-t" onclick="openPaper('${p.arxiv_id}')">${esc(deTeX(p.title))}</button>
-      ${p.cited ? '<span class="cited-b">CITED</span>' : ""}
-      ${node.depth < 3 ? `<span class="tp-leaf">${esc(p.topic[2] || "")}</span>` : ""}</li>`).join("")}</ul>`;
-}
-
-// -- one run ---------------------------------------------------------------------------------
-
-function tab(name, quiet) {
-  if (!TABS.includes(name)) name = "report";
-  if (!quiet && run) location.hash = `#/run/${encodeURIComponent(run.slug)}/${name}`;
-  for (const p of document.querySelectorAll(".tab-panel")) p.classList.toggle("active", p.id === "p-" + name);
-  for (const b of document.querySelectorAll(".tabs button")) b.classList.toggle("active", b.dataset.t === name);
-  hideTip();
-  // a hidden panel measures zero, so the chart is laid out once its own tab is showing
-  if (name === "graph" && run) graphTab();
-  if (name === "topics" && run) topicsTab();
-  if (!quiet) window.scrollTo(0, 0);
-}
-
-async function reading(slug, wanted) {
-  const view = document.getElementById("view");
-  view.innerHTML = '<p class="empty">Loading&hellip;</p>';
-  const answer = await fetch(`api/runs/${encodeURIComponent(slug)}`);
-  if (!answer.ok) { view.innerHTML = `<p class="empty">There is no report called ${esc(slug)}.</p>`; return; }
-  run = await answer.json();
-  // papers.json overwrites run.json's id list, and an older run that has only ids gets none
-  papers = (run.papers || []).filter((p) => typeof p === "object");
-  byId = Object.fromEntries(papers.map((p) => [p.arxiv_id, p]));
-  nodeById = Object.fromEntries(((run.graph || {}).nodes || []).map((n) => [n.arxiv_id, n]));
-  lineNames = ((run.sections || {}).lineages || []).map((l) => l.name || "");
-  refs = REF_DEFAULT();
-  topics.picked = "root";
-  topics.open = null;
-  pickedLine = linesOf().length ? 1 : 0;
-  focusedNode = null;
-  document.title = "GraphIV, " + run.question;
-
-  const files = [["report.md", "The report (Markdown)"], ["papers.json", "Every paper (JSON)"],
-    ["graph.json", "The graph (JSON)"], ["run.json", "Run settings (JSON)"]]
-    .map(([f, l]) => `<a class="mi" href="files/${encodeURIComponent(slug)}/${f}" target="_blank">${l}</a>`).join("");
-  const nCited = (run.cited || []).length;
-  const byline = [`Asked ${longDate(run.asked)}`, `${papers.length || (run.papers || []).length} papers, ${nCited} cited in the report`,
-    `${capital(run.mode)}, ${run.effort} depth`].join(" · ");
-  view.innerHTML = `
-    <div class="runhead">
-      <a class="back" href="#/">&larr; Library</a>
-      <h1 class="q">${esc(run.question)}</h1>
-      <div class="byline">${esc(byline)}</div>
-      <div class="actionbar">
-        <button class="ab-btn primary" id="topcited">Open the top paper</button>
-        <details class="menu"><summary class="ab-btn">Download &#9662;</summary>
-          <div class="menu-body">${files}</div></details>
-      </div>
-    </div>
-    <div class="tabs">${[["report", "Report"], ["methods", "Methods"], ["references", "Papers"], ["graph", "Graph"], ["topics", "Topics"], ["details", "Details"]]
-      .map(([t, l]) => `<button data-t="${t}" onclick="tab('${t}')">${l}</button>`).join("")}</div>
-    ${TABS.map((t) => `<div class="tab-panel" id="p-${t}"></div>`).join("")}`;
-
-  reportTab();
-  methodsTab();
-  referencesTab();
-  detailsTab();
-  const first = papers.find((p) => p.cited) || papers[0];
-  document.getElementById("topcited").onclick = () => first && openPaper(first.arxiv_id);
-  tab(wanted || "report", true);
-  window.scrollTo(0, 0);
+function showRun(tab) {
+  const views = { report: reportTab, papers: papersTab, process: processTab, timeline: timelineTab, check: checkTab };
+  const tabs = TABS.map((t) => `<button class="${t === tab ? "active" : ""}" onclick="location.hash='#/run/${encodeURIComponent(run.slug)}/${t}'">${t[0].toUpperCase() + t.slice(1)}</button>`).join("");
+  const c = run.check || {};
+  const quotes = Object.keys(run.evidence || {}).length;
+  document.getElementById("view").innerHTML = `
+    <header class="runhead"><a class="back" href="#/">&larr; Library</a>
+      <h1>${esc(asked(run.question))}</h1>
+      <div class="meta"><span class="chip ${c.passed ? "ok" : "warn"}">${c.passed ? "checked" : unverified(faultGroups().length)}</span>
+        <span class="chip">${duration(run.seconds)}</span><span class="chip">${Object.keys(run.papers || {}).length} papers read</span>
+        <span class="chip">${quotes} quotes</span><span class="byline">${esc(when(run.saved))}</span></div>
+    </header>
+    <nav class="tabs">${tabs}</nav>
+    <div class="runlayout${tab === "report" || tab === "papers" ? "" : " solo"}"><section class="tab-panel active">${views[tab]()}</section>
+      <aside id="inspector" class="inspector"></aside></div>`;
+  clearInspector();
+  wire(document.getElementById("view"));
+  wireResults();
+  drawTree();
+  wireGraph();
 }
 
 // -- routing ---------------------------------------------------------------------------------
 
-function route() {
-  closePanel();
-  hideTip();
-  const where = location.hash.replace(/^#/, "");
-  if (where.startsWith("/run/")) {
-    const parts = where.slice(5).split("/");
-    const slug = decodeURIComponent(parts[0]);
-    if (run && run.slug === slug) return tab(parts[1] || "report", true);
-    return reading(slug, parts[1]);
+async function route() {
+  const parts = location.hash.replace(/^#\/?/, "").split("/");
+  pinned = null;
+  if (parts[0] === "run" && parts[1]) {
+    const slug = decodeURIComponent(parts[1]);
+    if (!run || run.slug !== slug) {
+      resultsOn = "";
+      const got = await fetch(`api/runs/${encodeURIComponent(slug)}`);
+      if (!got.ok) { document.getElementById("view").innerHTML = '<p class="empty">No such run.</p>'; return; }
+      run = await got.json();
+    }
+    showRun(TABS.includes(parts[2]) ? parts[2] : "report");
+    window.scrollTo(0, 0);
+    return;
   }
-  run = null;
+  runs = await (await fetch("api/runs")).json();
   library();
 }
 
-// the report runs long, so the way back up is always one press away
-function backToTop() {
-  const button = document.getElementById("totop");
-  const mark = () => button.classList.toggle("on", window.scrollY > 600);
-  window.addEventListener("scroll", mark, { passive: true });
-  button.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
-  mark();
-}
-
-async function start() {
-  theme();
-  backToTop();
-  window.addEventListener("hashchange", route);
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape") { closePanel(); hideTip(); } });
-  let sized = 0;
-  window.addEventListener("resize", () => {
-    clearTimeout(sized);
-    sized = setTimeout(() => {
-      const on = document.getElementById("p-graph");
-      if (on && on.classList.contains("active") && run) graphTab();
-    }, 150);
-  });
-  try { runs = await (await fetch("api/runs")).json(); } catch (e) { runs = []; }
-  route();
-}
-
-start();
+theme();
+window.addEventListener("hashchange", route);
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") clearInspector(); });
+route();

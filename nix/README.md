@@ -40,7 +40,7 @@ GRAPHIV_VENV=/tmp/graphiv-venv ./result/bin/graphiv-sync
   services.graphiv = {
     enable = true;
     stateDir = "/srv/graphiv";
-    settings.endpoints.LLM_NAME = "Gemma-4-26B";
+    settings.endpoints.LLM_NAME = "Wordslop-Qwen3.6-27B";
     settings.serve.ALLOWED_HOSTS = [ "graphiv.example.com" ];
   };
 }
@@ -50,7 +50,7 @@ GRAPHIV_VENV=/tmp/graphiv-venv ./result/bin/graphiv-sync
 | --- | --- | --- |
 | `graphiv-pg` | socket only | the cluster, one postmaster of its own |
 | `graphiv-venv` | | a oneshot running `graphiv-sync` into `venvDir`, which every unit below requires |
-| `graphiv-api` | `serve.API_PORT`, 6767 | the ten tools, the store, the graph export |
+| `graphiv-api` | `serve.API_PORT`, 6767 | the six tools, the store, the graph export |
 | `graphiv-frontend` | `serve.FRONTEND_PORT`, 6969 | the dashboard, from a second process registering no tools |
 | `graphiv-manager` | `manager.PORT`, 6868 | the snapshot fetch and every preprocess stage, on the GPU |
 | `graphiv-graph` | | a path unit restarting the api when the graph export is rewritten |
@@ -83,7 +83,7 @@ Name it as a string, since a path literal copies the token into the store.
 `settings.export.DATA_REPO`, `CITATION_REPO` and `SURVEY_REPO` say where it publishes, and an empty one is skipped.
 
 No option names a tuned constant.
-The exponents and the `[miner]` block live in the recipe files that ship with the package, because an option is a promise to support whatever value is put there, and a detuned retriever still reports numbers.
+The exponents live in the recipe files that ship with the package, and the module writes the checkout's `[retrieve]` and `[miner]` blocks into the generated config, because an option is a promise to support whatever value is put there, and a detuned retriever still reports numbers.
 
 ## What a host has to supply
 

@@ -232,3 +232,24 @@ def test_rerank_returns_nothing_for_an_empty_pool(graph: GraphExport) -> None:
     An empty pool is not an error
     """
     assert GraphScorer(graph).rerank(_query(), [], 10) == []
+
+
+def test_a_blocked_citer_never_counts_toward_the_hub(graph: GraphExport, pool: list[Paper]) -> None:
+    """
+    p3 is the only citer of p0, so blocking it zeroes p0's hub as a case's own review must
+    """
+    scorer = GraphScorer(graph, core=2)
+    rows = scorer.get_paper_rows(pool)
+    cutoff = graph.get_day_number(CUTOFF)
+    assert scorer.get_individual_score(pool, rows, cutoff)["hub"][0] > 0.0
+    scorer.blocked = ["p3"]
+    assert scorer.get_individual_score(pool, rows, cutoff)["hub"][0] == 0.0
+
+
+def test_rerank_drops_a_blocked_paper_from_the_pool(graph: GraphExport, pool: list[Paper]) -> None:
+    """
+    A blocked paper handed in by a caller is neither returned nor walked through
+    """
+    scorer = GraphScorer(graph, _only("anc"), core=2)
+    scorer.blocked = ["p4"]
+    assert "p4" not in [p.arxiv_id for p in scorer.rerank(_query(), pool, None)]

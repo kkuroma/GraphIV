@@ -154,6 +154,23 @@ def test_blocking_reaches_the_retriever() -> None:
     assert retriever.blocked == []
 
 
+def test_blocking_reaches_every_step_that_holds_a_blocklist() -> None:
+    """
+    An expander or a scorer reaches papers through a hop or a count, so each gets the list
+    """
+
+    class _BlockingAppender(_Appender):
+        blocked: list[str] = []
+
+    class _BlockingReverser(_Reverser):
+        blocked: list[str] = []
+
+    expander, scorer = _BlockingAppender("x"), _BlockingReverser()
+    pipeline = PaperQuery(_Retriever(), [expander], [None], [scorer])
+    pipeline.block(["a"])
+    assert expander.blocked == ["a"] and scorer.blocked == ["a"]
+
+
 def test_pipeline_refuses_a_limit_per_expander_mismatch() -> None:
     """
     A missing limit is a construction error rather than a surprise at query time

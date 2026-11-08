@@ -1,11 +1,11 @@
 # webui
 
-The dashboard over past runs, served by the frontend role.
+The research library over saved runs, served by the frontend role.
 There is no build step and no framework, and the one dependency, the markdown renderer, is vendored.
 
 ```
-index.html            the page layout and the slide-over panel
-app.js                everything the page does, from the run library to the graph
+index.html            the page layout and the side panel
+app.js                the library, a run's five tabs, and the citation panel
 style.css             the four palettes, light and dark, and the layout
 icon.svg              the G mark
 vendor/marked.min.js  the markdown renderer
@@ -13,49 +13,13 @@ vendor/marked.min.js  the markdown renderer
 
 ## A Run
 
-The front page lists every run as a card, with a search box and paging.
-A run opens on six tabs, and the tab is part of the url, so `#/run/<slug>/graph` is a link you can send.
-
-| Tab | What it shows |
+| tab | what it shows |
 | --- | --- |
-| Report | a one-sentence answer over six numbered sections, with a rail that tracks where you are |
-| Methods | the method table filtered by answer, and a grid of the answer pairs no paper tried |
-| Papers | every paper the run touched, under nine filters |
-| Graph | one lineage at a time, every citation among its papers in its intent color |
-| Topics | the run's papers placed in the corpus topic tree, each topic with a bar split by role |
-| Details | what the run did, what it cost, and what the citation check had to change |
+| Report | the TL;DR as the answer card, the results table built from the reads, papers by year and by topic, the lineages as timelines, the method tables, then the report's sections as cards |
+| Papers | every paper read, cited ones first, with each claim the reader kept from it |
+| Process | where the time went as one stacked bar, then the run as a tree of dots read left to right, calls sent together branching; hovering a dot gives one line, and a click or the arrow keys open its parameters, response or thinking below |
+| Timeline | the citation graph among every paper a tool returned, by date and citation count, colored by its role in the run, with citations by intent and the lines from trace_lineages |
+| Check | whether the report passed the mechanical check, and each fault |
 
-| Section | What it holds |
-| --- | --- |
-| 1 Overview | the opening, which frames the question and how the answer has changed |
-| 2 What the papers show | one tab per claim the review makes, argued from the papers behind it |
-| 3 Methods | the table as the report wrote it, with a link into the Methods tab |
-| 4 Current work | one tab per area, plus what has appeared against the answer since |
-| 5 Open questions | one tab per area, read out of the papers' own limitations sections |
-| 6 Disagreements | one paper telling another it is wrong, in the citing author's words |
-
-An area that started from a paper lists that paper first, whatever grade the reader gave it.
-A method column filters and crosses only when its kind is `choice`, since free text is unique per row.
-A run written before columns carried their kind is read by which columns list options, which are exactly the choice ones.
-
-Hovering a citation shows the paper's card, and clicking it opens the pdf in the panel, from the local store when it is there and from arXiv when it is not.
-
-## On a Phone
-
-Below 760px the page goes to one column and the panel fills the screen.
-A back-to-top button appears after 600px of scrolling, since the report is long by design.
-
-## Where the Data Comes From
-
-The routes are in `src/mcp/dashboard.py`, and every one of them only reads: `/api/runs`, `/api/runs/{slug}`, `/files/{slug}/{name}` for the five files a run writes, and `/pdf/{arxiv_id}` from the local pdf store.
-The page draws `report.json`, so nothing parses the markdown back apart.
-A run's name is checked against what is on disk rather than joined onto the root, so no path can escape it.
-
-## Looking at It
-
-```sh
-uv run python scripts/serve.py --http --role frontend
-```
-
-Then open `[serve] FRONTEND_PORT` from `config.toml`, 6969 by default.
-For a scratch copy, give a copied config another port.
+The inspector docked on the right follows the citation under the pointer: the paper, the paragraph with the quote marked, the reader's claim, and the paper's other claims in the run. A click pins it.
+The tab is part of the url, so `#/run/<slug>/process` is a link someone can send.

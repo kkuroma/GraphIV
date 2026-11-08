@@ -1,0 +1,8 @@
+method = "boundedfield"
+dataset = "scholarcatalyst"
+split = "core"
+
+[run]
+ks = [5, 20, 100]
+ndcg = [20]
+recipe = "focused"

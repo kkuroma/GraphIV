@@ -1,0 +1,18 @@
+# The focused recipe written by benchmarks/tune.py
+NAME = "focused"
+CORE = 200 # papers the expanders and the walks start from
+
+# Exponent per score term
+[weights]
+COS = 1
+REC = 0.547
+ANC = 0.518
+FRO = 0.011
+ANC2 = 0.124
+FRO2 = 0.009
+ANC_DECAY = 0.009
+FRO_DECAY = 0.005
+COCITE = 0.362
+COUPLE = 0.046
+BM25 = 0.933
+HUB = 0.005

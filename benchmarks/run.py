@@ -8,6 +8,7 @@ A run whose results are already in runs/ is skipped unless --rerun is passed
 import argparse
 import hashlib
 import json
+import math
 import time
 import tomllib
 from pathlib import Path
@@ -86,7 +87,23 @@ def fitted(spec: dict[str, Any], method: Method) -> tuple[str | None, dict[str, 
     return key, result
 
 
-def write(name: str, spec: dict[str, Any], cases: list[Case], rankings: list[Ranking], key: str | None) -> dict[str, Any]:
+def ndcg(ranked: list[str], key: set[str], k: int) -> float:
+    """
+    Binary nDCG at k, the ideal list holding as many hits as the key allows within k
+
+    Args:
+        ranked: The ranking.
+        key: The answers.
+        k: The cutoff.
+
+    Returns:
+        The score on [0, 1].
+    """
+    gain = sum(1 / math.log2(i + 2) for i, a in enumerate(ranked[:k]) if a in key)
+    return gain / sum(1 / math.log2(i + 2) for i in range(min(len(key), k)))
+
+
+def write(name: str, spec: dict[str, Any], cases: list[Case], rankings: list[Ranking], key: str | None, allowed: set[str] | None) -> dict[str, Any]:
     """
     Writes runs/<name>.jsonl, each case's ranking and recall at every k, and runs/<name>.json, the summary
 
@@ -96,6 +113,7 @@ def write(name: str, spec: dict[str, Any], cases: list[Case], rankings: list[Ran
         cases: Its cases.
         rankings: One per case, in any order.
         key: The fit's key, None without a fit.
+        allowed: The dataset's corpus, which each ranking is cut to first, None for the whole store.
 
     Returns:
         The summary.
@@ -103,7 +121,7 @@ def write(name: str, spec: dict[str, Any], cases: list[Case], rankings: list[Ran
     Raises:
         ValueError: When a case has no ranking.
     """
-    ks = spec["run"]["ks"]
+    ks, ndcg_ks = spec["run"]["ks"], spec["run"].get("ndcg", [])
     by_id = {r["sample_id"]: r for r in rankings}
     missing = [c["sample_id"] for c in cases if c["sample_id"] not in by_id]
     if missing:
@@ -112,7 +130,10 @@ def write(name: str, spec: dict[str, Any], cases: list[Case], rankings: list[Ran
     for c in cases:
         r = by_id[c["sample_id"]]
         key_set = set(c["key"])
-        row = {"sample_id": c["sample_id"], "ranked": r["ranked"], "recall": {str(k): len(set(r["ranked"][:k]) & key_set) / len(key_set) for k in ks}}
+        ranked = [a for a in r["ranked"] if a in allowed] if allowed is not None else r["ranked"]
+        row = {"sample_id": c["sample_id"], "ranked": ranked, "recall": {str(k): len(set(ranked[:k]) & key_set) / len(key_set) for k in ks}}
+        if ndcg_ks:
+            row["ndcg"] = {str(k): ndcg(ranked, key_set, k) for k in ndcg_ks}
         if "seconds" in r:
             row["seconds"] = r["seconds"]
         rows.append(row)
@@ -125,9 +146,12 @@ def write(name: str, spec: dict[str, Any], cases: list[Case], rankings: list[Ran
         "split": spec.get("split", "test"),
         "cases": len(rows),
         "recall": {str(k): sum(r["recall"][str(k)] for r in rows) / len(rows) for k in ks},
+        "ndcg": {str(k): sum(r["ndcg"][str(k)] for r in rows) / len(rows) for k in ndcg_ks},
         "seconds": sum(seconds) / len(seconds) if len(seconds) == len(rows) else None,
         "fit": key,
         "config": spec,
+        # the recipe file as it ran, since a later tune rewrites it in place
+        "recipe": (common.TUNED_RECIPES / f"{spec['run']['recipe']}.toml").read_text() if "recipe" in spec["run"] else None,
         "finished": time.strftime("%Y-%m-%d %H:%M:%S"),
     }
     (common.RUNS / f"{name}.json").write_text(json.dumps(summary, indent=1))
@@ -159,13 +183,18 @@ def run(path: Path, rerun: bool) -> None:
     common.say(f"== {name} {time.strftime('%Y-%m-%d %H:%M:%S')}")
     method = methods.load(spec["method"])
     key, result = fitted(spec, method)
-    cases = datasets.load(spec["dataset"]).get(spec.get("split", "test"))
-    params = {k: v for k, v in spec["run"].items() if k != "ks"}
+    data = datasets.load(spec["dataset"])
+    cases = data.get(spec.get("split", "test"))
+    params = {k: v for k, v in spec["run"].items() if k not in ("ks", "ndcg")}
+    corpus = data.corpus()
+    if corpus is not None:
+        params["corpus"] = str(corpus)
     started = time.time()
     rankings = method.retrieve(cases, params, result)
-    done = write(name, spec, cases, rankings, key)
-    recall = ", ".join(f"R@{k} {v:.3f}" for k, v in done["recall"].items())
-    common.say(f"== {name} {len(cases)} cases in {time.time() - started:.0f}s, {recall}")
+    allowed = set(corpus.read_text().split()) if corpus is not None else None
+    done = write(name, spec, cases, rankings, key, allowed)
+    scores = [f"R@{k} {v:.3f}" for k, v in done["recall"].items()] + [f"nDCG@{k} {v:.3f}" for k, v in done["ndcg"].items()]
+    common.say(f"== {name} {len(cases)} cases in {time.time() - started:.0f}s, {', '.join(scores)}")
     common.LOG = None
 
 

@@ -94,10 +94,11 @@ class _Expander:
         self.pg_dest = pg_dest
         self.top_k = top_k
         self.hop_limit = hop_limit
+        self.blocked: list[str] = []
 
     def get_neighbor_ids(self, papers: list[Paper]) -> list[str]:
         """
-        The arXiv ids one hop away that the pool does not already hold
+        The arXiv ids one hop away that the pool does not already hold and the case does not block
 
         Args:
             papers: The pool.
@@ -114,7 +115,7 @@ class _Expander:
             np.int32,
         )
         found = self.graph.get_neighbors(rows, self.forward, self.hop_limit)
-        held = {p.arxiv_id for p in papers}
+        held = {p.arxiv_id for p in papers} | set(self.blocked)
         ids = [bytes(self.graph.ids[i]).decode() for i in found]
         return [a for a in ids if a not in held]
 

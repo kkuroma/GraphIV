@@ -5,6 +5,7 @@ A case is a dict with sample_id, query, cutoff, anchors and key, and may carry m
 """
 
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import Any
 
 from src import common
@@ -53,6 +54,15 @@ class Dataset(ABC):
             The row count, the case count unless a dataset says otherwise.
         """
         return len(self.get(split))
+
+    def corpus(self) -> Path | None:
+        """
+        The ids a ranking is cut to before it is scored, for a benchmark that searches its own corpus
+
+        Returns:
+            A file of one id per line, or None to score the whole store.
+        """
+        return None
 
     @abstractmethod
     def build(self, split: str) -> list[Case]:

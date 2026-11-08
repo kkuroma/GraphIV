@@ -1,7 +1,0 @@
-method = "boundedfield"
-dataset = "surge"
-split = "test"
-
-[run]
-ks = [100, 1000]
-recipe = "evolution"

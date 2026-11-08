@@ -7,11 +7,8 @@ The math is in [`docs/leyline.md`](../../docs/leyline.md).
 ```
 leyline.py   LeyLine itself, on a typed graph, knowing nothing about papers
 miner.py     Miner, which turns papers into that graph and calls LeyLine once
-reader.py    grades each paper into one of six roles, the only model call here
-era.py       finds where a field's current era starts, from its own dates
-rank.py      the area gate, then citations per year blended with the reader's grade
 store.py     every query this package sends to Postgres
-recipe.py    reads the [miner] block, where every constant lives
+recipe.py    reads config.toml's [miner] block, where every constant lives
 ```
 
 ## Why LeyLine Takes No Papers
@@ -22,7 +19,7 @@ So `tests/miner/test_leyline.py` runs it on a hand-built ten-node graph with no 
 ## What a Call Does
 
 ```python
-found = Miner(dsn, graph, read_recipe("retrieval_recipes/survey.toml")).mine(papers, vector, asked)
+found = Miner(dsn, graph, build_recipe(config["miner"])).mine(papers, vector, asked)
 ```
 
 The list is first expanded by one citation hop, because papers a reader kept rarely cite each other, while the papers a field argues with are the ones they all cite.

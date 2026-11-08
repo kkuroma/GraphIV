@@ -107,14 +107,14 @@ librechat, and point it at `http://127.0.0.1:6767/mcp` with `type: streamable-ht
 The frontend role serves a run's own files under `/files/<slug>/<name>`, PDFs at `/pdf/<arxiv_id>`
 and the Research Library dashboard at `/`, from a process carrying no tools at all.
 
-Nine tools, and the caller drives them: `refine`, `identify_areas`, `retrieve`, `mine`,
-`read_paper`, `write_report`, `what_cites`, `search_papers` and `find_runs`. `GRAPHIV_READONLY=1`
-registers eight of them, holding back `write_report`, the only one that writes a file.
+Six tools, and the caller drives them and writes the report: `recall_paper`, `search_papers`,
+`read_paper`, `list_citations`, `trace_lineages` and `save_report`. `GRAPHIV_READONLY=1`
+registers five of them, holding back `save_report`, the only one that writes a file.
+`src/mcp/README.md` covers connecting opencode, which is the client the tools are measured with.
 
-The effort a caller passes decides the cost. `quick` is retrieve and mine at about a minute,
-`standard` adds the full-text read, the method table and the written sections and measured 158
-seconds over two areas on one RTX 3090, and `deep` lifts every cap. Runs serialize on the one GPU,
-so keep client tool timeouts generous: the librechat wiring uses 7,200,000 ms.
+The effort in the research skill decides the cost: quick reads 4 to 6 papers in 3 to 5 minutes,
+standard 8 to 12 in about 10, and deep 12 to 20 in at most 20. `read_paper` runs the reader
+model on the server, so calls serialize on the one GPU and client tool timeouts need to be generous.
 
 Figures use `themes/theme.json`
 ([shunka-shuutou](https://git.kuroma.dev/kkuroma/shunka-shuutou-theme)).

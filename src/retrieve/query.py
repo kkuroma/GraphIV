@@ -8,8 +8,18 @@ An expander only appends and the scorer only cuts, so the order inside each half
 from __future__ import annotations
 
 from datetime import date
+from typing import Protocol, runtime_checkable
 
 from src.core.schema import Paper, Query, Reranker, Retriever
+
+
+@runtime_checkable
+class Blocking(Protocol):
+    """
+    A step that can reach a paper the retriever never returned, so it holds the case's blocklist
+    """
+
+    blocked: list[str]
 
 
 class PaperQuery:
@@ -42,12 +52,17 @@ class PaperQuery:
 
     def block(self, arxiv_ids: list[str]) -> None:
         """
-        Sets what this pipeline may never return, which is the only thing a case changes
+        Sets what this pipeline may never return or count, which is the only thing a case changes
+
+        Every step holding a blocklist gets it, since a hop or a count reaches past the retriever.
 
         Args:
             arxiv_ids: Papers to hide, usually an eval case's own reviews.
         """
         self.retriever.blocked = list(arxiv_ids)
+        for step in (*self.expanders, *self.scorers):
+            if isinstance(step, Blocking):
+                step.blocked = list(arxiv_ids)
 
     def build_pool(
         self, text: str, emb: list[float], retrieve_limit: int, max_date: date | None = None

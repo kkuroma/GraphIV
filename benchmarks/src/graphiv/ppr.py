@@ -22,8 +22,6 @@ from src.retrieve.recipe import build_pipeline, get_seed_limit, read_recipe
 from src.retrieve.scorer import GraphScorer
 
 ROOT = Path(__file__).resolve().parents[3]
-# the recipe whose pool PageRank ranks, BoundedField's own
-POOL = ROOT / "retrieval_recipes" / "survey.toml"
 CORE = 200
 RETURN = 1000
 
@@ -68,6 +66,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     _ = ap.add_argument("mode", choices=["grid", "run"])
     _ = ap.add_argument("--graph", required=True)
+    _ = ap.add_argument("--recipe", required=True, help="the BoundedField recipe whose pool PageRank ranks")
     _ = ap.add_argument("--cases", required=True)
     _ = ap.add_argument("--params", required=True, help="json: alphas, teleports, directions and k for grid, setting for run")
     _ = ap.add_argument("--out", required=True)
@@ -76,9 +75,9 @@ def main() -> None:
     config = load_config(str(ROOT / "config.toml"))
     api, name = str(config["endpoints"]["EMBED_API"]), str(config["endpoints"]["EMBED_NAME"])
     graph = load_graph_export(args.graph)
-    recipe = read_recipe(POOL)
-    pipeline = build_pipeline(recipe, graph, str(config["database"]["PG_DEST"]))
-    limit = get_seed_limit(recipe)
+    recipe = read_recipe(Path(args.recipe))
+    pipeline = build_pipeline(recipe, config["retrieve"], graph, str(config["database"]["PG_DEST"]))
+    limit = get_seed_limit(config["retrieve"])
     graph_scorer = GraphScorer(graph)
     with open(args.cases) as f:
         cases = [json.loads(line) for line in f]

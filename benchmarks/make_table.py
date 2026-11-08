@@ -24,6 +24,27 @@ REPORTED = {
     "pasa_test": [("PaSa-7b, reported", {"20": 0.530, "50": 0.633, "100": 0.695}), ("Google with GPT-4o, reported", {"20": 0.192, "50": 0.245, "100": 0.268})],
     "pasa_real": [("PaSa-7b, reported", {"20": 0.580, "50": 0.656, "100": 0.693})],
 }
+# their Table 3, nDCG@20 then recall at 5, 20 and 100, per split
+CATALYST = {
+    "core": [
+        ("BM25, reported", 0.16, 0.12, 0.23, 0.39),
+        ("SPECTER2, reported", 0.13, 0.10, 0.20, 0.38),
+        ("OpenScholar, reported", 0.16, 0.13, 0.23, 0.40),
+        ("Qwen3-Emb-4B, reported", 0.25, 0.18, 0.39, 0.59),
+        ("Qwen3-Emb-8B, reported", 0.26, 0.21, 0.37, 0.58),
+        ("Gemini-Emb-2, reported", 0.27, 0.21, 0.38, 0.62),
+        ("GPT-4.1 tool-calling agent, reported", 0.25, 0.19, 0.37, 0.60),
+    ],
+    "subfield": [
+        ("BM25, reported", 0.21, 0.12, 0.26, 0.45),
+        ("SPECTER2, reported", 0.18, 0.11, 0.23, 0.42),
+        ("OpenScholar, reported", 0.19, 0.12, 0.24, 0.46),
+        ("Qwen3-Emb-4B, reported", 0.35, 0.21, 0.44, 0.69),
+        ("Qwen3-Emb-8B, reported", 0.41, 0.25, 0.51, 0.73),
+        ("Gemini-Emb-2, reported", 0.38, 0.24, 0.46, 0.70),
+        ("GPT-4.1 tool-calling agent, reported", 0.37, 0.24, 0.43, 0.70),
+    ],
+}
 SECONDS = ["survey", "ppr", "nomic_cosine"]
 TERMS = ["rec", "anc", "fro", "anc2", "cocite", "couple", "hub"]
 
@@ -109,6 +130,26 @@ def focused() -> list[str]:
     return lines + ["", "| Footnote | |", "| --- | --- |", *footer, ""]
 
 
+def catalyst() -> list[str]:
+    lines = []
+    for split, reported in CATALYST.items():
+        rows = [(label, v) for label, *v in reported]
+        for path in sorted(common.RUNS.glob(f"*-scholarcatalyst_{split}.json")):
+            s = json.loads(path.read_text())
+            rows.append((path.stem.rsplit("-", 1)[0], [s["ndcg"].get("20"), *(s["recall"].get(k) for k in ("5", "20", "100"))]))
+        best = [max(v[i] for _, v in rows if v[i] is not None) for i in range(4)]
+        lines += [f"## ScholarCatalyst {split} queries, inside their corpus", "", "| method | nDCG@20 | R@5 | R@20 | R@100 |", "| --- " * 5 + "|"]
+        lines += [f"| {label} | " + " | ".join(cell(x, b) for x, b in zip(v, best, strict=True)) + " |" for label, v in rows]
+        lines.append("")
+    return lines + [
+        "| Footnote | |",
+        "| --- | --- |",
+        "| reported | the paper's two-decimal figures, their 191K corpus cut at the source paper's month |",
+        "| ours | ranked over the whole store with its citation graph, cut to their corpus ids, capped at the source paper's day |",
+        "",
+    ]
+
+
 def main() -> None:
     setting = [
         "# Main Tables",
@@ -118,12 +159,13 @@ def main() -> None:
         "| Split | `graphiv-benchmarks-2026-10-22` test: SurveyMatch, FrontierMatch, ConsensusMatch |",
         "| PaSa | AutoScholarQuery test and RealScholarQuery, each capped at its source paper's date |",
         "| SurGE | the survey task, each survey's title capped at its date and blocked from it |",
+        "| ScholarCatalyst | each author-verified question capped at its source paper's date, scored inside the benchmark's corpus |",
         "| Recipes | survey, frontier, consensus tuned on their train split; ancestry, evolution zeroed; focused tuned on AutoScholarQuery train |",
         "| pending | the run has not been made yet |",
         "| bold | the highest recall at that N |",
         "",
     ]
-    lines = setting + [line for suffix in EVALS for line in bench(suffix)] + outside() + ppr_picks() + seconds() + focused()
+    lines = setting + [line for suffix in EVALS for line in bench(suffix)] + outside() + catalyst() + ppr_picks() + seconds() + focused()
     common.TABLES.parent.mkdir(parents=True, exist_ok=True)
     common.TABLES.write_text("\n".join(lines))
     print(common.TABLES)

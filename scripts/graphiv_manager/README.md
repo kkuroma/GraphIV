@@ -4,7 +4,7 @@ The page that keeps the store current.
 It fetches the arXiv snapshot Kaggle publishes each week and runs it through every stage, one job at a time.
 A step that exits nonzero halts its job, so the next stage never reads a queue that did not fill.
 `citation_labeler/` is left out, since training a labeler is a one-time job we run by hand.
-The Benchmarks tab exports a version at `[benchmarks] CUTOFF`, scores every recipe on a chosen split, and runs the recipe fit as a dry run, since a deployed `RECIPE_PATH` is read only.
+Exporting the benchmarks at `[benchmarks] CUTOFF` is a stage of the Export table, and tuning and scoring the recipes happen in `benchmarks/`, never here.
 Publishing to Hugging Face runs only from its own Publish button, never as part of a table or of every stage, and its panel shows which account the token belongs to and which repos it can write.
 
 ```
@@ -13,7 +13,6 @@ schedule.py  the loop that picks the next job, and every number the page reads
 jobs.py      a job as ordered steps, and how a stop escalates from SIGINT to SIGKILL
 stages.py    every stage as a recipe: its script and what it reads, writes and fetches
 stats.py     one query per dashboard chart, cached as json in the state directory
-bench_results.py  the Benchmarks tab: the exported versions, every scored run per split, and the fit reports
 discover.py  finds every runnable script and its flags from the files themselves
 probes.py    the health checks for the store, the endpoints, the GPU, the disks and the queues
 snapshot.py  the snapshot in use, the resumable fetch of a new one, and the commit

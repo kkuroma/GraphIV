@@ -1,6 +1,0 @@
-# The dense retriever alone, which is what the graph score is measured against
-NAME = "cosine_only"
-
-[[component]]
-KIND = "CosineRetriever"
-LIMIT = 5000

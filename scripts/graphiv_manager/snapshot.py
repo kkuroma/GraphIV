@@ -25,6 +25,8 @@ ARCHIVE = "arxiv-new.zip"
 CHUNK = 1 << 22
 # the page polls every few seconds, so progress written more often only grows the log
 SAY_EVERY = 2.0
+# Kaggle answers 404 to the default Python-urllib agent, on the download and the metadata alike
+AGENT = {"User-Agent": "graphiv-manager"}
 FETCH_TIMEOUT = 60.0
 PROBE_TIMEOUT = 8.0
 # the page asks every few seconds and a 5 GB file does not change under it
@@ -191,7 +193,9 @@ def fetch(configured: Path, url: str, log: Path, halt: threading.Event) -> dict[
     have = part.stat().st_size if part.exists() else 0
     said = tag.read_text(encoding="utf-8").split() if tag.exists() else []
     held = said[0] if said else ""
-    request = urllib.request.Request(url, headers={"Range": f"bytes={have}-"} if have else {})
+    request = urllib.request.Request(
+        url, headers=AGENT | ({"Range": f"bytes={have}-"} if have else {})
+    )
     clock = time.time()
     with urllib.request.urlopen(request, timeout=FETCH_TIMEOUT) as reply:
         etag = str(reply.headers.get("ETag", "")).strip('"')
@@ -312,7 +316,9 @@ def remote(url: str) -> dict[str, Any]:
     """
     view = url.replace("/datasets/download/", "/datasets/view/")
     try:
-        with urllib.request.urlopen(view, timeout=PROBE_TIMEOUT) as reply:
+        with urllib.request.urlopen(
+            urllib.request.Request(view, headers=AGENT), timeout=PROBE_TIMEOUT
+        ) as reply:
             data = json.loads(reply.read())
     except (urllib.error.URLError, OSError, ValueError):
         return {}

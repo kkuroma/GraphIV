@@ -2,7 +2,7 @@
 
 ## Topic Queries
 
-These are the five Topic Queries behind the Unseen Newcomer evaluation in [LeyLine](leyline.md#evaluation), from [`frontier-system-REPORT.md`](../experiments/findings/frontier-system-REPORT.md). Each was asked on 2025-03-01, with the citation graph running to 2026-09-10. Each is written as a researcher saying what they already know and what they are trying to decide.
+These are the five Topic Queries behind the Unseen Newcomer evaluation in [LeyLine](leyline.md#evaluation). Each was asked on 2025-03-01, with the citation graph running to 2026-09-10. Each is written as a researcher saying what they already know and what they are trying to decide.
 
 | Topic | Topic Query |
 |---|---|

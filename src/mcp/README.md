@@ -1,62 +1,58 @@
 # mcp
 
-The tools an outside agent calls.
-The agent runs the loop and decides what to search next and when to stop, while the server holds the corpus and the tuned settings and answers one call at a time.
+The tool server an outside agent researches with, and the routes the webui reads saved runs from.
+The agent owns the loop and writes the report, and the server holds the corpus, answers one call at a time and checks what it is given.
 
 ```
-refine.py          turns a freeform interest into focused questions, each tagged survey or frontier
-identify_areas.py  splits one question, a list's papers, or people's papers by topic, into the areas that need separate searches
-retrieve.py        one area, or the field around a list of papers, into graded papers, plus an id for the ranking
-mine.py            runs LeyLine over the papers a search kept
-read_paper.py      a paper's full text at the depth asked for, or a schema the caller invented, filled in
-write_report.py    the document, checked and written to disk
-what_cites.py      who took a position on one paper, and the sentence they used
-search_papers.py   plain cosine, to turn a title into an id
-recall_paper.py    a description of what a paper did or argued into the papers that match it
-find_runs.py       the reports this server already wrote, matched to a new question
-server.py          registers the tools and serves both transports
-state.py           what every tool opens once, and the rankings and areas kept between calls
-effort.py          the quick, standard and deep presets
-dashboard.py       the read-only routes the dashboard reads its runs from
+server.py      the six tools, their docstrings as the agent reads them, and both transports
+context.py     the store, the graph, a pipeline per mode and the model, opened once
+papers.py      the paper record every tool returns, and the filter every lookup takes
+search.py      search_papers: BoundedField from a question or a paper
+recall.py      recall_paper: one paper from a description, or none
+read.py        read_paper: paragraph retrieval into the reader, quotes kept only when found
+citations.py   list_citations: a paper's citers or references with intent and sentence
+graph.py       the citation graph among a run's papers, which save_report stores for the webui's timeline
+lineages.py    trace_lineages: LeyLine lines over a set of papers
+runs.py        the run log: every call, every quote under its label, saved by save_report
+dashboard.py   the read-only routes the webui fetches runs from
+skills/        the agent's skills, one directory each, in the SKILL.md format
+prompts/       every prompt the tools send to the model, one markdown file each
 ```
 
-## A Session
-
-```
-refine -> identify_areas -> retrieve per area -> mine -> read_paper -> write_report
-```
-
-`retrieve` keeps its ranking on the server and returns a `query_id`, since the ranking is thousands of papers and `mine` needs three hundred of them rather than the forty that come back.
-Pass every earlier id as `seen`, and the reply carries `new_share`, the share of the new ranking nothing earlier found.
-Two different areas share almost none of their top papers, while an area that was only renamed shares about a fifth.
-
-## Modes
-
-| Mode | Starts from | Answers |
-| --- | --- | --- |
-| `survey` | the question, or a paper | a wide net, weighted to what the field cites |
-| `frontier` | the question, or a paper | a wide net, weighted to what the field is doing now |
-| `consensus` | the question, or a paper | what the field's reviews agree on |
-| `ancestry` | a paper | what led to it, which is survey with every forward term at 0 |
-| `evolution` | a paper | what came of it, which is frontier with every ancestor term at 0 |
-
-Starting from a paper uses its stored vector as the query, so it sits at a cosine of 1 and leads the kept list.
-`arxiv_id` picks the paper, and without one it is the paper closest to the question inside the dates.
-`date_min` and `date_max` bound every mode, and the floor cuts the ranking after scoring, so the retrieval itself does not change.
-
-## What the Caller Cannot Set
-
-The pool size, the gate, the era rule, how deep the reader reads, the walk settings and the exponents all live in `retrieval_recipes/*.toml`.
-The caller picks a mode by name and never sees the numbers.
-
-## Running It
+## Running it
 
 ```sh
-uv run python scripts/serve.py                          # stdio
-uv run python scripts/serve.py --http --role api        # the tools, 6767
-uv run python scripts/serve.py --http --role frontend   # the dashboard, 6969
+uv run python scripts/serve.py --http --role api         # the tools
+uv run python scripts/serve.py --http --role frontend    # the webui over saved runs
 ```
 
-Both ports are in the `[serve]` block of `config.toml`, and `GRAPHIV_CONFIG` can point at another file.
-The frontend role is a second server with no tools, so it never opens the store or the graph and cannot reach the corpus.
-The graph export is about 400 MB and loads once at start, so the first question costs the same as the tenth.
+A run is every call of one MCP session since its last passing `save_report`.
+`save_report` writes `report.md`, `run.json` and `calls.jsonl` into one directory under `RUNS_PATH`, and a client may add `session.json`, its own transcript, which the webui interleaves with the calls.
+
+## Connecting opencode
+
+The configuration the measured runs used, with `<checkout>` the repo and the model on the router's OpenAI-compatible endpoint:
+
+```json
+{
+  "provider": {
+    "local": {
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {"baseURL": "http://127.0.0.1:11434/v1"},
+      "models": {"Wordslop-Qwen3.6-27B": {"tool_call": true, "limit": {"context": 262144, "output": 32768}}}
+    }
+  },
+  "model": "local/Wordslop-Qwen3.6-27B",
+  "mcp": {"servers": {"graphiv": {"type": "remote", "url": "http://127.0.0.1:6767/mcp", "codemode": false}}},
+  "tools": {"bash": false, "edit": false, "write": false, "patch": false, "read": false, "glob": false, "grep": false, "list": false, "webfetch": false, "websearch": false, "codesearch": false, "lsp": false, "task": false, "todowrite": false, "todoread": false, "skill": true},
+  "tool_output": {"max_bytes": 600000, "max_lines": 20000},
+  "skills": ["<checkout>/src/mcp/skills"],
+  "instructions": ["<checkout>/src/mcp/skills/graphiv-research/SKILL.md"],
+  "compaction": {"auto": true, "buffer": 16000}
+}
+```
+
+`codemode` off makes every tool a plain call, since code mode let an agent build a call it never awaited.
+The built-in tools are off so every answer comes from the corpus, and the skill tool stays on so the agent can load the other three skills.
+The research skill goes in as instructions because an agent rarely loads an optional skill on its own.
+The output limits are raised so a long `read_paper` reply reaches the agent whole.

@@ -16,7 +16,6 @@ from starlette.responses import FileResponse, JSONResponse, Response
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 
-import bench_results
 import snapshot
 import stages
 import stats
@@ -80,10 +79,6 @@ def routes(manager: Manager) -> list[Route | Mount]:
     async def numbers(request: Request) -> Response:
         _ = request
         return JSONResponse(stats.read(manager.state / "stats"))
-
-    async def bench(request: Request) -> Response:
-        _ = request
-        return JSONResponse(await asyncio.to_thread(bench_results.read, manager.cfg))
 
     async def recount(request: Request) -> Response:
         only = str(request.query_params.get("table", ""))
@@ -191,7 +186,6 @@ def routes(manager: Manager) -> list[Route | Mount]:
         Route("/", page),
         Route("/api/state", state),
         Route("/api/stats", numbers),
-        Route("/api/benchmarks", bench),
         Route("/api/stats/refresh", recount, methods=["POST"]),
         Route("/api/refresh", refresh, methods=["POST"]),
         Route("/api/rescan", rescan, methods=["POST"]),

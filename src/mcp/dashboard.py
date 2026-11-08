@@ -26,7 +26,7 @@ TYPES = {
     ".js": "text/javascript; charset=utf-8",
     ".svg": "image/svg+xml",
 }
-FILES = ("report.md", "run.json", "papers.json", "graph.json", "report.json")
+FILES = ("report.md", "run.json", "calls.jsonl")
 
 
 def read_runs(root: Path) -> list[dict[str, Any]]:
@@ -50,15 +50,19 @@ def read_runs(root: Path) -> list[dict[str, Any]]:
             parsed: dict[str, Any] = json.loads(meta.read_text(encoding="utf-8"))
         except (OSError, ValueError):
             continue
-        papers = parsed.get("papers")
+        check = parsed.get("check") or {}
         out.append(
             {
                 "slug": found.name,
                 "question": str(parsed.get("question", found.name)),
-                "asked": str(parsed.get("asked", "")),
-                "mode": str(parsed.get("mode", "")),
-                "effort": str(parsed.get("effort", "")),
-                "papers": len(papers) if isinstance(papers, list) else 0,
+                "tldr": str(parsed.get("tldr", "")),
+                "saved": str(parsed.get("saved", "")),
+                "seconds": parsed.get("seconds", 0),
+                "passed": bool(check.get("passed")),
+                "unverified": len({str(f.get("line", "")) for f in check.get("faults") or []}),
+                "papers": len(parsed.get("papers") or {}),
+                "tables": len(parsed.get("tables") or []),
+                "lineages": sum(len(x.get("lines", [])) for x in parsed.get("lineages") or []),
             }
         )
     return out
@@ -80,7 +84,7 @@ def known(root: Path, slug: str) -> bool:
 
 def read_one(root: Path, slug: str) -> dict[str, Any] | None:
     """
-    One run, with the document itself
+    One run: its facts, the report, every call, and the client's transcript when one is attached
 
     Args:
         root: The directory runs are written to.
@@ -97,13 +101,18 @@ def read_one(root: Path, slug: str) -> dict[str, Any] | None:
     except (OSError, ValueError):
         return None
     parsed["slug"] = slug
-    for name in FILES:
-        found = where / name
-        if not found.is_file() or name == "run.json":
-            continue
-        raw = found.read_text(encoding="utf-8")
-        key = "sections" if name == "report.json" else name.split(".")[0]
-        parsed[key] = json.loads(raw) if name.endswith(".json") else raw
+    report = where / "report.md"
+    parsed["report"] = report.read_text(encoding="utf-8") if report.is_file() else ""
+    calls = where / "calls.jsonl"
+    parsed["calls"] = (
+        [json.loads(x) for x in calls.read_text(encoding="utf-8").splitlines() if x.strip()]
+        if calls.is_file()
+        else []
+    )
+    session = where / "session.json"
+    parsed["session"] = (
+        json.loads(session.read_text(encoding="utf-8")) if session.is_file() else None
+    )
     return parsed
 
 

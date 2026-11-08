@@ -1,27 +1,5 @@
 """
-The document a researcher reads, and the three things it is assembled out of
+The evidence an agent's report rests on, and the mechanical check it passes before it is saved
 
-The prose belongs to whoever called this, and everything else here is evidence they can check
+The prose belongs to whoever called the tools, and nothing here writes or calls a model
 """
-
-from src.report.fulltext import FullText, read_paper
-from src.report.ground import Grounded, check, linkify
-from src.report.render import Draft, Section, document
-from src.report.table import Design, Method, design, extract, merge, repair
-
-__all__ = [
-    "Design",
-    "Draft",
-    "FullText",
-    "Grounded",
-    "Method",
-    "Section",
-    "check",
-    "design",
-    "document",
-    "extract",
-    "linkify",
-    "merge",
-    "read_paper",
-    "repair",
-]

@@ -112,7 +112,7 @@ Two smaller reads come off the same graph.
 
 ## Evaluation
 
-There is no benchmark for a lineage, since no document lists a field's lineages to score against. What can be measured is the cold start, by asking at a date in the past and scoring against what happened after ([`frontier-system-REPORT.md`](../experiments/findings/frontier-system-REPORT.md)). Five Topic Queries ([`supplement.md`](supplement.md#topic-queries)) were asked on 2025-03-01, with the citation graph running to 2026-09-10. An Unseen Newcomer is a paper of the 365 days before the question with no citations at the question date and 20 or more in the 18 months after.
+There is no benchmark for a lineage, since no document lists a field's lineages to score against. What can be measured is the cold start, by asking at a date in the past and scoring against what happened after. Five Topic Queries ([`supplement.md`](supplement.md#topic-queries)) were asked on 2025-03-01, with the citation graph running to 2026-09-10. An Unseen Newcomer is a paper of the 365 days before the question with no citations at the question date and 20 or more in the 18 months after.
 
 | Topic | Unseen Newcomers | BoundedField's Top 20 | Successor Top 20 | Successor Set |
 |---|---|---|---|---|
@@ -162,7 +162,7 @@ Every constant above is in the `[miner]` block of the mode's recipe, the same fi
 ## Limitations
 
 - Lineages have no ground truth, so the walk's design was settled by reading the reports it produced rather than by a number.
-- The walk's constants were set by reading the lineages rather than by a score: $\lambda$ came down from $1$ because at $1$ every walk started at the oldest paper, $\phi = 4$ reuses the area gate's exponent, and all five modes share one `[miner]` block.
+- The walk's constants were set by reading the lineages rather than by a score: $\lambda$ came down from $1$ because at $1$ every walk started at the oldest paper, $\phi = 4$ reuses the area gate's exponent, and every mode shares one `[miner]` block.
 - At the standard effort the walks rarely repeat a path. In 8 of the 10 runs on the demo every kept lineage was walked once, so their rank falls to the magnet mass they collected.
 - Every intent comes from GraphIV's DistilBERT labeler, at macro F1 0.815 against its teacher, so a mislabeled citation moves a magnet.
 - The cold-start measurement is five questions on one date, and the successor set it reports is a reach, not a ranking that put the Unseen Newcomers on top.

@@ -5,13 +5,10 @@ How a paper taking a position is ranked, and how many slots one argued-with pape
 from __future__ import annotations
 
 from datetime import date
-from pathlib import Path
 
 from src.core.schema import Edge, Paper
 from src.miner.miner import PER_TARGET, Miner, Successor
-from src.miner.recipe import read_recipe
-
-RECIPES = Path(__file__).resolve().parents[2] / "retrieval_recipes"
+from src.miner.recipe import build_recipe
 
 
 def paper(arxiv_id: str, cosine: float) -> Paper:
@@ -43,7 +40,7 @@ def edge(source: str, target: str, intent: str = "critiques") -> Edge:
 
 def test_one_paper_cannot_take_every_dispute_slot():
     miner = Miner.__new__(Miner)
-    miner.recipe = read_recipe(RECIPES / "survey.toml")
+    miner.recipe = build_recipe({})
     edges = [edge(f"c{i}", "a") for i in range(6)] + [edge("d", "b"), edge("e", "b")]
     out = miner.disputes(edges, {"a": 1.0, "b": 0.5})
     assert sum(1 for e in out if e.target == "a") == PER_TARGET

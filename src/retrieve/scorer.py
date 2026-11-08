@@ -16,6 +16,7 @@ from numpy.typing import NDArray
 
 from src.core.parse_graph_export import GraphExport, gather_rows
 from src.core.schema import Paper, Query
+from src.retrieve.keyword import get_bm25
 
 # the multiplier is what makes log1p compress, since normalizing leaves values where it is linear
 LOG_SCALE = 100.0
@@ -31,6 +32,7 @@ TERMS = (
     "fro_decay",
     "cocite",
     "couple",
+    "bm25",
 )
 
 
@@ -50,6 +52,7 @@ class Weights:
     fro_decay: float = 0.0
     cocite: float = 1.0
     couple: float = 1.0
+    bm25: float = 0.0
     hub: float = 0.3
 
 
@@ -134,6 +137,7 @@ class GraphScorer:
         self.core = core
         self.depth = depth
         self.decay = decay
+        self.blocked: list[str] = []
 
     def get_paper_rows(self, papers: list[Paper]) -> NDArray[np.int32]:
         """
@@ -218,8 +222,18 @@ class GraphScorer:
             current = fresh.astype(np.float64)
         return out
 
+    def get_blocked_rows(self) -> NDArray[np.int32]:
+        """
+        Graph rows of the blocked papers, which no citation count may include as a citer
+
+        Returns:
+            One row per blocked paper the export holds.
+        """
+        index = self.graph.index
+        return np.array([index[a] for a in self.blocked if a in index], np.int32)
+
     def get_individual_score(
-        self, papers: list[Paper], rows: NDArray[np.int32], cutoff: int
+        self, papers: list[Paper], rows: NDArray[np.int32], cutoff: int, text: str = ""
     ) -> dict[str, NDArray[np.float64]]:
         """
         Every term on [0, 1], one vector each, before any exponent is applied
@@ -232,6 +246,7 @@ class GraphScorer:
             papers: The pool.
             rows: Graph rows of the pool.
             cutoff: The latest day a citation may carry.
+            text: The question, which the keyword term matches against each title and abstract.
 
         Returns:
             One normalized vector per term, keyed by the name of its exponent.
@@ -253,7 +268,10 @@ class GraphScorer:
             "fro_decay": self.get_distance_decay(fwd, core),
             "cocite": compress_long_tail((back @ frontier) * recency),
             "couple": compress_long_tail((fwd @ ancestors) * recency),
-            "hub": compress_long_tail(self.graph.get_citation_counts_before(rows, cutoff)),
+            "bm25": normalize_to_max(get_bm25(text, [f"{p.title}\n{p.abstract}" for p in papers])),
+            "hub": compress_long_tail(
+                self.graph.get_citation_counts_before(rows, cutoff, self.get_blocked_rows())
+            ),
         }
 
     def rerank(self, query: Query, papers: list[Paper], limit: int | None) -> list[Paper]:
@@ -268,11 +286,13 @@ class GraphScorer:
         Returns:
             At most `limit` papers, best first.
         """
+        hidden = set(self.blocked)
+        papers = [p for p in papers if p.arxiv_id not in hidden]
         if not papers:
             return []
         rows = self.get_paper_rows(papers)
         cutoff = self.graph.get_day_number(query.max_date or date.today())
-        individual = self.get_individual_score(papers, rows, cutoff)
+        individual = self.get_individual_score(papers, rows, cutoff, query.text)
         combined = get_combined_score(individual, self.weights)
         order = np.argsort(-combined)[: limit if limit is not None else len(papers)]
 

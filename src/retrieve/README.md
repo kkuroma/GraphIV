@@ -9,7 +9,7 @@ cosine.py   CosineRetriever, which picks the first pool by cosine
 expand.py   AncestorExpander and FrontierExpander, which add one citation hop in each direction
 scorer.py   GraphScorer and its Weights, the only step that ranks
 query.py    PaperQuery, which runs the steps in order
-recipe.py   builds a pipeline out of a recipe file
+recipe.py   builds a pipeline out of a recipe file and config.toml's [retrieve] block
 people.py   one person's papers under a shared name, from a known paper, and their topics
 ```
 
@@ -17,8 +17,8 @@ people.py   one person's papers under a shared name, from a known paper, and the
 from src.retrieve.recipe import build_pipeline, get_seed_limit, read_recipe
 
 recipe = read_recipe("retrieval_recipes/frontier.toml")
-pipeline = build_pipeline(recipe, graph, PG_DEST)
-pool = pipeline.build_pool(question, vector, get_seed_limit(recipe), cap)
+pipeline = build_pipeline(recipe, config["retrieve"], graph, PG_DEST)
+pool = pipeline.build_pool(question, vector, get_seed_limit(config["retrieve"]), cap)
 ranked = pipeline.score_pool(question, vector, pool, cap)
 ```
 

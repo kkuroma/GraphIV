@@ -6,7 +6,7 @@ import importlib
 
 from src.schema import Dataset
 
-NAMES = ("surveymatch", "frontiermatch", "consensusmatch", "pasa", "surge")
+NAMES = ("surveymatch", "frontiermatch", "consensusmatch", "pasa", "surge", "scholarcatalyst")
 
 
 def load(name: str) -> Dataset:

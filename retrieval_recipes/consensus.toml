@@ -1,64 +1,18 @@
-# What three reviews of one field agree on, tuned on ConsensusMatch
+# The consensus recipe written by benchmarks/tune.py
 NAME = "consensus"
+CORE = 200 # papers the expanders and the walks start from
 
-[[component]]
-KIND = "CosineRetriever"
-LIMIT = 5000
-
-[[component]]
-KIND = "AncestorExpander"
-TOP_K = 200
-HOP_LIMIT = 20000
-
-[[component]]
-KIND = "FrontierExpander"
-TOP_K = 200
-HOP_LIMIT = 20000
-
-[[component]]
-KIND = "GraphScorer"
-CORE = 200
-DEPTH = 4
-DECAY = 0.5
-
-[component.weights]
-COS = 1.5
-REC = 3
-ANC = 4
-FRO = 0.25
-ANC2 = 0
-FRO2 = 0
-ANC_DECAY = 1
-FRO_DECAY = 0
-COCITE = 2.5
-COUPLE = 0
-HUB = 0.25
-
-# What the miner does above the ranking, in the one file the mode already picks
-[miner]
-# measured best at 4 over the on-topic share of a hard question
-GATE = 4.0
-# the same exponent the gate takes, since it answers the same question about the same cosine
-FOCUS = 4.0
-# the walk runs on the head of the list, where two runs still land on the same path
-WALK_PREFIX = 30
-CONNECTORS = 40
-DECAY = 0.5
-KNOCKDOWN = 0.4
-SEEDS = 10
-WALKS = 50
-BRANCH = 1
-ARGUES = ["extends", "critiques", "compares"]
-SUCCESSOR_DAYS = 240
-SUCCESSOR_FLOOR = 0.60
-GRAPH_WEIGHT = 0.65
-RELEVANCE_WEIGHT = 0.35
-
-# how much each intent says the citing paper took a position rather than waved at the work
-[miner.weights]
-extends = 1.0
-critiques = 1.0
-compares = 0.8
-uses = 0.4
-motivates = 0.15
-background = 0.0
+# Exponent per score term
+[weights]
+COS = 1
+REC = 1.473
+ANC = 2.643
+FRO = 0.022
+ANC2 = 0.088
+FRO2 = 0.015
+ANC_DECAY = 0.03
+FRO_DECAY = 0.018
+COCITE = 0.29
+COUPLE = 0.011
+BM25 = 0.61
+HUB = 0.027

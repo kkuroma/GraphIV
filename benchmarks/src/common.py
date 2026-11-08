@@ -1,7 +1,7 @@
 """
 Paths, jsonl files, the frozen citation graph, and the call into GraphIV's own environment
 
-Every path comes from config.toml, so moving the data is one line there
+The checkout's config.toml is read first and this directory's config.toml only fills what it leaves out
 """
 
 import json
@@ -16,10 +16,32 @@ from typing import Any
 
 import numpy as np
 
+
+
+def merge(root: dict[str, Any], local: dict[str, Any]) -> dict[str, Any]:
+    """
+    Two parsed configs as one, the root's value winning wherever both set a key
+
+    Args:
+        root: The checkout's config.
+        local: This directory's config.
+
+    Returns:
+        The merged config.
+    """
+    out = dict(local)
+    for key, value in root.items():
+        held = out.get(key)
+        out[key] = merge(value, held) if isinstance(value, dict) and isinstance(held, dict) else value
+    return out
+
+
 HERE = Path(__file__).resolve().parent.parent
-PATHS = tomllib.loads((HERE / "config.toml").read_text())["paths"]
+LOCAL = tomllib.loads((HERE / "config.toml").read_text())
+ROOT = (HERE / LOCAL["paths"]["ROOT"]).resolve()
+CONFIG = merge(tomllib.loads((ROOT / "config.toml").read_text()), LOCAL)
+PATHS = CONFIG["paths"]
 DATA = HERE / PATHS["DATA"]
-ROOT = (HERE / PATHS["ROOT"]).resolve()
 TABLES = HERE / PATHS["TABLES"]
 SOURCES = DATA / "sources"
 CASES = DATA / "cases"
@@ -27,6 +49,9 @@ INDEX = DATA / "index_cache"
 FITS = DATA / "fit_cache"
 RUNS = DATA / "runs"
 LOGS = DATA / "logs"
+# each recipe's term cache and fit report, and the recipes tune.py writes
+TUNED = DATA / "tuning"
+TUNED_RECIPES = DATA / "recipes"
 # the graph every method reads, copied from the store's export so a later ingest cannot move it
 GRAPH = SOURCES / "graph_export.npy"
 # the process stops rather than let the shared box swap

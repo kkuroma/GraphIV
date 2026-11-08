@@ -37,7 +37,11 @@ let
       };
     };
 
-  file = toml.generate "graphiv-config.toml" s;
+  # the retrieval and miner constants ship with the code, under whatever the host names
+  shipped = lib.importTOML ../config.toml;
+  file = toml.generate "graphiv-config.toml" (
+    lib.recursiveUpdate { inherit (shipped) retrieve miner; } s
+  );
 
   # where systemd puts the manager's Hugging Face token, readable by that unit alone
   credential = "/run/credentials/graphiv-manager.service/hf-token";
@@ -194,10 +198,10 @@ in
     };
 
     api = {
-      enable = opt types.bool true "Serve the nine tools over streamable-http.";
+      enable = opt types.bool true "Serve the six tools over streamable-http.";
 
       readOnly = opt types.bool false ''
-        Register every tool but write_report, the only one that writes a file.
+        Register every tool but save_report, the only one that writes a file.
       '';
 
       restartOnExport = opt types.bool true ''
@@ -312,6 +316,10 @@ in
             FETCH = opt types.bool true ''
               Whether a paper the corpus never had may be fetched from arXiv into the corpus.
             '';
+            PDFTOTEXT =
+              derived types.str (lib.getExe' pkgs.poppler-utils "pdftotext")
+                ''"''${poppler-utils}/bin/pdftotext"''
+                "The extractor read_paper falls back to for a paper with no usable HTML.";
           };
 
           manager = section "The manager." {
@@ -352,7 +360,7 @@ in
             LLM_API = opt types.str "http://127.0.0.1:11434/v1" "Any OpenAI compatible host.";
             LLM_NAME = mkOption {
               type = types.str;
-              example = "Gemma-4-26B-Batched";
+              example = "Wordslop-Qwen3.6-27B";
               description = "The model every call goes to, a 26B instruct class being the reference.";
             };
           };
@@ -435,57 +443,6 @@ in
             FRONTIER_WINDOW_DAYS = opt types.int 730 "How early a frontier answer may be published.";
             CONSENSUS_COSINE = opt types.float 0.75 "The cosine three ConsensusMatch reviews share.";
             CONSENSUS_MIN_KEY = opt types.int 5 "The smallest ConsensusMatch answer key.";
-          };
-
-          recipe_tuning = section "Recipe tuning and evaluation on the published benchmarks." {
-            RECIPE_PATH =
-              derived types.str "${cfg.package}/share/graphiv/retrieval_recipes"
-                ''"''${package}/share/graphiv/retrieval_recipes"''
-                "Where the compared recipes are read from.";
-            OUTPUT_PATH =
-              derived types.str "${toString cfg.stateDir}/benchmarks/recipe_tuning"
-                ''"''${stateDir}/benchmarks/recipe_tuning"''
-                ''
-                  One directory per split, metric and recipe.
-                '';
-            CACHE_PATH =
-              derived types.str "${toString cfg.stateDir}/cache/recipe_tuning"
-                ''"''${stateDir}/cache/recipe_tuning"''
-                "Each case's pool and terms, cached per version and split for the fit.";
-            RETURN_LIMIT = opt types.int 1000 "Papers a query returns.";
-            BUDGETS = opt (types.listOf types.int) [ 100 200 500 1000 ] "The cutoffs recall is read at.";
-            SPLIT = opt (types.enum [ "train" "val" "test" ]) "val" "The split a run reads.";
-            MAX_SAMPLES = opt types.int 0 "The most cases a run reads from its split, every case at 0.";
-            PRECISION_LEVEL = opt types.int 2 "The tree level the PrecisionMatch judge reads.";
-            recipes = opt (types.attrsOf (types.listOf types.str)) {
-              SurveyMatch = [
-                "survey.toml"
-                "anc_only.toml"
-                "survey_no_forward.toml"
-                "all_terms.toml"
-                "no_expansion.toml"
-                "cosine_only.toml"
-              ];
-              FrontierMatch = [
-                "frontier.toml"
-                "survey.toml"
-                "frontier_no_forward.toml"
-                "all_terms.toml"
-                "cosine_only.toml"
-              ];
-              ConsensusMatch = [
-                "consensus.toml"
-                "consensus_no_forward.toml"
-                "survey.toml"
-                "all_terms.toml"
-                "cosine_only.toml"
-              ];
-              PrecisionMatch = [
-                "survey.toml"
-                "frontier.toml"
-                "cosine_only.toml"
-              ];
-            } "Which recipes each benchmark runs and compares, relative to RECIPE_PATH.";
           };
         };
       };
@@ -644,8 +601,6 @@ in
             "-${dirOf s.source.SOURCE_PATH}"
             "-${dirOf s.dataset.GRAPH_PATH}"
             "-${dirOf s.umap.UMAP_MODEL_PATH}"
-            "-${dirOf s.recipe_tuning.OUTPUT_PATH}"
-            "-${s.recipe_tuning.CACHE_PATH}"
           ]
         );
       };

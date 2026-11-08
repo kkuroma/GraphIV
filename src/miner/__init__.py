@@ -6,7 +6,7 @@ A caller decides which papers are worth mining and this decides what they mean t
 
 from src.miner.leyline import LeyLine, Settings
 from src.miner.miner import Mined, Miner, Successor
-from src.miner.recipe import Recipe, build_recipe, read_recipe
+from src.miner.recipe import Recipe, build_recipe
 
 __all__ = [
     "LeyLine",
@@ -16,5 +16,4 @@ __all__ = [
     "Settings",
     "Successor",
     "build_recipe",
-    "read_recipe",
 ]

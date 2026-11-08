@@ -3,7 +3,7 @@ const PALETTES = ["haruhana", "natsumikan", "akiba", "fuyuyuki"];
 const SEEDS = { haruhana: "#F07898", natsumikan: "#E08030", akiba: "#C84040", fuyuyuki: "#78B4E8" };
 const INTENTS = ["background", "uses", "compares", "critiques", "extends", "motivates", "unlabeled"];
 const PAPER_STAGES = ["added", "pdf", "html", "embedded", "scored"];
-const TABS = ["dashboard", "download", "benchmarks", "history"];
+const TABS = ["dashboard", "download", "history"];
 const DASH = [["overview", "Overview"], ["papers", "Papers"], ["tree", "Topic tree"], ["citations", "Citations"], ["storage", "Storage"]];
 const POLL = 3000;
 
@@ -302,7 +302,7 @@ function go(next) {
   where = { ...where, ...next };
   const path = where.tab === "dashboard" ? `#/dashboard/${where.sub}`
     : where.tab === "download" ? `#/download/${where.table}/${where.stage}`
-    : where.tab === "benchmarks" ? `#/benchmarks${where.split ? `/${where.split}` : ""}` : "#/history";
+    : "#/history";
   if (location.hash !== path) history.replaceState(null, "", path);
   draw(true);
 }
@@ -311,7 +311,6 @@ function readHash() {
   const [, tab, a, b] = location.hash.split("/");
   if (tab === "dashboard") where = { ...where, tab, sub: a || "overview" };
   else if (tab === "download") where = { ...where, tab, table: a || "papers", stage: b || `${a || "papers"}.0` };
-  else if (tab === "benchmarks") where = { ...where, tab, split: a || "" };
   else if (tab === "history") where = { ...where, tab };
 }
 
@@ -333,7 +332,6 @@ function draw(full) {
   for (const t of TABS) $(`p-${t}`).classList.toggle("active", t === where.tab);
   if (where.tab === "dashboard") dashboard(full);
   if (where.tab === "download") download(full);
-  if (where.tab === "benchmarks") benchTab(full);
   if (where.tab === "history") historyTab();
 }
 
@@ -946,7 +944,7 @@ function download(full) {
   if (!mine.some((s) => s.key === where.stage)) where.stage = (mine[0] || {}).key;
   const st = mine.find((s) => s.key === where.stage);
   if (full || !$("stagebox") || $("stagebox").dataset.key !== where.stage) {
-    const delta = mine.filter((s) => !s.alone && (s.delta || ["eval", "export"].includes(s.table)));
+    const delta = mine.filter((s) => !s.alone && (s.delta || s.table === "export"));
     host.innerHTML = `<div class="subbar"><div class="seg">${Object.entries(tables).map(([k, l]) => {
       const ss = (S.stages || []).filter((s) => s.table === k);
       const busy = ss.some((s) => stageStatus(s).led === "run");
@@ -1149,122 +1147,6 @@ function historyTab() {
   for (const b of document.querySelectorAll("#p-history [data-open]")) b.onclick = () => openJob(b.dataset.open);
 }
 
-// -- the benchmarks --------------------------------------------------------------------------
-
-// the tab reads its own route, since a SurveyMatch split is thousands of rows the state poll skips
-const BENCH = [["SurveyMatch", "--secondary"], ["FrontierMatch", "--primary"], ["ConsensusMatch", "--green"], ["PrecisionMatch", "--sky"]];
-const SPLIT_NAMES = { test: "Test", val: "Val", train: "Train", legacy: "Before splits" };
-let BS = null;
-let benchSeen = "";
-const three = (v) => (v == null ? "–" : Number(v).toFixed(3));
-
-async function benchPoll(force) {
-  if (!force && BS && Date.now() - (benchPoll.at || 0) < 15000) return;
-  benchPoll.at = Date.now();
-  BS = await api("/api/benchmarks").catch(() => BS);
-}
-
-function benchJob(key) {
-  const st = (S.stages || []).find((s) => s.key === key);
-  return st ? stageStatus(st) : { led: "idle", text: "not a stage here" };
-}
-
-function benchAction(label, key, note, primary) {
-  const status = benchJob(key);
-  return `<div class="bact"><div class="bact-h"><i class="led ${status.led}"></i><b>${label}</b><span class="tech">${esc(key)}</span></div>
-    <p>${note}</p><div class="bact-s tech">${esc(status.text)}</div><div class="bact-b" data-key="${key}">${primary}</div></div>`;
-}
-
-function benchTab(full) {
-  const host = $("p-benchmarks");
-  if (!BS) {
-    host.innerHTML = `<div class="pending">Reading the exported versions and the scored runs…</div>`;
-    benchPoll(true).then(() => draw(true));
-    return;
-  }
-  const live = JSON.stringify(["export.2", "export.3", "eval.0", "eval.1", "eval.2"].map((k) => benchJob(k).text));
-  const seen = JSON.stringify([BS.versions.length, Object.keys(BS.runs), BS.fits.length, where.split, live]);
-  if (!full && seen === benchSeen) return;
-  benchSeen = seen;
-  const current = BS.versions.find((v) => v.current);
-  const splits = Object.keys(SPLIT_NAMES).filter((s) => BS.runs[s]);
-  const split = splits.includes(where.split) ? where.split : splits[0] || "test";
-  const total = current ? Object.values(current.counts).reduce((a, c) => a + Object.values(c).reduce((x, y) => x + y, 0), 0) : 0;
-  host.innerHTML = `<div class="tiles hero">
-      ${tile({ k: "Version", v: esc(BS.cutoff || "–"), s: current ? "exported, the cutoff config.toml names" : "the cutoff in config.toml, not exported yet", icon: "clock", dom: "dom-bench", hot: true })}
-      ${tile({ k: "Cases", v: current ? n(total) : "–", s: current ? "SurveyMatch, FrontierMatch and ConsensusMatch" : "export to mine them", icon: "layers", dom: "dom-bench", hot: true })}
-      ${tile({ k: "On the hub", v: esc(BS.repo ? BS.repo.split("/").pop() : "–"), s: BS.repo ? `tagged GraphIV-benchmarks-${esc(BS.cutoff)}` : "[export] BENCHMARK_REPO is empty", icon: "spark", dom: "dom-bench" })}
-      ${tile({ k: "Runs read by default", v: esc(SPLIT_NAMES[BS.split] || BS.split), s: "[recipe_tuning] SPLIT", icon: "check", dom: "dom-bench" })}
-    </div>
-    <div class="bacts">
-      ${benchAction("Export the benchmarks", "export.2", "Mines every case up to the cutoff, writes each question once and splits by subfield.", `<button class="btn" data-dry="export.2">Count only</button><button class="btn primary" data-run="export.2">Export</button>`)}
-      ${benchAction("Evaluate", "eval.2", "Scores every recipe config.toml lists on one split of all four benchmarks.", `<div class="seg sm" id="evsplit">${["test", "val", "train"].map((s) => `<button data-ev="${s}" class="${s === (BS.split || "val") ? "on" : ""}">${SPLIT_NAMES[s]}</button>`).join("")}</div><button class="btn primary" id="evrun">Run</button>`)}
-      ${benchAction("Check the recipes", "eval.1", "Caches the train and val terms, then fits each recipe without writing it, to see whether a new version would move the exponents.", `<button class="btn" id="drift">Fit, write nothing</button>`)}
-      ${benchAction("Publish", "export.3", "Uploads every changed file of the four repos and tags them. It also has its own panel under Export.", `<button class="btn" id="pubopen">Open its panel</button>`)}
-    </div>
-    <div class="charts">${chart("Versions", benchVersions(), { dom: "dom-bench", icon: "layers", w: "w12", sub: "Every graphiv-benchmarks-&lt;cutoff&gt; under EXPORT_PATH, and its cases per split." })}
-    ${chart("Results", benchResults(split, splits), { dom: "dom-bench", icon: "spark", w: "w12", sub: `Mean recall at each benchmark's own cutoff, PrecisionMatch's being the share on topic. The best recipe per benchmark is marked.` })}
-    ${chart("Recipe fits", benchFits(), { dom: "dom-bench", icon: "check", w: "w12", sub: "What the fit stage found per version: each tuned recipe's candidates on train and on val, and the one val picked." })}</div>`;
-  for (const b of host.querySelectorAll("[data-ev]")) b.onclick = () => { for (const x of host.querySelectorAll("[data-ev]")) x.classList.toggle("on", x === b); };
-  for (const b of host.querySelectorAll("[data-sp]")) b.onclick = () => go({ split: b.dataset.sp });
-  for (const b of host.querySelectorAll("[data-run]")) b.onclick = () => confirm("Export every benchmark at this cutoff? Each new case asks the router for its question.") && act("/api/run", { stage: b.dataset.run, args: [] }, () => benchPoll(true));
-  for (const b of host.querySelectorAll("[data-dry]")) b.onclick = () => act("/api/run", { stage: b.dataset.dry, args: ["--dry-run"] });
-  $("evrun").onclick = () => {
-    const chosen = (host.querySelector("[data-ev].on") || {}).dataset;
-    const s = chosen ? chosen.ev : "val";
-    if (confirm(`Score every recipe on the ${s} split of all four benchmarks?`)) act("/api/run", { stage: "eval.2", args: ["--split", s] });
-  };
-  $("drift").onclick = () => confirm("Cache any split not cached yet, then fit each recipe without writing it?")
-    && act("/api/run", { stage: "eval.0", args: [] }, (job) => act("/api/run", { stage: "eval.1", args: ["--dry-run"], after: job.id }));
-  $("pubopen").onclick = () => go({ tab: "download", table: "export", stage: "export.3" });
-}
-
-function benchVersions() {
-  if (!BS.versions.length) return `<div class="pending">Nothing exported yet. Export writes graphiv-benchmarks-${esc(BS.cutoff)}.</div>`;
-  return `<table class="jobs btable"><tr><th>version</th>${BENCH.slice(0, 3).map(([b]) => `<th>${b}</th>`).join("")}<th>size</th><th>written</th></tr>
-    ${BS.versions.map((v) => `<tr class="${v.current ? "cur" : ""}"><td><b>${esc(v.cutoff)}</b>${v.current ? ' <span class="chip">in use</span>' : ""}</td>
-      ${BENCH.slice(0, 3).map(([b]) => {
-        const c = v.counts[b];
-        return `<td class="num">${c ? `<b>${n(c.train + c.val + c.test)}</b><div class="tech">${n(c.train)} · ${n(c.val)} · ${n(c.test)}</div>` : "–"}</td>`;
-      }).join("")}
-      <td class="num">${bytes(v.bytes)}</td><td class="tech">${when(v.written)}</td></tr>`).join("")}</table>
-    <p class="chart-s">Each benchmark's cases, then train · val · test.</p>`;
-}
-
-function benchResults(split, splits) {
-  if (!splits.length) return `<div class="pending">No run yet. Evaluate writes benchmarks/data/recipe_tuning/&lt;split&gt;.</div>`;
-  const runs = BS.runs[split] || {};
-  const recipes = [...new Set(Object.values(runs).flatMap((r) => Object.keys(r)))].sort();
-  const best = {};
-  for (const [b] of BENCH) {
-    const got = Object.entries(runs[b] || {}).filter(([, r]) => r.headline != null);
-    if (!got.length) continue;
-    // PrecisionMatch reports the share on topic, so a higher number is the better one there too
-    best[b] = got.reduce((a, c) => (c[1].headline > a[1].headline ? c : a))[0];
-  }
-  return `<div class="subbar"><div class="seg sm">${splits.map((s) => `<button data-sp="${s}" class="${s === split ? "on" : ""}">${SPLIT_NAMES[s]}</button>`).join("")}</div></div>
-    <table class="jobs btable"><tr><th>recipe</th>${BENCH.map(([b, c]) => `<th><i class="sw" style="background:var(${c})"></i>${b}<div class="tech">@${BS.headline[b]}${runs[b] ? ` · ${n(Object.values(runs[b])[0].cases)} cases` : ""}</div></th>`).join("")}</tr>
-    ${recipes.map((r) => `<tr><td><b>${esc(r)}</b></td>${BENCH.map(([b]) => {
-      const run = (runs[b] || {})[r];
-      if (!run) return `<td class="num tech">–</td>`;
-      const cuts = Object.entries(run.means).map(([k, v]) => `@${k} ${three(v)}`).join("<br>");
-      return `<td class="num${best[b] === r ? " top" : ""}" data-tip="${esc(r)} on ${b}<br>${cuts}<br>${n(run.cases)} cases, written ${esc(when(run.written))}">${three(run.headline)}</td>`;
-    }).join("")}</tr>`).join("")}</table>`;
-}
-
-function benchFits() {
-  if (!BS.fits.length) return `<div class="pending">No fit report yet. Check the recipes writes one per version.</div>`;
-  const report = BS.fits[0];
-  const rows = Object.entries(report).filter(([, v]) => v && v.candidates);
-  return `<table class="jobs btable"><tr><th>recipe</th><th>fit on</th>${["shipped", "fit", "search"].map((c) => `<th>${c}<div class="tech">train · judged</div></th>`).join("")}<th>picked</th></tr>
-    ${rows.map(([name, v]) => `<tr><td><b>${esc(name)}</b></td><td class="tech">${esc(v.metric)} @${v.k}</td>
-      ${["shipped", "fit", "search"].map((c) => {
-        const x = v.candidates[c];
-        return `<td class="num${v.picked === c ? " top" : ""}">${x ? `${three(x.judged)}<div class="tech">${three(x.train)}</div>` : "–"}</td>`;
-      }).join("")}<td><span class="chip">${esc(v.picked)}</span></td></tr>`).join("")}</table>
-    <p class="chart-s">${esc(report.version)}, written ${esc(when(report.written))}. Judged is val, or train and val pooled for consensus.</p>`;
-}
-
 // -- the loop --------------------------------------------------------------------------------
 
 async function poll() {
@@ -1279,7 +1161,6 @@ async function poll() {
     ST = await api("/api/stats").catch(() => ST);
     poll.taken = taken;
   }
-  if (where.tab === "benchmarks") await benchPoll(false);
   leds();
   rail();
   const count = (S.jobs || []).filter((j) => ["queued", "waiting", "scheduled", "running", "stopping"].includes(j.status)).length;
