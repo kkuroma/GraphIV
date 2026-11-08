@@ -10,7 +10,7 @@ stage2_export_benchmarks.py  graphiv-benchmarks-<cutoff>/, the three benchmarks 
 stage3_publish_hf.py      uploads the newest release, the benchmarks and the cards to the four Hugging Face repos
 case_miner.py             mines the benchmark cases out of the store, the same ones for the same seed and cutoff
 query_writer.py           writes each case's question once, cached by its input
-benchmark_files.py        the published schema and the split assigned per parent topic
+benchmark_files.py        the published schema and the split assigned per case
 cards/<name>/             the README, figures and license of each Hugging Face repo
 ```
 
@@ -40,7 +40,7 @@ The dump stops once its disk falls under 10 GB free, since that disk may also ho
 
 `[benchmarks] CUTOFF` is the version, since a newer paper never adds a reference to a review already published.
 Every case that exists at the cutoff is mined, with no sample cap, and each case's question is written once and frozen in the file.
-The split is assigned per parent topic with the seed 69420 hardcoded in `benchmark_files.py`, so no topic sits in two splits.
+The split is a hash of each case's sorted anchors under the seed 69420 hardcoded in `benchmark_files.py`, so appending cases never moves an existing one.
 
 ```
 graphiv-benchmarks-<cutoff>/
@@ -48,6 +48,7 @@ graphiv-benchmarks-<cutoff>/
   frontiermatch/   the same, 40/20/40
   consensusmatch/  the same, 40/10/50
   manifest.json    the settings, the seed and the counts per split
+  README.md        the card, with this version's cutoff and counts filled in
 ```
 
 `cards/benchmarks/README.md` is the card and lists every column, and [`docs/benchmarks.md`](../../docs/benchmarks.md) defines each benchmark.

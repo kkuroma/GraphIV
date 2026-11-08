@@ -48,7 +48,7 @@ configs:
 
 Existing literature search benchmark, like LitSearch, often matches a query to a list of one or a few papers. As many research questions can be answered by multiple research papers that often complement each other, often in the form of a literature review cohort, I find existing benchmarks lacking for automated research agents. As such, I built three benchmarks that score a retriever against what arXiv's own reviews cite, often as a list of dozens, if not hundreds, of papers. Every case is mined from [GraphIV](https://huggingface.co/datasets/kkuroma/GraphIV), and every id in it is an arXiv id in that corpus.
 
-A version is specified by its date cutoff, which is the newest date of publication for the reviews inside of this dataset. As newer papers aren't cited by already published reviews, a later cutoff only adds new cases. The present one is `GraphIV-benchmarks-2026-10-22`.
+A version is specified by its date cutoff, which is the newest date of publication for the reviews inside of this dataset. As newer papers aren't cited by already published reviews, a later cutoff only adds new cases. This is `GraphIV-benchmarks-{{cutoff}}`.
 
 ## How Each Benchmark Is Built
 
@@ -74,7 +74,9 @@ ConsensusMatch asks what every review of a field agrees on. For each research qu
 
 ### Splits
 
-The split is assigned per subfield of the GraphIV topic tree, never per case, with the seed 69420. Two reviews of one topic share most of their references, so a split by case would let a retriever tune on the answers it is tested on. `split_group` is that subfield, so anyone can check it.
+The split is a hash of each case's sorted anchor ids under the seed 69420, so a case keeps its split whatever else is mined, and anyone can recompute it from `anchors`.
+
+{{counts}}
 
 ## Downloading and Scoring
 
@@ -104,7 +106,7 @@ To score a case, retrieve from the GraphIV corpus with every paper dated after `
 | `headline_k` | int | the cutoff recall is reported at |
 | `topic_l0`, `topic_l1`, `topic_l2` | int | the case's field, subfield and topic in the topic tree |
 | `topic_l0_name`, `topic_l1_name`, `topic_l2_name` | string | |
-| `split_group` | string | the subfield the split was assigned by |
+| `split_group` | string | the case's subfield, as `topic_l0.topic_l1` |
 | `gap_days`, `cosine` | int, float | frontiermatch only, the gap and the similarity between the two reviews |
 
 ## Limitations

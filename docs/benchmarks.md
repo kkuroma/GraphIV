@@ -50,19 +50,14 @@ Its answers are small, $9$ papers at the median, so it is scored at $100$ rather
 
 A version is specified by its cutoff, the newest date a mined review may carry, set as `[benchmarks] CUTOFF` in `config.toml`. As newer papers aren't cited by already published reviews, a later cutoff only adds new cases. Every case that exists at the cutoff is mined, with no sample cap.
 
-The split is assigned per subfield of the topic tree, never per case, with the seed $69420$. Subfields are taken in hash order and each goes to the split furthest under its share. Two reviews of one topic share most of their references, so a split by case would let a retriever tune on the answers it is tested on.
+The split is a hash of each case's sorted anchor ids under the seed $69420$, which places the case on $[0, 1)$, and the shares cut that interval in train, val and test order.
+A case keeps its split whatever else is mined, since nothing else enters its hash.
 
-| benchmark | cases | train | val | test | answer, median | scored at |
-| --- | --- | --- | --- | --- | --- | --- |
-| SurveyMatch | 6,109 | 3,665 | 1,215 | 1,229 | 150 | 1,000 |
-| FrontierMatch | 518 | 210 | 101 | 207 | 32 | 1,000 |
-| ConsensusMatch | 144 | 58 | 13 | 73 | 9 | 100 |
-
-These are the counts of the version `2026-10-22`.
+Each version's cases per split and median answer size are in its `manifest.json`, and in the table its `README.md` carries, both written by `scripts/export/stage2_export_benchmarks.py`.
 
 ## Scoring
 
-A retriever searches GraphIV with every paper dated after `date_max` and every paper in `anchors` removed, and its score is recall at `headline_k`: the share of `citations` in its top `headline_k`. We run them with `scripts/recipe_tuning/` on the split `[recipe_tuning] SPLIT` sets, so train is for tuning, val for choosing, and test for reporting.
+A retriever searches GraphIV with every paper dated after `date_max` and every paper in `anchors` removed, and its score is recall at `headline_k`: the share of `citations` in its top `headline_k`. `benchmarks/tune.py` fits a recipe on train and chooses its point on val, and `benchmarks/run.py` reports on test.
 
 PrecisionMatch reuses the SurveyMatch cases with no answer key, and calls a retrieved paper on topic when it shares the case's leaf or another review in that leaf cites it. It is not published, since its judge is the topic tree itself.
 

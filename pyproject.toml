@@ -74,7 +74,7 @@ known-first-party = ["graphiv"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 # the manager and the export are flat script directories rather than packages, as their entrypoints see them
-pythonpath = ["scripts/graphiv_manager", "scripts/export", "scripts/recipe_tuning"]
+pythonpath = ["scripts/graphiv_manager", "scripts/export"]
 addopts = "-ra -m 'not slow and not gpu'"
 markers = [
     "slow: needs real data or a long run",

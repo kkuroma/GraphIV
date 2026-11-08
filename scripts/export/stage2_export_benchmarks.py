@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import json
 import shutil
+import statistics
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -40,6 +41,7 @@ SELECT arxiv_id, date, survey_probability, title FROM papers WHERE arxiv_id = AN
 NAMES = """
 SELECT level_0, level_1, level_2, name FROM topic_names
 """
+CARD = Path(__file__).resolve().parent / "cards" / "benchmarks" / "README.md"
 
 
 def mine(cfg: dict[str, Any], metric: str) -> list[Sample]:
@@ -135,6 +137,29 @@ def build_rows(
     return rows
 
 
+def render_card(cutoff: str, counts: dict[str, dict[str, int]], medians: dict[str, int]) -> str:
+    """
+    The benchmark card with this version's name and its counts per split filled in
+
+    Args:
+        cutoff: The version.
+        counts: Cases per split of each benchmark.
+        medians: The median answer size of each benchmark.
+
+    Returns:
+        The card's markdown.
+    """
+    table = [
+        "| benchmark | cases | train | val | test | answer, median | scored at |",
+        "| --- | --- | --- | --- | --- | --- | --- |",
+    ]
+    for metric, c in counts.items():
+        cells = [sum(c.values()), *(c[s] for s in SPLITS), medians[metric], HEADLINE_K[metric]]
+        table.append(f"| {metric} | " + " | ".join(f"{n:,}" for n in cells) + " |")
+    card = CARD.read_text(encoding="utf-8")
+    return card.replace("{{cutoff}}", cutoff).replace("{{counts}}", "\n".join(table))
+
+
 def main() -> None:
     """
     Mine, write the questions, split and save every benchmark under one versioned directory
@@ -153,6 +178,7 @@ def main() -> None:
         Path(str(cfg["export"]["QUERY_CACHE"])),
     )
     counts: dict[str, dict[str, int]] = {}
+    medians: dict[str, int] = {}
     for metric in ("SurveyMatch", "FrontierMatch", "ConsensusMatch"):
         samples = mine(cfg, metric)
         print(f"[benchmarks] {metric}: {len(samples)} cases at the cutoff {cutoff}", flush=True)
@@ -165,6 +191,7 @@ def main() -> None:
             continue
         rows = build_rows(cfg, metric, samples, writer)
         counts[metric] = {s: sum(r["split"] == s for r in rows) for s in SPLITS}
+        medians[metric] = int(statistics.median(len(s.key) for s in samples))
         for split in SPLITS:
             write_split(
                 [r for r in rows if r["split"] == split],
@@ -178,11 +205,13 @@ def main() -> None:
         "split_seed": SPLIT_SEED,
         "ratios": RATIOS,
         "counts": counts,
+        "median_answer": medians,
         "settings": cfg["benchmarks"],
     }
     _ = (part / "manifest.json").write_text(
         json.dumps(manifest, indent=2, default=str), encoding="utf-8"
     )
+    _ = (part / "README.md").write_text(render_card(cutoff, counts, medians), encoding="utf-8")
     if out.exists():
         shutil.rmtree(out)
     part.rename(out)

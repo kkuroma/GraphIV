@@ -97,6 +97,8 @@ def files(repo: Repo, release: Path, cards: Path = CARDS) -> dict[str, Path]:
     out = {p.name: p for p in sorted((cards / repo.card).iterdir()) if p.is_file()}
     if repo.model:
         out |= {p.name: p for p in sorted((release / "classifiers" / repo.model).iterdir())}
+    if repo.benchmarks:
+        out["README.md"] = release / "README.md"
     for table in repo.tables:
         out |= {f"{table}/{p.name}": p for p in sorted((release / table).glob("*.parquet"))}
     return out
@@ -291,9 +293,10 @@ def main() -> None:
         if not repo_id:
             print(f"[publish] [export] {repo.key} is empty, so that repo is skipped", flush=True)
             continue
-        if repo.benchmarks and not bench.is_dir():
+        if repo.benchmarks and not (bench / "README.md").is_file():
             print(
-                f"[publish] no {bench.name} under EXPORT_PATH, so {repo_id} is skipped", flush=True
+                f"[publish] no {bench.name}/README.md, so rerun the benchmark export first",
+                flush=True,
             )
             continue
         if repo.benchmarks:

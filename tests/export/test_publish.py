@@ -62,6 +62,19 @@ def test_files_lay_out_a_repo(tmp_path: Path) -> None:
     assert set(files(model, release, cards)) == {"README.md", "config.json"}
 
 
+def test_the_benchmark_card_comes_from_its_version(tmp_path: Path) -> None:
+    cards, bench = tmp_path / "cards", tmp_path / "graphiv-benchmarks-2026-10-22"
+    (cards / "card").mkdir(parents=True)
+    (cards / "card" / "README.md").write_text("template")
+    (cards / "card" / "figure.png").write_bytes(b"")
+    bench.mkdir()
+    (bench / "README.md").write_text("rendered")
+    repo = Repo("BENCHMARK_REPO", "dataset", "card", benchmarks=True)
+    found = files(repo, bench, cards)
+    assert found["README.md"] == bench / "README.md"
+    assert "figure.png" in found
+
+
 def test_the_tag_is_the_newest_paper(tmp_path: Path) -> None:
     (tmp_path / "papers").mkdir()
     dates = pa.array([date(2026, 9, 30), date(2026, 10, 1)], type=pa.date32())

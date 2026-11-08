@@ -1,13 +1,12 @@
 """
-The published benchmark files: their schema, and the split assigned per parent topic
+The published benchmark files: their schema, and the split assigned per case from its anchors
 
-A split is assigned per parent topic, so no topic sits on both sides of a train and test comparison
+A split is a hash of the anchors, so appending cases to a version never moves an existing one
 """
 
 from __future__ import annotations
 
 import hashlib
-from collections import Counter
 from pathlib import Path
 
 import pyarrow as pa
@@ -53,7 +52,7 @@ SCHEMA = pa.schema(
 
 def get_split_group(leaf: list[int]) -> str:
     """
-    The unit a split is assigned by, which is a case's parent topic
+    A case's parent topic, published beside its split
 
     Args:
         leaf: The three tree levels.
@@ -66,10 +65,9 @@ def get_split_group(leaf: list[int]) -> str:
 
 def assign_splits(samples: list[Sample], ratios: tuple[float, float, float]) -> list[str]:
     """
-    One split per sample, filled a whole parent topic at a time to the given shares
+    One split per sample, from the seeded hash of its sorted anchors
 
-    Topics are taken in seeded hash order and each goes to the split furthest under its share,
-    so the shares land close to the target and a topic never straddles two splits.
+    The hash maps each case to a point on [0, 1), and the shares cut that interval in split order.
 
     Args:
         samples: The mined samples.
@@ -78,16 +76,14 @@ def assign_splits(samples: list[Sample], ratios: tuple[float, float, float]) -> 
     Returns:
         The split of each sample, in the same order.
     """
-    sizes = Counter(get_split_group(s.leaf) for s in samples)
-    order = sorted(sizes, key=lambda g: hashlib.sha1(f"{SPLIT_SEED}:{g}".encode()).hexdigest())
-    total = sum(sizes.values())
-    filled = dict.fromkeys(SPLITS, 0)
-    chosen: dict[str, str] = {}
-    for group in order:
-        split = max(SPLITS, key=lambda s: ratios[SPLITS.index(s)] * total - filled[s])
-        chosen[group] = split
-        filled[split] += sizes[group]
-    return [chosen[get_split_group(s.leaf)] for s in samples]
+    edges = [sum(ratios[: i + 1]) for i in range(len(SPLITS))]
+    out: list[str] = []
+    for s in samples:
+        key = ",".join(sorted(s.anchors))
+        digest = hashlib.sha1(f"{SPLIT_SEED}:{key}".encode()).digest()[:8]
+        point = int.from_bytes(digest, "big") / 2**64
+        out.append(next((sp for sp, e in zip(SPLITS, edges, strict=True) if point < e), SPLITS[-1]))
+    return out
 
 
 def write_split(rows: list[dict[str, object]], path: Path) -> None:
