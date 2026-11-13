@@ -324,7 +324,7 @@ def save(config: Path, changes: dict[str, dict[str, Any]], check: bool = True) -
 
     Args:
         config: Where config.toml lives.
-        changes: The new values, by dotted table and key.
+        changes: The new values, by dotted table and key, where None reverts the key.
         check: Whether the probes have to pass before anything is written.
 
     Returns:
@@ -342,7 +342,9 @@ def save(config: Path, changes: dict[str, dict[str, Any]], check: bool = True) -
                 problems.append(f"{section}.{key} is not a setting")
                 continue
             try:
-                wanted[(section, key)] = coerce(spec, raw)
+                wanted[(section, key)] = (
+                    at(default, section).get(key) if raw is None else coerce(spec, raw)
+                )
             except ValueError as err:
                 problems.append(str(err))
     if problems:

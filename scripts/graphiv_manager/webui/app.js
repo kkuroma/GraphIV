@@ -1151,9 +1151,30 @@ function historyTab() {
 
 // -- config ----------------------------------------------------------------------------------
 
+// each group borrows one palette hue, the way the dashboard's areas do
+const CFG_GROUPS = [
+  ["Models", "--secondary", ["endpoints"]],
+  ["MCP and retrieval", "--primary", ["serve", "retrieve", "miner", "miner.weights"]],
+  ["Corpus and storage", "--yellow", ["database", "source", "download", "dataset", "export"]],
+  ["Preprocessing", "--green", ["survey", "umap", "topics", "citation_labeler"]],
+  ["Benchmarks", "--sky", ["surveymatch", "benchmarks"]],
+  ["Manager", "--overlay1", ["manager"]],
+];
+const BUILT_TIP = "nix also builds the units, caddy or the sandbox around this, so a change applies fully only after a rebuild";
+
 let CFG = null;
 let EDIT = {};
 let CFG_PROBLEMS = [];
+let CFG_OPEN = new Set();
+let CFG_QUERY = "";
+let CFG_ONLY = false;
+const REVEALED = {};
+
+try { CFG_OPEN = new Set(JSON.parse(localStorage.getItem("cfg-open") || "[]")); } catch (e) { CFG_OPEN = new Set(); }
+
+function keepOpen() {
+  try { localStorage.setItem("cfg-open", JSON.stringify([...CFG_OPEN])); } catch (e) { /* private window */ }
+}
 
 async function configCall(method, path, body) {
   const r = await fetch(path, { method, headers: { "content-type": "application/json" }, body: body === undefined ? undefined : JSON.stringify(body) });
@@ -1168,6 +1189,10 @@ async function configTab() {
   configDraw();
 }
 
+const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+const edited = (sec, key) => EDIT[sec] !== undefined && EDIT[sec][key] !== undefined;
+const editOf = (sec, key) => (edited(sec, key) ? EDIT[sec][key] : undefined);
+
 function shown(k, v) {
   if (k.kind === "list") return (v || []).join(", ");
   return v == null ? "" : String(v);
@@ -1178,83 +1203,222 @@ function parsed(k, text) {
     const items = text.split(",").map((x) => x.trim()).filter((x) => x !== "");
     return k.item === "int" || k.item === "float" ? items.map(Number) : items;
   }
-  if (k.kind === "int" || k.kind === "float") return text.trim() === "" ? NaN : Number(text);
+  if (k.kind === "int" || k.kind === "float") return Number(text);
   return text;
 }
 
-function edits() {
-  return Object.values(EDIT).reduce((a, keys) => a + Object.keys(keys).length, 0);
+function put(sec, key, value) { EDIT[sec] = { ...(EDIT[sec] || {}), [key]: value }; }
+
+function drop(sec, key) {
+  if (!EDIT[sec]) return;
+  delete EDIT[sec][key];
+  if (!Object.keys(EDIT[sec]).length) delete EDIT[sec];
 }
 
-function configField(section, k) {
-  const id = `${section}.${k.key}`;
-  const mine = (EDIT[section] || {})[k.key];
-  const value = mine !== undefined ? mine : k.value;
-  if (k.kind === "bool") return `<input type="checkbox" data-cfg="${esc(id)}" ${value ? "checked" : ""}>`;
-  if (k.secret) {
-    const note = mine !== undefined ? (mine ? "replaced" : "cleared") : k.value ? "set" : "not set";
-    return `<span class="cfg-secret"><input type="password" data-cfg="${esc(id)}" placeholder="${note}" value="${mine ? esc(mine) : ""}" autocomplete="off">
-      <button class="btn sm" data-reveal="${esc(id)}">Reveal</button><button class="btn sm" data-clear="${esc(id)}">Clear</button></span>`;
+// a value equal to the default reverts the key, and one equal to the saved override is no edit
+function decide(sec, k, v) {
+  if (v === undefined || same(v, k.default)) return k.overridden ? put(sec, k.key, null) : drop(sec, k.key);
+  if (k.overridden && same(v, k.value)) return drop(sec, k.key);
+  return put(sec, k.key, v);
+}
+
+function rowState(sec, k) {
+  const v = editOf(sec, k.key);
+  if (v === null) return "revert";
+  if (v !== undefined) return "edit";
+  return k.overridden ? "over" : "default";
+}
+
+function inputFor(sec, k) {
+  const id = `${sec}.${k.key}`;
+  const v = editOf(sec, k.key);
+  if (k.kind === "bool") {
+    const on = v === null ? k.default : v !== undefined ? v : k.value;
+    return `<label class="cfg-switch"><input type="checkbox" data-cfg="${esc(id)}" ${on ? "checked" : ""}><span>${on ? "on" : "off"}</span></label>`;
   }
+  if (k.secret) {
+    const note = v === null ? "cleared on save" : k.value ? "set, type to replace" : "not set";
+    const text = typeof v === "string" ? v : REVEALED[id] || "";
+    return `<input class="cfg-text" type="${REVEALED[id] ? "text" : "password"}" data-cfg="${esc(id)}" placeholder="${note}" value="${esc(text)}" autocomplete="off" spellcheck="false">
+      ${k.value ? `<button class="cfg-icon" data-reveal="${esc(id)}" data-tip="Show the key">${REVEALED[id] ? "hide" : "show"}</button>` : ""}`;
+  }
+  const text = v === null ? "" : v !== undefined ? shown(k, v) : k.overridden ? shown(k, k.value) : "";
+  const hint = shown(k, k.default);
   const type = k.kind === "int" || k.kind === "float" ? "number" : "text";
-  const step = k.kind === "float" ? ' step="any"' : "";
-  return `<input type="${type}"${step} data-cfg="${esc(id)}" value="${esc(shown(k, value))}">`;
+  return `<input class="cfg-text" type="${type}"${k.kind === "float" ? ' step="any"' : ""} data-cfg="${esc(id)}" placeholder="${esc(hint || "empty")}" value="${esc(text)}" spellcheck="false">`;
+}
+
+function rowHtml(sec, k) {
+  const id = `${sec}.${k.key}`;
+  const state = rowState(sec, k);
+  const undo = state === "edit" ? "Discard this edit" : state === "over" ? "Revert to default on save" : state === "revert" ? "Keep the override" : "";
+  return `<div class="cfg-row" data-row="${esc(id)}" data-state="${state}">
+    <div class="cfg-k"><code>${esc(k.key)}</code>${k.secret ? '<span class="cfg-chip secret">secret</span>' : ""}${k.built ? `<span class="cfg-chip built" data-tip="${BUILT_TIP}">nix</span>` : ""}
+      <div class="cfg-d" title="${esc(k.description)}">${esc(k.description)}</div></div>
+    <div class="cfg-in">${inputFor(sec, k)}</div>
+    <div class="cfg-act">${undo ? `<button class="cfg-icon" data-undo="${esc(id)}" data-tip="${undo}">&#8634;</button>` : ""}</div></div>`;
+}
+
+function counts(sec) {
+  const keys = sec.keys;
+  return {
+    over: keys.filter((k) => k.overridden && editOf(sec.name, k.key) !== null).length,
+    edits: Object.keys(EDIT[sec.name] || {}).length,
+  };
+}
+
+function sectionHtml(sec, hue) {
+  const c = counts(sec);
+  const open = CFG_OPEN.has(sec.name);
+  return `<section class="cfg-sec${open ? " open" : ""}" data-sec="${esc(sec.name)}" style="--hue: var(${hue})">
+    <button class="cfg-sh" data-toggle="${esc(sec.name)}"><span class="cfg-chev">&#9656;</span><b>${esc(sec.description || sec.name)}</b><code>[${esc(sec.name)}]</code>
+      <span class="cfg-n">${sec.keys.length} setting${sec.keys.length === 1 ? "" : "s"}</span>
+      <span class="cfg-chip over" ${c.over ? "" : "hidden"}>${c.over} overridden</span><span class="cfg-chip edit" ${c.edits ? "" : "hidden"}>${c.edits} unsaved</span></button>
+    <div class="cfg-rows">${sec.keys.map((k) => rowHtml(sec.name, k)).join("")}</div></section>`;
+}
+
+function grouped() {
+  const byName = Object.fromEntries(CFG.sections.map((s) => [s.name, s]));
+  const placed = new Set(CFG_GROUPS.flatMap((g) => g[2]));
+  const groups = CFG_GROUPS.map(([title, hue, names]) => [title, hue, names.filter((n) => byName[n]).map((n) => byName[n])]);
+  const rest = CFG.sections.filter((s) => !placed.has(s.name));
+  if (rest.length) groups.push(["Other", "--overlay1", rest]);
+  return groups.filter((g) => g[2].length);
 }
 
 function configDraw() {
   const c = CFG;
-  const count = edits();
-  const rows = (section, k) => {
-    const id = `${section}.${k.key}`;
-    const changed = (EDIT[section] || {})[k.key] !== undefined;
-    return `<div class="cfg-row${k.overridden ? " over" : ""}${changed ? " edited" : ""}">
-      <div class="cfg-k"><code>${esc(k.key)}</code>${k.built ? `<span class="chip" data-tip="nix also builds the units, caddy or the sandbox around this, so an override applies fully only after a rebuild">built</span>` : ""}
-        <div class="tech">${esc(k.description)}</div></div>
-      <div class="cfg-v">${configField(section, k)}
-        <div class="tech">${k.secret ? "" : `default <code>${esc(shown(k, k.default)) || "empty"}</code>`}
-          ${k.overridden ? `<button class="btn sm" data-revert="${esc(id)}">Revert to default</button>` : ""}</div></div></div>`;
-  };
-  $("p-config").innerHTML = `<div class="cfg-head">
-      <div><b>graphiv-mcp</b><div class="tech">Defaults from ${c.source === "nix" ? "the NixOS module" : "config.toml"}, overrides in <code>${esc(c.override)}</code></div></div>
-      <div class="btns"><button class="btn danger" id="cfgall">Revert all</button><button class="btn" id="cfgdrop" ${count ? "" : "disabled"}>Discard edits</button>
-        <button class="btn primary" id="cfgsave" ${count ? "" : "disabled"}>Save ${count || ""}</button></div></div>
-    <div class="box cfg-note">Saving restarts graphiv-api and graphiv-frontend, which ends any MCP session in progress. A running stage keeps the values it started with.</div>
-    ${CFG_PROBLEMS.length ? `<div class="box cfg-bad"><b>The save was refused</b><ul>${CFG_PROBLEMS.map((p) => `<li>${esc(p)}</li>`).join("")}</ul>
-      <button class="btn danger sm" id="cfgforce">Save anyway</button></div>` : ""}
-    ${c.stale.length ? `<div class="box cfg-bad"><b>In the override but no longer a setting</b><ul>${c.stale.map((s) => `<li><code>${esc(s)}</code> <button class="btn sm" data-revert="${esc(s)}">Remove</button></li>`).join("")}</ul></div>` : ""}
-    ${c.sections.map((sec) => `<section class="box cfg-sec"><div class="box-t">${esc(sec.description || sec.name)}<span class="tech">[${esc(sec.name)}]</span></div>
-      ${sec.keys.map((k) => rows(sec.name, k)).join("")}</section>`).join("")}`;
-  const spec = (id) => {
-    const cut = id.lastIndexOf(".");
-    const section = id.slice(0, cut);
-    const key = id.slice(cut + 1);
-    const sec = c.sections.find((s) => s.name === section);
-    return { section, key, k: sec && sec.keys.find((x) => x.key === key) };
-  };
-  const put = (section, key, value) => { EDIT[section] = { ...(EDIT[section] || {}), [key]: value }; };
-  for (const el of document.querySelectorAll("#p-config [data-cfg]")) {
-    el.onchange = () => {
-      const { section, key, k } = spec(el.dataset.cfg);
-      if (k.secret && el.value === "") return;
-      put(section, key, k.kind === "bool" ? el.checked : parsed(k, el.value));
-      configDraw();
+  const edits = Object.values(EDIT).reduce((a, keys) => a + Object.keys(keys).length, 0);
+  const over = c.sections.reduce((a, s) => a + s.keys.filter((k) => k.overridden).length, 0);
+  const focus = document.activeElement && document.activeElement.id === "cfgq";
+  $("p-config").innerHTML = `<div class="cfg">
+    <div class="cfg-bar">
+      <input id="cfgq" class="cfg-search" type="search" placeholder="Search settings" value="${esc(CFG_QUERY)}" spellcheck="false">
+      <label class="cfg-only"><input type="checkbox" id="cfgonly" ${CFG_ONLY ? "checked" : ""}> Changed only</label>
+      <button class="btn sm" id="cfgopen">Expand all</button><button class="btn sm" id="cfgshut">Collapse all</button>
+      <span class="cfg-status"><span class="cfg-chip over" ${over ? "" : "hidden"}>${over} overridden</span><span class="cfg-chip edit" id="cfgedits" ${edits ? "" : "hidden"}>${edits} unsaved</span></span>
+      <button class="btn sm" id="cfgdrop" ${edits ? "" : "disabled"}>Discard</button>
+      <button class="btn sm primary" id="cfgsave" ${edits ? "" : "disabled"}>Save</button>
+    </div>
+    <div class="cfg-warn" id="cfgwarn" ${edits ? "" : "hidden"}>Saving restarts graphiv-api and graphiv-frontend, which ends any MCP session in progress. A running stage keeps the values it started with.</div>
+    ${CFG_PROBLEMS.length ? `<div class="cfg-alert"><b>The save was refused</b><ul>${CFG_PROBLEMS.map((p) => `<li>${esc(p)}</li>`).join("")}</ul>
+      <button class="btn danger sm" id="cfgforce">Save without the checks</button></div>` : ""}
+    ${c.stale.length ? `<div class="cfg-alert"><b>In the override but no longer a setting</b><ul>${c.stale.map((s) => `<li><code>${esc(s)}</code> <button class="btn sm" data-stale="${esc(s)}">Remove</button></li>`).join("")}</ul></div>` : ""}
+    ${grouped().map(([title, hue, secs]) => `<div class="cfg-group" style="--hue: var(${hue})"><div class="rh"><i class="cfg-dot"></i>${esc(title)}</div>
+      ${secs.map((s) => sectionHtml(s, hue)).join("")}</div>`).join("")}
+    <div class="cfg-foot tech">Defaults from ${c.source === "nix" ? "the NixOS module" : "config.toml"}, overrides in <code>${esc(c.override)}</code>
+      <button class="btn sm danger" id="cfgall" ${over ? "" : "disabled"}>Revert all</button></div></div>`;
+  configWire();
+  configFilter();
+  if (focus) { const q = $("cfgq"); q.focus(); q.setSelectionRange(q.value.length, q.value.length); }
+}
+
+function configMarks(sec, key) {
+  const s = CFG.sections.find((x) => x.name === sec);
+  const k = s.keys.find((x) => x.key === key);
+  const row = document.querySelector(`#p-config [data-row="${CSS.escape(`${sec}.${key}`)}"]`);
+  row.dataset.state = rowState(sec, k);
+  const st = row.dataset.state;
+  const undo = st === "edit" ? "Discard this edit" : st === "over" ? "Revert to default on save" : st === "revert" ? "Keep the override" : "";
+  row.querySelector(".cfg-act").innerHTML = undo ? `<button class="cfg-icon" data-undo="${esc(`${sec}.${key}`)}" data-tip="${undo}">&#8634;</button>` : "";
+  const b = row.querySelector("[data-undo]");
+  if (b) b.onclick = () => undoRow(b.dataset.undo);
+  const c = counts(s);
+  const head = document.querySelector(`#p-config [data-sec="${CSS.escape(sec)}"] .cfg-sh`);
+  const [overChip, editChip] = head.querySelectorAll(".cfg-chip");
+  overChip.hidden = !c.over; overChip.textContent = `${c.over} overridden`;
+  editChip.hidden = !c.edits; editChip.textContent = `${c.edits} unsaved`;
+  const edits = Object.values(EDIT).reduce((a, keys) => a + Object.keys(keys).length, 0);
+  $("cfgedits").hidden = !edits; $("cfgedits").textContent = `${edits} unsaved`;
+  $("cfgwarn").hidden = !edits;
+  $("cfgsave").disabled = !edits; $("cfgdrop").disabled = !edits;
+}
+
+function specOf(id) {
+  const cut = id.lastIndexOf(".");
+  const sec = id.slice(0, cut);
+  const key = id.slice(cut + 1);
+  const s = CFG.sections.find((x) => x.name === sec);
+  return { sec, key, k: s && s.keys.find((x) => x.key === key) };
+}
+
+function undoRow(id) {
+  const { sec, key, k } = specOf(id);
+  if (edited(sec, key)) drop(sec, key);
+  else if (k.overridden) put(sec, key, null);
+  delete REVEALED[id];
+  configDraw();
+}
+
+function configFilter() {
+  const q = CFG_QUERY.trim().toLowerCase();
+  for (const group of document.querySelectorAll("#p-config .cfg-group")) {
+    let groupShown = 0;
+    for (const secEl of group.querySelectorAll(".cfg-sec")) {
+      const s = CFG.sections.find((x) => x.name === secEl.dataset.sec);
+      const title = `${s.description} ${s.name}`.toLowerCase();
+      let rowsShown = 0;
+      for (const row of secEl.querySelectorAll(".cfg-row")) {
+        const k = s.keys.find((x) => `${s.name}.${x.key}` === row.dataset.row);
+        const hit = !q || title.includes(q) || `${k.key} ${k.description}`.toLowerCase().includes(q);
+        const changed = row.dataset.state !== "default";
+        row.hidden = !(hit && (!CFG_ONLY || changed));
+        rowsShown += row.hidden ? 0 : 1;
+      }
+      secEl.hidden = !rowsShown;
+      secEl.classList.toggle("open", CFG_OPEN.has(s.name) || ((q || CFG_ONLY) && rowsShown > 0));
+      groupShown += rowsShown ? 1 : 0;
+    }
+    group.hidden = !groupShown;
+  }
+}
+
+function configWire() {
+  const q = $("cfgq");
+  q.oninput = () => { CFG_QUERY = q.value; configFilter(); };
+  $("cfgonly").onchange = (e) => { CFG_ONLY = e.target.checked; configFilter(); };
+  $("cfgopen").onclick = () => { CFG.sections.forEach((s) => CFG_OPEN.add(s.name)); keepOpen(); configFilter(); };
+  $("cfgshut").onclick = () => { CFG_OPEN.clear(); keepOpen(); configFilter(); };
+  for (const b of document.querySelectorAll("#p-config [data-toggle]")) {
+    b.onclick = () => {
+      const name = b.dataset.toggle;
+      const sec = b.closest(".cfg-sec");
+      if (sec.classList.contains("open")) { CFG_OPEN.delete(name); sec.classList.remove("open"); }
+      else { CFG_OPEN.add(name); sec.classList.add("open"); }
+      keepOpen();
     };
   }
-  for (const b of document.querySelectorAll("#p-config [data-clear]")) b.onclick = () => { const { section, key } = spec(b.dataset.clear); put(section, key, ""); configDraw(); };
+  for (const el of document.querySelectorAll("#p-config [data-cfg]")) {
+    const { sec, key, k } = specOf(el.dataset.cfg);
+    if (k.kind === "bool") {
+      el.onchange = () => { decide(sec, k, el.checked); el.nextElementSibling.textContent = el.checked ? "on" : "off"; configMarks(sec, key); };
+    } else if (k.secret) {
+      el.oninput = () => {
+        const text = el.value;
+        if (text === "" || text === REVEALED[el.dataset.cfg]) drop(sec, key);
+        else put(sec, key, text);
+        configMarks(sec, key);
+      };
+    } else {
+      el.oninput = () => { decide(sec, k, el.value === "" ? undefined : parsed(k, el.value)); configMarks(sec, key); };
+    }
+  }
+  for (const b of document.querySelectorAll("#p-config [data-undo]")) b.onclick = () => undoRow(b.dataset.undo);
   for (const b of document.querySelectorAll("#p-config [data-reveal]")) {
     b.onclick = async () => {
-      const { section, key } = spec(b.dataset.reveal);
-      const { ok, got } = await configCall("GET", `/api/config/reveal?section=${encodeURIComponent(section)}&key=${encodeURIComponent(key)}`);
-      b.parentElement.querySelector("input").type = "text";
-      b.parentElement.querySelector("input").value = ok ? got.value : got.error;
+      const id = b.dataset.reveal;
+      if (REVEALED[id]) { delete REVEALED[id]; configDraw(); return; }
+      const { sec, key } = specOf(id);
+      const { ok, got } = await configCall("GET", `/api/config/reveal?section=${encodeURIComponent(sec)}&key=${encodeURIComponent(key)}`);
+      if (ok) { REVEALED[id] = got.value; configDraw(); }
     };
   }
-  for (const b of document.querySelectorAll("#p-config [data-revert]")) {
+  for (const b of document.querySelectorAll("#p-config [data-stale]")) {
     b.onclick = async () => {
-      const { section, key } = spec(b.dataset.revert);
-      if (!confirm(`Revert ${section}.${key} to its default? This restarts graphiv-api and graphiv-frontend.`)) return;
-      const { ok, got } = await configCall("POST", "/api/config/revert", { section, key });
-      if (ok) { CFG = got; if (EDIT[section]) delete EDIT[section][key]; }
+      const id = b.dataset.stale;
+      const cut = id.lastIndexOf(".");
+      const { ok, got } = await configCall("POST", "/api/config/revert", { section: id.slice(0, cut), key: id.slice(cut + 1) });
+      if (ok) CFG = got;
       configDraw();
     };
   }
@@ -1266,15 +1430,28 @@ function configDraw() {
   };
   $("cfgdrop").onclick = () => { EDIT = {}; CFG_PROBLEMS = []; configDraw(); };
   const save = async (force) => {
-    const bad = Object.entries(EDIT).flatMap(([s, keys]) => Object.entries(keys).filter(([, v]) => typeof v === "number" && Number.isNaN(v)).map(([k]) => `${s}.${k} needs a number`));
+    const bad = Object.entries(EDIT).flatMap(([s, keys]) => Object.entries(keys)
+      .filter(([, v]) => (typeof v === "number" && Number.isNaN(v)) || (Array.isArray(v) && v.some((x) => typeof x === "number" && Number.isNaN(x))))
+      .map(([k]) => `${s}.${k} needs a number`));
     if (bad.length) { CFG_PROBLEMS = bad; configDraw(); return; }
+    $("cfgsave").disabled = true;
+    $("cfgsave").textContent = "Checking";
     const { ok, got } = await configCall("PUT", "/api/config", { changes: EDIT, force });
-    if (ok) { CFG = got; EDIT = {}; CFG_PROBLEMS = []; } else CFG_PROBLEMS = got.problems || [got.error || "the save failed"];
+    if (ok) { CFG = got; EDIT = {}; CFG_PROBLEMS = []; for (const id of Object.keys(REVEALED)) delete REVEALED[id]; }
+    else CFG_PROBLEMS = got.problems || [got.error || "the save failed"];
     configDraw();
   };
   $("cfgsave").onclick = () => save(false);
   if ($("cfgforce")) $("cfgforce").onclick = () => { if (confirm("Save without the checks passing?")) save(true); };
 }
+
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "/" || where.tab !== "config") return;
+  const tag = (document.activeElement && document.activeElement.tagName) || "";
+  if (tag === "INPUT" || tag === "TEXTAREA") return;
+  e.preventDefault();
+  $("cfgq").focus();
+});
 
 // -- the loop --------------------------------------------------------------------------------
 

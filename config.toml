@@ -1,10 +1,10 @@
 # GraphIV global configuration. Local configurations live in benchmarks/config.toml
 
-# The store
+# Database
 [database]
 PG_DEST = "host=.pg port=5433 dbname=arxivkg" # connection string of the store
 
-# Where the corpus comes from
+# Source URLs
 [source]
 SOURCE_URL = "https://www.kaggle.com/api/v1/datasets/download/Cornell-University/arxiv" # Kaggle arXiv snapshot
 SOURCE_PATH = "data/arxiv.json" # snapshot on disk
@@ -13,7 +13,7 @@ PDF_LEGACY_BASE_URL = "https://storage.googleapis.com/arxiv-dataset/arxiv" # bul
 HTML_BASE_URL = "https://arxiv.org/html" # arXiv HTML
 HTML_FALLBACK_URL = "https://ar5iv.labs.arxiv.org/html" # ar5iv HTML when arXiv has none
 
-# Bulk downloads
+# Download Settings
 [download]
 PDF_BATCH = 500 # papers per PDF batch
 PDF_N_PARALLEL = 8 # PDF downloads at once
@@ -21,13 +21,13 @@ HTML_RATE = 8.0 # HTML requests per second
 HTML_BATCH = 200 # papers per HTML batch
 HTML_N_PARALLEL = 16 # HTML downloads at once
 
-# Where the corpus and the graph live
+# Storage Paths
 [dataset]
 PDF_PATH = "data/arxiv/pdfs" # downloaded PDFs
 HTML_PATH = "data/arxiv/html" # downloaded HTML
 GRAPH_PATH = "data/citation_graph_export.npy" # citation graph export
 
-# The tool server and the dashboard
+# MCP Server and Library
 [serve]
 HOST = "127.0.0.1" # address both servers bind
 API_PORT = 6767 # port of the tool server
@@ -39,14 +39,14 @@ CACHE_PATH = "data/cache" # model replies cached by prompt
 FETCH = true # fetch a paper the corpus lacks
 PDFTOTEXT = "pdftotext" # pdf text extractor
 
-# The retrieval pipeline every recipe runs
+# Retrieval
 [retrieve]
 COSINE_LIMIT = 5000 # papers the cosine retriever returns
 EXPANSION_LIMIT = 20000 # most papers each expander appends
 DEPTH = 4 # hops the decay terms reach
 DECAY = 0.5 # weight kept per hop in the decay terms
 
-# The miner that turns a ranking into lines
+# LeyLine Miner
 [miner]
 FOCUS = 4.0 # exponent on closeness when scoring an argued-with paper
 WALK_PREFIX = 30 # head of the ranking the walks run on
@@ -60,7 +60,7 @@ ARGUES = ["extends", "critiques", "compares"] # intents that count as arguing wi
 SUCCESSOR_DAYS = 240 # days before the cap a successor may date from
 SUCCESSOR_FLOOR = 0.60 # lowest intent score a successor's citation needs
 
-# Weight of each citation intent in the miner
+# LeyLine Intent Weights
 [miner.weights]
 extends = 1.0
 critiques = 1.0
@@ -69,13 +69,13 @@ uses = 0.4
 motivates = 0.15
 background = 0.0
 
-# The pipeline manager
+# Manager
 [manager]
 PORT = 6868 # port of the manager page
 STATE_PATH = "data/manager" # jobs and cached charts
 HF_TOKEN_PATH = "" # Hugging Face token file for publishing (empty means none)
 
-# Store dumps and public releases
+# Export and Publishing
 [export]
 EXPORT_PATH = "data/export" # where dumps and releases are written
 DATA_REPO = "kkuroma/GraphIV" # Hugging Face repo of the paper release
@@ -84,7 +84,7 @@ SURVEY_REPO = "kkuroma/GraphIV-survey" # Hugging Face repo of the review classif
 BENCHMARK_REPO = "kkuroma/GraphIV_benchmarks" # Hugging Face repo of the benchmarks
 QUERY_CACHE = "data/cache/queries" # benchmark questions cached by input
 
-# Model endpoints
+# Model Endpoints
 [endpoints]
 EMBEDDING_ENDPOINT = "http://127.0.0.1:11434/embedding/nomic-embed-text-v2-moe" # embedding endpoint
 EMBEDDING_API_KEY = "" # embedding endpoint key (empty means none)
@@ -98,13 +98,13 @@ LLM_ENDPOINT = "http://localhost:11434/v1" # chat model endpoint
 LLM_API_KEY = "" # chat model endpoint key (empty means none)
 LLM_NAME = "Wordslop-Qwen3.6-27B" # chat model
 
-# The review classifier
+# Review Classifier
 [survey]
 MODEL_PATH = "data/survey_detection" # classifier checkpoint
 BATCH = 64 # papers per forward pass
 CHUNK = 50000 # papers per commit
 
-# The UMAP projection
+# UMAP Projection
 [umap]
 UMAP_MODEL_PATH = "data/umap_50.joblib" # fitted model
 UMAP_SAMPLE = 400000 # papers the fit reads
@@ -113,7 +113,7 @@ UMAP_DIM = 50 # projected dimensions
 UMAP_BATCH = 50000 # papers per transform batch
 UMAP_WORKERS = 4 # transform processes
 
-# The topic tree
+# Topic Tree
 [topics]
 TREE_METHODS = ["kmeans", "kmeans", "kmeans"] # clustering method per level
 TREE_K = 16 # clusters per node
@@ -124,7 +124,7 @@ TREE_SEED = 69420 # random seed
 N_TOPIC_LABEL = 10 # papers shown to the namer per topic
 TOPIC_BATCH = 8 # topics named at once
 
-# The citation intent labeler
+# Citation Labeler
 [citation_labeler]
 LABELER_PATH = "data/citation_labeler" # checkpoint directory
 LABELER_MODEL = "distilbert/distilbert-base-uncased" # student base model
@@ -140,13 +140,13 @@ LABELER_EPOCHS = 12 # student training epochs
 LABELER_TRAIN_BATCH = 64 # citations per training step
 LABELER_LR = 2e-5 # student learning rate
 
-# Review case selection
+# Review Case Selection
 [surveymatch]
 SURVEY_THRESHOLD = 0.5 # review score floor
 MUTUAL_COSINE_THRESHOLD = 0.65 # closeness the reviews of one case share
 SURVEYMATCH_LEVEL = 2 # tree level cases group by
 
-# The published benchmarks
+# Benchmark Release
 [benchmarks]
 CUTOFF = "2026-10-22" # last day a mined review may carry
 SURVEYMATCH_FLOOR = 100 # resolved references a SurveyMatch review needs

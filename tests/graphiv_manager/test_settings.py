@@ -119,3 +119,9 @@ def test_the_staged_config_beats_an_overridden_snapshot(config: Path) -> None:
     read = load_config(staged, override=os.devnull)
     assert read["source"]["SOURCE_PATH"] == "/elsewhere/arxiv-new.json"
     assert read["serve"]["FETCH"] is True
+
+
+def test_null_reverts_a_key_in_the_same_save(config: Path) -> None:
+    _ = settings.save(config, {"serve": {"FETCH": False, "HOST": "0.0.0.0"}}, check=False)
+    _ = settings.save(config, {"serve": {"FETCH": None, "HOST": "10.0.0.1"}}, check=False)
+    assert override(config) == {"serve": {"HOST": "10.0.0.1"}}
