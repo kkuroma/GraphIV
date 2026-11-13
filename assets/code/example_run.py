@@ -20,7 +20,7 @@ from typing import Any
 import psycopg
 from style import DATA
 
-from src.core.embed import embed
+from src.core.embed import EmbeddingEndpoint, embed
 from src.core.parse_graph_export import load_graph_export
 from src.retrieve.query import Query
 from src.retrieve.recipe import build_pipeline, get_seed_limit, read_recipe
@@ -92,11 +92,10 @@ def rerun(config: dict[str, Any], run: dict[str, Any]) -> list[dict[str, Any]]:
     cap = date.fromisoformat(run["asked"])
     recipe = read_recipe(Path(config["serve"]["RECIPE_PATH"]) / f"{run['mode']}.toml")
     graph = load_graph_export(config["dataset"]["GRAPH_PATH"])
-    endpoints = config["endpoints"]
     out: list[dict[str, Any]] = []
     for area in run["areas"]:
         clock = time.perf_counter()
-        vector = embed(endpoints["EMBED_API"], endpoints["EMBED_NAME"], area["question"])
+        vector = embed(EmbeddingEndpoint.from_config(config), area["question"])
         pipeline = build_pipeline(recipe, graph, config["database"]["PG_DEST"])
         query = Query(text=area["question"], emb=vector, max_date=cap)
         pool = pipeline.retriever.retrieve(query, get_seed_limit(recipe))

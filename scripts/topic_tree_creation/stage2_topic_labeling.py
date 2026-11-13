@@ -1,7 +1,7 @@
 """
 Name every node of the topic tree from the leaves upward and store one row per node
 
-A parent is capped three words under its shortest child, so abstraction rises with the level
+A parent is asked for three words fewer than its shortest child, so abstraction rises with the level
 Siblings above the leaves are named in one call each, since a node named alone collides with them
 """
 
@@ -20,6 +20,7 @@ import psycopg
 from pydantic import BaseModel
 
 from src.core.config import load_config
+from src.core.llm import headers
 
 MIN_CAP = 3
 LEAF_CAP = 15
@@ -54,16 +55,20 @@ class TopicTreeLabeler:
     A namer for one topic tree, holding the endpoint and the width of its request pool
     """
 
-    def __init__(self, base_url: str, model: str, batch_size: int, n_papers: int) -> None:
+    def __init__(
+        self, base_url: str, model: str, batch_size: int, n_papers: int, key: str = ""
+    ) -> None:
         """
         Args:
             base_url: an OpenAI-compatible root, normally llama-router.
             model: the model name the endpoint answers to.
             batch_size: nodes named at once, which is also the pool width.
             n_papers: papers shown per leaf.
+            key: the API key, empty for an endpoint that takes none.
         """
         self.base_url = base_url.rstrip("/")
         self.model = model
+        self.key = key
         self.batch_size = batch_size
         self.n_papers = n_papers
         self.fallbacks = 0
@@ -92,7 +97,7 @@ class TopicTreeLabeler:
         req = urllib.request.Request(
             f"{self.base_url}/chat/completions",
             data=json.dumps(body).encode(),
-            headers={"Content-Type": "application/json"},
+            headers=headers(self.key),
         )
         for _ in range(3):
             try:
@@ -108,19 +113,19 @@ class TopicTreeLabeler:
         return ""
 
     @staticmethod
-    def _clean(raw: str, cap: int) -> str:
+    def _clean(raw: str) -> str:
         """
-        Strip the model's decoration and drop anything past the word cap
+        Strip the model's decoration, keeping a name over its word cap whole
+
+        Cutting it at the cap left names ending mid-phrase, like Algebraic Geometry And.
 
         Args:
             raw: one line of the reply.
-            cap: the word budget.
 
         Returns:
             The bare name.
         """
-        name = " ".join(raw.split()).strip("\"'*`.,")
-        return " ".join(name.split()[:cap])
+        return " ".join(raw.split()).strip("\"'*`.,")
 
     def label_topics(self, papers: list[Paper]) -> str:
         """
@@ -144,7 +149,7 @@ class TopicTreeLabeler:
             "No preamble, no quotes, no trailing period.\n"
             "Do not use the words Papers, Research, Studies, Approaches or Methods.\n\n"
         ) + "\n".join(lines)
-        return self._clean(self._complete(prompt, 60), LEAF_CAP)
+        return self._clean(self._complete(prompt, 60))
 
     def label_meta_topic(self, topics: list[str], cap: int) -> str:
         """
@@ -164,7 +169,7 @@ class TopicTreeLabeler:
             f"Answer with a title-case noun phrase of at most {cap} words and nothing else.\n"
             "No preamble, no quotes, no trailing period.\n\n" + listed
         )
-        return self._clean(self._complete(prompt, 40), cap)
+        return self._clean(self._complete(prompt, 40))
 
     def label_sibling_group(self, groups: list[list[str]], cap: int) -> list[str]:
         """
@@ -198,7 +203,7 @@ class TopicTreeLabeler:
         for line in reply.splitlines():
             hit = NUMBERED.match(line)
             if hit:
-                got[int(hit.group(1))] = self._clean(hit.group(2), cap)
+                got[int(hit.group(1))] = self._clean(hit.group(2))
         if len(got) == len(groups):
             return [got[i] for i in range(1, len(groups) + 1)]
         return [self.label_meta_topic(children, cap) for children in groups]
@@ -385,10 +390,11 @@ def main() -> None:
     cfg = load_config(str(args.config_path))
     ep, tp = cfg["endpoints"], cfg["topics"]
     labeler = TopicTreeLabeler(
-        base_url=str(ep["LLM_API"]),
+        base_url=str(ep["LLM_ENDPOINT"]),
         model=str(ep["LLM_NAME"]),
         batch_size=int(tp["TOPIC_BATCH"]),
         n_papers=int(tp["N_TOPIC_LABEL"]),
+        key=str(ep["LLM_API_KEY"]),
     )
     _ = labeler.label_tree(str(cfg["database"]["PG_DEST"]))
 

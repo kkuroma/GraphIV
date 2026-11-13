@@ -40,7 +40,7 @@ llama-server --embedding -m nomic-embed-text-v2-moe.f16.gguf --alias nomic-embed
 ```
 
 It has to be llama-server rather than any OpenAI-compatible host, since documents are truncated
-client-side through `/tokenize`. Point `embeddings.api` or `GRAPHIV_EMBED_API` at it.
+client-side through `/tokenize`. Point `[endpoints] EMBEDDING_ENDPOINT` at it, with `EMBEDDING_API_KEY` when it takes one.
 
 ## 3. The LLM endpoint
 
@@ -48,7 +48,8 @@ Any OpenAI-compatible host, named under `[endpoints]` in `config.toml`.
 
 | key | role |
 | --- | --- |
-| `LLM_API` | the endpoint, default `http://localhost:11434/v1` |
+| `LLM_ENDPOINT` | the endpoint, default `http://localhost:11434/v1` |
+| `LLM_API_KEY` | its bearer key, empty for none |
 | `LLM_NAME` | the one model every call goes to |
 
 A 26B instruct model with 32k context is the reference point, and one model answers every call,

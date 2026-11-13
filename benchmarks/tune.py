@@ -53,13 +53,34 @@ def split_cases(spec: dict[str, Any], split: str) -> list[dict[str, Any]]:
     return cases
 
 
-def cache_terms(name: str, spec: dict[str, Any]) -> Path:
+def embedder_args(embedder: str | None, workers: int) -> list[str]:
+    """
+    The terms.py arguments that pool from another embedder's npy instead of the store
+
+    Args:
+        embedder: A section of tuning/embedders.toml, or None for the store's nomic.
+        workers: Processes scoring cases.
+
+    Returns:
+        The arguments.
+    """
+    out = ["--workers", str(workers)]
+    if embedder is None:
+        return out
+    e = tomllib.loads((TUNING / "embedders.toml").read_text())[embedder]
+    out += ["--vectors", str(common.INDEX / f"{e['vectors']}.npy"), "--endpoint", e["endpoint"], "--prompt", e.get("prompt", "")]
+    return out + (["--unload"] if e.get("unload") else [])
+
+
+def cache_terms(name: str, spec: dict[str, Any], tag: str, extra: list[str]) -> Path:
     """
     Pools and scores every train and val case at every core, through src/graphiv/terms.py
 
     Args:
         name: The recipe.
         spec: Its spec.
+        tag: The directory the terms go under, the recipe or the recipe and its embedder.
+        extra: terms.py's embedder and worker arguments.
 
     Returns:
         The recipe's term directory.
@@ -67,7 +88,7 @@ def cache_terms(name: str, spec: dict[str, Any]) -> Path:
     Raises:
         RuntimeError: When a split's cached cases are not the ones the spec now asks for.
     """
-    root = common.TUNED / name / "terms"
+    root = common.TUNED / tag / "terms"
     for split in ("train", "val"):
         cases = split_cases(spec, split)
         out = root / split
@@ -80,7 +101,7 @@ def cache_terms(name: str, spec: dict[str, Any]) -> Path:
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "cases.jsonl"
             common.write_jsonl(path, cases)
-            common.graphiv("terms.py", "--graph", str(common.GRAPH), "--cases", str(path), "--cores", json.dumps(spec["cores"]), "--out", str(out))
+            common.graphiv("terms.py", "--graph", str(common.GRAPH), "--cases", str(path), "--cores", json.dumps(spec["cores"]), "--out", str(out), *extra)
     return root
 
 
@@ -108,23 +129,26 @@ def write_recipe(name: str, pick: dict[str, Any]) -> Path:
     return out
 
 
-def tune(name: str) -> None:
+def tune(name: str, embedder: str | None, workers: int) -> None:
     """
     Caches the terms, fits every core, and writes the picked recipe
 
     Args:
         name: The recipe.
+        embedder: A section of tuning/embedders.toml, or None for the store's nomic.
+        workers: Processes scoring cases.
     """
     spec = read_spec(name)
+    tag = name if embedder is None else f"{name}_{embedder}"
     common.LOGS.mkdir(parents=True, exist_ok=True)
-    common.LOG = common.LOGS / f"tune-{name}.log"
-    common.say(f"== tune {name} {time.strftime('%Y-%m-%d %H:%M:%S')}, cores {spec['cores']}, R@{spec['k']}")
-    root = cache_terms(name, spec)
-    report = common.TUNED / name / "report.json"
+    common.LOG = common.LOGS / f"tune-{tag}.log"
+    common.say(f"== tune {tag} {time.strftime('%Y-%m-%d %H:%M:%S')}, cores {spec['cores']}, R@{spec['k']}")
+    root = cache_terms(name, spec, tag, embedder_args(embedder, workers))
+    report = common.TUNED / tag / "report.json"
     common.graphiv("fit.py", "--terms", str(root), "--spec", json.dumps(spec), "--out", str(report))
     pick = json.loads(report.read_text())["pick"]
-    path = write_recipe(name, pick)
-    common.say(f"== tune {name} wrote {path}, core {pick['core']}, {pick['point']}, R@{spec['k']} {pick['judged']:.4f}")
+    path = write_recipe(tag, pick)
+    common.say(f"== tune {tag} wrote {path}, core {pick['core']}, {pick['point']}, R@{spec['k']} {pick['judged']:.4f}")
     common.LOG = None
 
 
@@ -149,6 +173,8 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     _ = ap.add_argument("--recipe", choices=RECIPES, action="append", help="a recipe to tune, repeatable, in the order given")
     _ = ap.add_argument("--promote", action="store_true", help="copy data/recipes/ into the checkout's retrieval_recipes/")
+    _ = ap.add_argument("--embedder", help="a section of tuning/embedders.toml, pooled exactly from its npy, written as <recipe>_<embedder>")
+    _ = ap.add_argument("--workers", type=int, default=8, help="processes scoring cases")
     args = ap.parse_args()
     if bool(args.recipe) == args.promote:
         ap.error("pass --recipe or --promote, not both")
@@ -157,7 +183,7 @@ def main() -> None:
         return
     common.guard()
     for name in args.recipe:
-        tune(name)
+        tune(name, args.embedder, args.workers)
 
 
 if __name__ == "__main__":

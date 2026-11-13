@@ -22,12 +22,28 @@ PARALLEL = 8
 ATTEMPTS = 3
 
 
+def headers(key: str) -> dict[str, str]:
+    """
+    The headers of one json request, with the bearer key when there is one
+
+    Args:
+        key: The API key, empty for an endpoint that takes none.
+
+    Returns:
+        The headers.
+    """
+    out = {"Content-Type": "application/json"}
+    if key:
+        out["Authorization"] = f"Bearer {key}"
+    return out
+
+
 class Gemma:
     """
     An OpenAI-compatible endpoint that remembers what it said
     """
 
-    def __init__(self, api: str, model: str, cache: str | Path) -> None:
+    def __init__(self, api: str, model: str, cache: str | Path, key: str = "") -> None:
         """
         Holds the endpoint and the directory a completion is written into
 
@@ -35,9 +51,11 @@ class Gemma:
             api: The OpenAI-compatible base url.
             model: Which model to ask.
             cache: Directory the completions are written into.
+            key: The API key, empty for an endpoint that takes none.
         """
         self.api = api.rstrip("/")
         self.model = model
+        self.key = key
         self.cache = Path(cache)
         self.cache.mkdir(parents=True, exist_ok=True)
 
@@ -78,7 +96,7 @@ class Gemma:
         request = urllib.request.Request(
             f"{self.api}/chat/completions",
             data=json.dumps(body).encode(),
-            headers={"Content-Type": "application/json"},
+            headers=headers(self.key),
         )
         for _ in range(ATTEMPTS):
             try:

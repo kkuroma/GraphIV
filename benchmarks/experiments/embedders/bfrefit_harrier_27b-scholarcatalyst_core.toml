@@ -1,0 +1,12 @@
+method = "embedder"
+dataset = "scholarcatalyst"
+split = "core"
+
+[run]
+ks = [5, 20, 100]
+ndcg = [20]
+vectors = "harrier-27b"
+endpoint = "http://127.0.0.1:11434/embedding/harrier-oss-v1-27b-q4"
+prompt = "Instruct: Given a research question, retrieve the arXiv papers a literature review answering it would cite\nQuery: "
+unload = true
+recipe = "focused_harrier_27b"

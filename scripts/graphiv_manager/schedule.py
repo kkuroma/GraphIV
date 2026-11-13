@@ -24,7 +24,7 @@ import snapshot
 import stages
 import stats
 from jobs import ACTIVE, Job, Runner, Step, Store, progress
-from src.core.config import load_config
+from src.core.config import dumps, load_config
 
 LOG = logging.getLogger(__name__)
 
@@ -38,7 +38,6 @@ HUB_REPOS = ("DATA_REPO", "CITATION_REPO", "SURVEY_REPO", "BENCHMARK_REPO")
 # a rate from a step shorter than this is mostly startup, not throughput
 RATE_FLOOR = 60.0
 PHASE = re.compile(r"^\[(\w+)\]", re.MULTILINE)
-SOURCE = re.compile(r'^(\s*SOURCE_PATH\s*=\s*)".*"', re.MULTILINE)
 CHECKED = {
     "new": re.compile(r"\[stage0\] ([\d,]+) new rows"),
     "reset": re.compile(r"\[stage0\] ([\d,]+) papers moved to a new version"),
@@ -67,10 +66,6 @@ class Manager:
         self.state = state
         self.python = python
         state.mkdir(parents=True, exist_ok=True)
-        self.cfg: dict[str, Any] = load_config(config)
-        self.dsn = str(self.cfg["database"]["PG_DEST"])
-        self.source = Path(str(self.cfg["source"]["SOURCE_PATH"]))
-        self.url = str(self.cfg["source"].get("SOURCE_URL", ""))
         self.remote: dict[str, Any] = {}
         self.hub: dict[str, Any] = {}
         self.store = Store(state / "jobs")
@@ -90,6 +85,36 @@ class Manager:
         self.health: dict[str, Any] = {}
         self.checked = 0.0
         self.tasks: list[asyncio.Task[None]] = []
+
+    # -- the config, read again on every use so a saved override applies at the next job or probe
+
+    @property
+    def cfg(self) -> dict[str, Any]:
+        """
+        The config with the override merged over it
+        """
+        return load_config(self.config)
+
+    @property
+    def dsn(self) -> str:
+        """
+        The store's connection string
+        """
+        return str(self.cfg["database"]["PG_DEST"])
+
+    @property
+    def source(self) -> Path:
+        """
+        The snapshot in use
+        """
+        return Path(str(self.cfg["source"]["SOURCE_PATH"]))
+
+    @property
+    def url(self) -> str:
+        """
+        Where the snapshot is fetched from
+        """
+        return str(self.cfg["source"].get("SOURCE_URL", ""))
 
     # -- files this manager owns
 
@@ -122,16 +147,17 @@ class Manager:
 
     def staged_config(self) -> Path:
         """
-        A copy of the config pointing the snapshot stage at the staged file, for its dry run
+        The merged config pointing the snapshot stage at the staged file, for its dry run
+
+        The runner hands a step with its own config no override, so the staged path stands
 
         Returns:
             The copy's path.
         """
-        text = self.config.read_text(encoding="utf-8")
-        target = snapshot.staged(self.source)
-        written = SOURCE.sub(lambda m: f'{m.group(1)}"{target}"', text, count=1)
+        merged = self.cfg
+        merged["source"]["SOURCE_PATH"] = str(snapshot.staged(self.source))
         path = self.state / "staged.toml"
-        _ = path.write_text(written, encoding="utf-8")
+        _ = path.write_text(dumps(merged), encoding="utf-8")
         return path
 
     def measured(self, step: Step, said: str) -> None:
@@ -283,9 +309,17 @@ class Manager:
         store, llm, embed, card, disk = await asyncio.gather(
             asyncio.to_thread(probes.store, self.dsn),
             asyncio.to_thread(
-                probes.models, str(ep.get("LLM_API", "")), str(ep.get("LLM_NAME", ""))
+                probes.models,
+                str(ep.get("LLM_ENDPOINT", "")),
+                str(ep.get("LLM_NAME", "")),
+                str(ep.get("LLM_API_KEY", "")),
             ),
-            asyncio.to_thread(probes.models, str(ep.get("EMBED_API", ""))),
+            asyncio.to_thread(
+                probes.models,
+                str(ep.get("EMBEDDING_ENDPOINT", "")),
+                "",
+                str(ep.get("EMBEDDING_API_KEY", "")),
+            ),
             asyncio.to_thread(probes.gpu),
             asyncio.to_thread(probes.disks, paths),
         )

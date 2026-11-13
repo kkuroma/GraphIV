@@ -86,13 +86,16 @@ QUERY_CACHE = "data/cache/queries" # benchmark questions cached by input
 
 # Model endpoints
 [endpoints]
-EMBED_API = "http://127.0.0.1:11434/embedding/nomic-embed-text-v2-moe" # embedding endpoint
-EMBED_NAME = "nomic-embed-text-v2-moe" # embedding model
-EMBED_PARALLEL = 1 # embedding batches in flight
-EMBED_BATCH = 256 # papers per embedding batch
-EMBED_MAX_SEQ = 512 # token budget per document
-EMBED_PREFIX = "search_document: " # prefix on every embedded document
-LLM_API = "http://localhost:11434/v1" # chat model endpoint
+EMBEDDING_ENDPOINT = "http://127.0.0.1:11434/embedding/nomic-embed-text-v2-moe" # embedding endpoint
+EMBEDDING_API_KEY = "" # embedding endpoint key (empty means none)
+EMBEDDING_NAME = "nomic-embed-text-v2-moe" # embedding model
+EMBEDDING_PARALLEL = 1 # embedding batches in flight
+EMBEDDING_BATCH = 256 # papers per embedding batch
+EMBEDDING_MAX_SEQ = 512 # token budget per document
+EMBEDDING_DOCUMENT_PREFIX = "search_document: " # prefix on every embedded document
+EMBEDDING_QUERY_PREFIX = "search_query: " # prefix on every embedded question
+LLM_ENDPOINT = "http://localhost:11434/v1" # chat model endpoint
+LLM_API_KEY = "" # chat model endpoint key (empty means none)
 LLM_NAME = "Wordslop-Qwen3.6-27B" # chat model
 
 # The review classifier

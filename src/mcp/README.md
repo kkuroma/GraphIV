@@ -56,3 +56,13 @@ The configuration the measured runs used, with `<checkout>` the repo and the mod
 The built-in tools are off so every answer comes from the corpus, and the skill tool stays on so the agent can load the other three skills.
 The research skill goes in as instructions because an agent rarely loads an optional skill on its own.
 The output limits are raised so a long `read_paper` reply reaches the agent whole.
+
+## Connecting Claude Code
+
+```sh
+claude mcp add --scope user --transport http graphiv https://graphiv.zaphkiel/mcp
+```
+
+The api answers only the hosts in `ALLOWED_HOSTS`, so a loopback url gets a 421.
+The four skill directories go under `~/.claude/skills`, and `/graphiv-research <question>` starts a report.
+A `PostToolUse` hook on `mcp__graphiv__save_report` writes the transcript into the saved run as `session.json`, and zaphkiel's is in `home/dev/claude.nix` of the nixos configs.

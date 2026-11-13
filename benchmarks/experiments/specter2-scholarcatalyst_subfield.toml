@@ -1,0 +1,7 @@
+method = "specter2"
+dataset = "scholarcatalyst"
+split = "subfield"
+
+[run]
+ks = [5, 20, 100]
+ndcg = [20]

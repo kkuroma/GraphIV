@@ -173,9 +173,10 @@ def main() -> None:
     out = Path(str(cfg["export"]["EXPORT_PATH"])) / f"graphiv-benchmarks-{cutoff}"
     part = out.with_name(out.name + ".part")
     writer = GemmaWriter(
-        str(cfg["endpoints"]["LLM_API"]),
+        str(cfg["endpoints"]["LLM_ENDPOINT"]),
         str(cfg["endpoints"]["LLM_NAME"]),
         Path(str(cfg["export"]["QUERY_CACHE"])),
+        str(cfg["endpoints"]["LLM_API_KEY"]),
     )
     counts: dict[str, dict[str, int]] = {}
     medians: dict[str, int] = {}

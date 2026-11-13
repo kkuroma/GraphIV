@@ -12,7 +12,7 @@ from datetime import date
 from pathlib import Path
 
 from src.core.config import load_config
-from src.core.embed import embed
+from src.core.embed import EmbeddingEndpoint, embed
 from src.core.parse_graph_export import load_graph_export
 from src.retrieve.recipe import build_pipeline, get_seed_limit, read_recipe
 
@@ -29,7 +29,7 @@ def main() -> None:
     _ = ap.add_argument("--corpus", help="a file of the ids a ranking may hold, one per line")
     args = ap.parse_args()
     config = load_config(str(ROOT / "config.toml"))
-    api, name = str(config["endpoints"]["EMBED_API"]), str(config["endpoints"]["EMBED_NAME"])
+    endpoint = EmbeddingEndpoint.from_config(config)
     recipe = read_recipe(Path(args.recipe))
     pipeline = build_pipeline(recipe, config["retrieve"], load_graph_export(args.graph), str(config["database"]["PG_DEST"]))
     limit = get_seed_limit(config["retrieve"])
@@ -39,7 +39,7 @@ def main() -> None:
     with open(args.out, "w") as f:
         for i, c in enumerate(cases):
             started = time.perf_counter()
-            v = embed(api, name, c["query"])
+            v = embed(endpoint, c["query"])
             cap = date.fromisoformat(c["cutoff"])
             pipeline.block(c["anchors"])
             pool = pipeline.build_pool(c["query"], v, retrieve_limit=limit, max_date=cap)

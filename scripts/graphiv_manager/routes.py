@@ -16,6 +16,7 @@ from starlette.responses import FileResponse, JSONResponse, Response
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 
+import settings
 import snapshot
 import stages
 import stats
@@ -178,6 +179,37 @@ def routes(manager: Manager) -> list[Route | Mount]:
         text, size = manager.store.tail(job, start)
         return JSONResponse({"text": text, "offset": size})
 
+    async def config(request: Request) -> Response:
+        _ = request
+        return JSONResponse(await asyncio.to_thread(settings.view, manager.config))
+
+    async def save(request: Request) -> Response:
+        body: dict[str, Any] = await request.json()
+        changes = body.get("changes", {})
+        if not isinstance(changes, dict) or not all(isinstance(v, dict) for v in changes.values()):
+            return JSONResponse(
+                {"error": "send changes as {section: {key: value}}"}, status_code=400
+            )
+        check = not bool(body.get("force"))
+        problems = await asyncio.to_thread(settings.save, manager.config, changes, check)
+        if problems:
+            return JSONResponse({"problems": problems}, status_code=400)
+        return JSONResponse(await asyncio.to_thread(settings.view, manager.config))
+
+    async def revert(request: Request) -> Response:
+        body: dict[str, Any] = await request.json()
+        section, key = str(body.get("section", "")), str(body.get("key", ""))
+        await asyncio.to_thread(settings.revert, manager.config, section, key)
+        return JSONResponse(await asyncio.to_thread(settings.view, manager.config))
+
+    async def reveal(request: Request) -> Response:
+        section = str(request.query_params.get("section", ""))
+        key = str(request.query_params.get("key", ""))
+        try:
+            return JSONResponse({"value": settings.secret(manager.config, section, key)})
+        except ValueError as err:
+            return JSONResponse({"error": str(err)}, status_code=400)
+
     async def page(request: Request) -> Response:
         _ = request
         return FileResponse(HERE / "index.html")
@@ -199,5 +231,9 @@ def routes(manager: Manager) -> list[Route | Mount]:
         Route("/api/jobs/{job}/cancel", cancel, methods=["POST"]),
         Route("/api/jobs/{job}/resume", resume, methods=["POST"]),
         Route("/api/jobs/{job}/log", log),
+        Route("/api/config", config),
+        Route("/api/config", save, methods=["PUT"]),
+        Route("/api/config/revert", revert, methods=["POST"]),
+        Route("/api/config/reveal", reveal),
         Mount("/", StaticFiles(directory=HERE)),
     ]

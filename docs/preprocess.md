@@ -9,8 +9,8 @@ Reproduce the PostGreSQL DB (`papers`, `citations`, `topic_tree` and `topic_name
 | metadata dump URL | `[source] SOURCE_URL` | the Kaggle arXiv snapshot, 5.1 GB of JSONL |
 | PDF mirror | `[source] PDF_BASE_URL` | Google's arxiv-dataset bucket |
 | HTML source | `[source] HTML_BASE_URL`, `HTML_FALLBACK_URL` | arXiv's render, ar5iv before 2024-01 |
-| embedding endpoint | `[endpoints] EMBED_API` | llama-server only, since it needs `/tokenize` |
-| LLM endpoint | `[endpoints] LLM_API` | any OpenAI-compatible host |
+| embedding endpoint | `[endpoints] EMBEDDING_ENDPOINT` | llama-server only, since it needs `/tokenize` |
+| LLM endpoint | `[endpoints] LLM_ENDPOINT` | any OpenAI-compatible host |
 | CUDA GPU | not configured | the student trains and infers on it |
 | disk space | `[dataset] PDF_PATH`, `HTML_PATH` | 5.6 TB of PDFs, 87 GB of database |
 

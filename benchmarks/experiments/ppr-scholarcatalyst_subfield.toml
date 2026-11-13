@@ -1,0 +1,18 @@
+method = "ppr"
+dataset = "scholarcatalyst"
+split = "subfield"
+
+# ScholarCatalyst has no train split, so it takes PaSa's pick, as the focused recipe does
+[fit]
+train = "pasa"
+split = "val"
+cases = 200
+seed = 0
+k = 20
+alphas = [0.1, 0.3, 0.5, 0.7, 0.85, 0.95]
+teleports = ["pool", "core"]
+directions = ["back", "both"]
+
+[run]
+ks = [5, 20, 100]
+ndcg = [20]

@@ -3,7 +3,7 @@ const PALETTES = ["haruhana", "natsumikan", "akiba", "fuyuyuki"];
 const SEEDS = { haruhana: "#F07898", natsumikan: "#E08030", akiba: "#C84040", fuyuyuki: "#78B4E8" };
 const INTENTS = ["background", "uses", "compares", "critiques", "extends", "motivates", "unlabeled"];
 const PAPER_STAGES = ["added", "pdf", "html", "embedded", "scored"];
-const TABS = ["dashboard", "download", "history"];
+const TABS = ["dashboard", "download", "history", "config"];
 const DASH = [["overview", "Overview"], ["papers", "Papers"], ["tree", "Topic tree"], ["citations", "Citations"], ["storage", "Storage"]];
 const POLL = 3000;
 
@@ -302,6 +302,7 @@ function go(next) {
   where = { ...where, ...next };
   const path = where.tab === "dashboard" ? `#/dashboard/${where.sub}`
     : where.tab === "download" ? `#/download/${where.table}/${where.stage}`
+    : where.tab === "config" ? "#/config"
     : "#/history";
   if (location.hash !== path) history.replaceState(null, "", path);
   draw(true);
@@ -311,7 +312,7 @@ function readHash() {
   const [, tab, a, b] = location.hash.split("/");
   if (tab === "dashboard") where = { ...where, tab, sub: a || "overview" };
   else if (tab === "download") where = { ...where, tab, table: a || "papers", stage: b || `${a || "papers"}.0` };
-  else if (tab === "history") where = { ...where, tab };
+  else if (tab === "history" || tab === "config") where = { ...where, tab };
 }
 
 function openJob(id) {
@@ -333,6 +334,7 @@ function draw(full) {
   if (where.tab === "dashboard") dashboard(full);
   if (where.tab === "download") download(full);
   if (where.tab === "history") historyTab();
+  if (where.tab === "config" && full) configTab();
 }
 
 // -- charts ----------------------------------------------------------------------------------
@@ -1145,6 +1147,133 @@ function historyTab() {
   for (const b of document.querySelectorAll("#p-history [data-resume]")) b.onclick = () => act(`/api/jobs/${b.dataset.resume}/resume`, {});
   for (const b of document.querySelectorAll("#p-history [data-cancel]")) b.onclick = () => act(`/api/jobs/${b.dataset.cancel}/cancel`, {});
   for (const b of document.querySelectorAll("#p-history [data-open]")) b.onclick = () => openJob(b.dataset.open);
+}
+
+// -- config ----------------------------------------------------------------------------------
+
+let CFG = null;
+let EDIT = {};
+let CFG_PROBLEMS = [];
+
+async function configCall(method, path, body) {
+  const r = await fetch(path, { method, headers: { "content-type": "application/json" }, body: body === undefined ? undefined : JSON.stringify(body) });
+  const got = await r.json().catch(() => ({}));
+  return { ok: r.ok, got };
+}
+
+async function configTab() {
+  const { ok, got } = await configCall("GET", "/api/config");
+  if (!ok) { $("p-config").innerHTML = `<div class="pending">${esc(got.error || "the config did not load")}</div>`; return; }
+  CFG = got;
+  configDraw();
+}
+
+function shown(k, v) {
+  if (k.kind === "list") return (v || []).join(", ");
+  return v == null ? "" : String(v);
+}
+
+function parsed(k, text) {
+  if (k.kind === "list") {
+    const items = text.split(",").map((x) => x.trim()).filter((x) => x !== "");
+    return k.item === "int" || k.item === "float" ? items.map(Number) : items;
+  }
+  if (k.kind === "int" || k.kind === "float") return text.trim() === "" ? NaN : Number(text);
+  return text;
+}
+
+function edits() {
+  return Object.values(EDIT).reduce((a, keys) => a + Object.keys(keys).length, 0);
+}
+
+function configField(section, k) {
+  const id = `${section}.${k.key}`;
+  const mine = (EDIT[section] || {})[k.key];
+  const value = mine !== undefined ? mine : k.value;
+  if (k.kind === "bool") return `<input type="checkbox" data-cfg="${esc(id)}" ${value ? "checked" : ""}>`;
+  if (k.secret) {
+    const note = mine !== undefined ? (mine ? "replaced" : "cleared") : k.value ? "set" : "not set";
+    return `<span class="cfg-secret"><input type="password" data-cfg="${esc(id)}" placeholder="${note}" value="${mine ? esc(mine) : ""}" autocomplete="off">
+      <button class="btn sm" data-reveal="${esc(id)}">Reveal</button><button class="btn sm" data-clear="${esc(id)}">Clear</button></span>`;
+  }
+  const type = k.kind === "int" || k.kind === "float" ? "number" : "text";
+  const step = k.kind === "float" ? ' step="any"' : "";
+  return `<input type="${type}"${step} data-cfg="${esc(id)}" value="${esc(shown(k, value))}">`;
+}
+
+function configDraw() {
+  const c = CFG;
+  const count = edits();
+  const rows = (section, k) => {
+    const id = `${section}.${k.key}`;
+    const changed = (EDIT[section] || {})[k.key] !== undefined;
+    return `<div class="cfg-row${k.overridden ? " over" : ""}${changed ? " edited" : ""}">
+      <div class="cfg-k"><code>${esc(k.key)}</code>${k.built ? `<span class="chip" data-tip="nix also builds the units, caddy or the sandbox around this, so an override applies fully only after a rebuild">built</span>` : ""}
+        <div class="tech">${esc(k.description)}</div></div>
+      <div class="cfg-v">${configField(section, k)}
+        <div class="tech">${k.secret ? "" : `default <code>${esc(shown(k, k.default)) || "empty"}</code>`}
+          ${k.overridden ? `<button class="btn sm" data-revert="${esc(id)}">Revert to default</button>` : ""}</div></div></div>`;
+  };
+  $("p-config").innerHTML = `<div class="cfg-head">
+      <div><b>graphiv-mcp</b><div class="tech">Defaults from ${c.source === "nix" ? "the NixOS module" : "config.toml"}, overrides in <code>${esc(c.override)}</code></div></div>
+      <div class="btns"><button class="btn danger" id="cfgall">Revert all</button><button class="btn" id="cfgdrop" ${count ? "" : "disabled"}>Discard edits</button>
+        <button class="btn primary" id="cfgsave" ${count ? "" : "disabled"}>Save ${count || ""}</button></div></div>
+    <div class="box cfg-note">Saving restarts graphiv-api and graphiv-frontend, which ends any MCP session in progress. A running stage keeps the values it started with.</div>
+    ${CFG_PROBLEMS.length ? `<div class="box cfg-bad"><b>The save was refused</b><ul>${CFG_PROBLEMS.map((p) => `<li>${esc(p)}</li>`).join("")}</ul>
+      <button class="btn danger sm" id="cfgforce">Save anyway</button></div>` : ""}
+    ${c.stale.length ? `<div class="box cfg-bad"><b>In the override but no longer a setting</b><ul>${c.stale.map((s) => `<li><code>${esc(s)}</code> <button class="btn sm" data-revert="${esc(s)}">Remove</button></li>`).join("")}</ul></div>` : ""}
+    ${c.sections.map((sec) => `<section class="box cfg-sec"><div class="box-t">${esc(sec.description || sec.name)}<span class="tech">[${esc(sec.name)}]</span></div>
+      ${sec.keys.map((k) => rows(sec.name, k)).join("")}</section>`).join("")}`;
+  const spec = (id) => {
+    const cut = id.lastIndexOf(".");
+    const section = id.slice(0, cut);
+    const key = id.slice(cut + 1);
+    const sec = c.sections.find((s) => s.name === section);
+    return { section, key, k: sec && sec.keys.find((x) => x.key === key) };
+  };
+  const put = (section, key, value) => { EDIT[section] = { ...(EDIT[section] || {}), [key]: value }; };
+  for (const el of document.querySelectorAll("#p-config [data-cfg]")) {
+    el.onchange = () => {
+      const { section, key, k } = spec(el.dataset.cfg);
+      if (k.secret && el.value === "") return;
+      put(section, key, k.kind === "bool" ? el.checked : parsed(k, el.value));
+      configDraw();
+    };
+  }
+  for (const b of document.querySelectorAll("#p-config [data-clear]")) b.onclick = () => { const { section, key } = spec(b.dataset.clear); put(section, key, ""); configDraw(); };
+  for (const b of document.querySelectorAll("#p-config [data-reveal]")) {
+    b.onclick = async () => {
+      const { section, key } = spec(b.dataset.reveal);
+      const { ok, got } = await configCall("GET", `/api/config/reveal?section=${encodeURIComponent(section)}&key=${encodeURIComponent(key)}`);
+      b.parentElement.querySelector("input").type = "text";
+      b.parentElement.querySelector("input").value = ok ? got.value : got.error;
+    };
+  }
+  for (const b of document.querySelectorAll("#p-config [data-revert]")) {
+    b.onclick = async () => {
+      const { section, key } = spec(b.dataset.revert);
+      if (!confirm(`Revert ${section}.${key} to its default? This restarts graphiv-api and graphiv-frontend.`)) return;
+      const { ok, got } = await configCall("POST", "/api/config/revert", { section, key });
+      if (ok) { CFG = got; if (EDIT[section]) delete EDIT[section][key]; }
+      configDraw();
+    };
+  }
+  $("cfgall").onclick = async () => {
+    if (!confirm("Revert every setting to its default? This empties the override and restarts graphiv-api and graphiv-frontend.")) return;
+    const { ok, got } = await configCall("POST", "/api/config/revert", {});
+    if (ok) { CFG = got; EDIT = {}; CFG_PROBLEMS = []; }
+    configDraw();
+  };
+  $("cfgdrop").onclick = () => { EDIT = {}; CFG_PROBLEMS = []; configDraw(); };
+  const save = async (force) => {
+    const bad = Object.entries(EDIT).flatMap(([s, keys]) => Object.entries(keys).filter(([, v]) => typeof v === "number" && Number.isNaN(v)).map(([k]) => `${s}.${k} needs a number`));
+    if (bad.length) { CFG_PROBLEMS = bad; configDraw(); return; }
+    const { ok, got } = await configCall("PUT", "/api/config", { changes: EDIT, force });
+    if (ok) { CFG = got; EDIT = {}; CFG_PROBLEMS = []; } else CFG_PROBLEMS = got.problems || [got.error || "the save failed"];
+    configDraw();
+  };
+  $("cfgsave").onclick = () => save(false);
+  if ($("cfgforce")) $("cfgforce").onclick = () => { if (confirm("Save without the checks passing?")) save(true); };
 }
 
 // -- the loop --------------------------------------------------------------------------------

@@ -1,0 +1,11 @@
+method = "embedder"
+dataset = "surge"
+split = "test"
+
+[run]
+ks = [100, 200, 500, 1000]
+vectors = "nomic"
+endpoint = "http://127.0.0.1:11434/embedding/nomic-embed-text-v2-moe"
+prompt = "search_query: "
+unload = false
+recipe = "survey"

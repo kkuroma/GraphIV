@@ -33,7 +33,8 @@ GRAPHIV_VENV=/tmp/graphiv-venv ./result/bin/graphiv-sync
 
 ## The module
 
-`settings` is `config.toml`, one attribute per key, and every key has a default, so a host names only what differs.
+`settings` is `config.toml`, one typed option per key, and every key has a default, so a host names only what differs.
+A key the module does not declare fails evaluation, and `nix flake check` holds the options and the checkout's `config.toml` to the same set of keys.
 
 ```nix
 {
@@ -54,6 +55,7 @@ GRAPHIV_VENV=/tmp/graphiv-venv ./result/bin/graphiv-sync
 | `graphiv-frontend` | `serve.FRONTEND_PORT`, 6969 | the dashboard, from a second process registering no tools |
 | `graphiv-manager` | `manager.PORT`, 6868 | the snapshot fetch and every preprocess stage, on the GPU |
 | `graphiv-graph` | | a path unit restarting the api when the graph export is rewritten |
+| `graphiv-config` | | a path unit restarting the api and the frontend when the config override is rewritten |
 
 The frontend opens neither the store nor the graph export, so it cannot reach the corpus.
 The manager writes the store and the corpus, so it belongs on a private vhost only.
@@ -82,8 +84,16 @@ The manager's path carries `postgres.package` for the dump stage, and with `post
 Name it as a string, since a path literal copies the token into the store.
 `settings.export.DATA_REPO`, `CITATION_REPO` and `SURVEY_REPO` say where it publishes, and an empty one is skipped.
 
-No option names a tuned constant.
-The exponents live in the recipe files that ship with the package, and the module writes the checkout's `[retrieve]` and `[miner]` blocks into the generated config, because an option is a promise to support whatever value is put there, and a detuned retriever still reports numbers.
+No option names a tuned exponent.
+The exponents live in the recipe files that ship with the package, because an option is a promise to support whatever value is put there, and a detuned retriever still reports numbers.
+
+## The config override
+
+The generated `config.toml` is the default, linked as `<stateDir>/config.toml`, and `<stateDir>/config-override.toml` holds only the keys the manager's graphiv-mcp tab changed.
+Every unit reads the default with the override merged over it, and reverting a key in the tab deletes it from the override.
+The override is 0600, since it holds `settings.endpoints.LLM_API_KEY` and `EMBEDDING_API_KEY`, which have to stay empty in nix because a value set there lands in the world-readable store.
+The tab renders `graphiv-config-schema.json`, every section and option with its type and description, which the module writes and hands the manager as `GRAPHIV_CONFIG_SCHEMA`.
+A path, a port, `HOST`, `ALLOWED_HOSTS` and `PG_DEST` are marked built in the tab, since the units, caddy and the sandbox are built around their nix value until the next rebuild.
 
 ## What a host has to supply
 

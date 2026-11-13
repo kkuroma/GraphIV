@@ -56,3 +56,6 @@ scratchpad/
 
 # The paper is a work in progress, kept out of git until it is ready
 /paper/
+
+# The manager's settings over config.toml, which holds API keys
+config-override.toml

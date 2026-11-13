@@ -1,0 +1,10 @@
+method = "embedder"
+dataset = "pasa"
+split = "real"
+
+[run]
+ks = [20, 50, 100]
+vectors = "nemotron-1b"
+endpoint = "http://127.0.0.1:11434/embedding/nemotron-3-embed-1b"
+prompt = "query: "
+unload = true

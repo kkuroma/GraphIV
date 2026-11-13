@@ -1,0 +1,47 @@
+[nomic]
+vectors = "nomic"
+endpoint = "http://127.0.0.1:11434/embedding/nomic-embed-text-v2-moe"
+prompt = "search_query: "
+unload = false
+
+[qwen3_0_6b]
+vectors = "qwen3-0.6b"
+endpoint = "http://127.0.0.1:11434/embedding/qwen3-embedding-0.6b"
+prompt = "Instruct: Given a research question, retrieve the arXiv papers a literature review answering it would cite\nQuery: "
+unload = true
+
+[harrier_0_6b]
+vectors = "harrier-0.6b"
+endpoint = "http://127.0.0.1:11434/embedding/harrier-oss-v1-0.6b"
+prompt = "Instruct: Given a research question, retrieve the arXiv papers a literature review answering it would cite\nQuery: "
+unload = true
+
+[nemotron_1b]
+vectors = "nemotron-1b"
+endpoint = "http://127.0.0.1:11434/embedding/nemotron-3-embed-1b"
+prompt = "query: "
+unload = true
+
+[qwen3_4b]
+vectors = "qwen3-4b"
+endpoint = "http://127.0.0.1:11434/embedding/qwen3-embedding-4b"
+prompt = "Instruct: Given a research question, retrieve the arXiv papers a literature review answering it would cite\nQuery: "
+unload = true
+
+[qwen3_8b]
+vectors = "qwen3-8b"
+endpoint = "http://127.0.0.1:11434/embedding/qwen3-embedding-8b"
+prompt = "Instruct: Given a research question, retrieve the arXiv papers a literature review answering it would cite\nQuery: "
+unload = true
+
+[nemotron_8b]
+vectors = "nemotron-8b"
+endpoint = "http://127.0.0.1:11434/embedding/nemotron-3-embed-8b"
+prompt = "query: "
+unload = true
+
+[harrier_27b]
+vectors = "harrier-27b"
+endpoint = "http://127.0.0.1:11434/embedding/harrier-oss-v1-27b-q4"
+prompt = "Instruct: Given a research question, retrieve the arXiv papers a literature review answering it would cite\nQuery: "
+unload = true

@@ -47,4 +47,4 @@ psql -h "$PWD/.pg" -p 5433 -d arxivkg -f scripts/papers_preprocess/indexes.sql
 ```
 
 `stage0` takes `--no-fetch` to use the snapshot already on disk, and `--dry-run` to only report what it would insert.
-Stage 3 needs the embedding server on `[endpoints] EMBED_API`, which is `llama-router`'s path for the embedding model on port 11434.
+Stage 3 needs the embedding server on `[endpoints] EMBEDDING_ENDPOINT`, which is `llama-router`'s path for the embedding model on port 11434.

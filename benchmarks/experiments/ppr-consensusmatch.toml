@@ -7,10 +7,10 @@ train = "consensusmatch"
 split = "train"
 cases = 200
 seed = 0
-k = 100
+k = 50
 alphas = [0.1, 0.3, 0.5, 0.7, 0.85, 0.95]
 teleports = ["pool", "core"]
 directions = ["back", "both"]
 
 [run]
-ks = [100, 1000]
+ks = [20, 50, 100]

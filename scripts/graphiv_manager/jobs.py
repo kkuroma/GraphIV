@@ -20,6 +20,8 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
+from src.core.config import OVERRIDE_ENV
+
 # a stage finishing its current batch needs longer than a network timeout, and less than a COPY
 GRACE_INT = 60.0
 GRACE_TERM = 30.0
@@ -395,6 +397,9 @@ class Runner:
             return 0
         args = step.resume_args if job.resumed and step.resume_args is not None else step.args
         env = dict(os.environ, PGAPPNAME=f"graphiv-manager:{job.id}", PYTHONUNBUFFERED="1")
+        if step.config:
+            # a step's own config is already merged, so no override may land on it again
+            env[OVERRIDE_ENV] = os.devnull
         with log.open("ab") as fh:
             self.proc = await asyncio.create_subprocess_exec(
                 self.python,

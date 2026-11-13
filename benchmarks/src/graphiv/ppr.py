@@ -16,7 +16,7 @@ import numpy as np
 import scipy.sparse as sp
 
 from src.core.config import load_config
-from src.core.embed import embed
+from src.core.embed import EmbeddingEndpoint, embed
 from src.core.parse_graph_export import load_graph_export
 from src.retrieve.recipe import build_pipeline, get_seed_limit, read_recipe
 from src.retrieve.scorer import GraphScorer
@@ -73,7 +73,7 @@ def main() -> None:
     args = ap.parse_args()
     params = json.loads(args.params)
     config = load_config(str(ROOT / "config.toml"))
-    api, name = str(config["endpoints"]["EMBED_API"]), str(config["endpoints"]["EMBED_NAME"])
+    endpoint = EmbeddingEndpoint.from_config(config)
     graph = load_graph_export(args.graph)
     recipe = read_recipe(Path(args.recipe))
     pipeline = build_pipeline(recipe, config["retrieve"], graph, str(config["database"]["PG_DEST"]))
@@ -83,9 +83,11 @@ def main() -> None:
         cases = [json.loads(line) for line in f]
 
     def pool_of(c: dict) -> list:
-        v = embed(api, name, c["query"])
+        v = embed(endpoint, c["query"])
         pipeline.block(c["anchors"])
-        return pipeline.build_pool(c["query"], v, retrieve_limit=limit, max_date=date.fromisoformat(c["cutoff"]))
+        pool = pipeline.build_pool(c["query"], v, retrieve_limit=limit, max_date=date.fromisoformat(c["cutoff"]))
+        # papers ingested after the frozen graph have no row in it
+        return [p for p in pool if p.arxiv_id in graph.index]
 
     if args.mode == "grid":
         settings = list(itertools.product(params["alphas"], params["teleports"], params["directions"]))

@@ -1,0 +1,12 @@
+method = "embedder"
+dataset = "scholarcatalyst"
+split = "core"
+
+[run]
+ks = [5, 20, 100]
+ndcg = [20]
+vectors = "qwen3-4b"
+endpoint = "http://127.0.0.1:11434/embedding/qwen3-embedding-4b"
+prompt = "Instruct: Given a research question, retrieve the arXiv papers a literature review answering it would cite\nQuery: "
+unload = true
+recipe = "focused"

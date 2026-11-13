@@ -19,6 +19,7 @@ from typing import Any
 from labels import INTENTS, parse_labels
 
 from src.core.config import load_config
+from src.core.llm import headers
 
 BATCH = 25
 
@@ -40,17 +41,21 @@ class PromptRefiner:
     One LLM endpoint and the label, critique, redraft loop over it
     """
 
-    def __init__(self, model: str, generations: int, api: str, parallel: int) -> None:
+    def __init__(
+        self, model: str, generations: int, api: str, parallel: int, key: str = ""
+    ) -> None:
         """
         Args:
             model: model name the endpoint answers to.
             generations: how many rounds to run.
             api: OpenAI-compatible base URL.
             parallel: concurrent requests.
+            key: the API key, empty for an endpoint that takes none.
         """
         self.model = model
         self.generations = generations
         self.api = api.rstrip("/")
+        self.key = key
         self.parallel = parallel
 
     def _chat(self, system: str, user: str, max_tokens: int = 2048) -> str:
@@ -78,7 +83,7 @@ class PromptRefiner:
         req = urllib.request.Request(
             f"{self.api}/chat/completions",
             data=json.dumps(payload).encode(),
-            headers={"Content-Type": "application/json"},
+            headers=headers(self.key),
         )
         try:
             with urllib.request.urlopen(req, timeout=600) as r:
@@ -298,8 +303,9 @@ def main() -> None:
     refiner = PromptRefiner(
         model=str(cl["LABELER_APE_MODEL"]),
         generations=int(cl["LABELER_APE_GENERATIONS"]),
-        api=str(cfg["endpoints"]["LLM_API"]),
+        api=str(cfg["endpoints"]["LLM_ENDPOINT"]),
         parallel=int(cl["LABELER_APE_PARALLEL"]),
+        key=str(cfg["endpoints"]["LLM_API_KEY"]),
     )
     _ = refiner.refine(str(cl["LABELER_PATH"]))
     report(str(cl["LABELER_PATH"]), refiner)

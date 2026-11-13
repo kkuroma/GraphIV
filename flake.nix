@@ -68,11 +68,42 @@
       graphiv = final.callPackage ./nix/package.nix { };
     };
     graphiv = pkgs.callPackage ./nix/package.nix { };
+
+    # the module on a bare host, enough to read its options and the config it writes
+    probe = lib.nixosSystem {
+      inherit system;
+      modules = [
+        self.nixosModules.default
+        {
+          boot.isContainer = true;
+          system.stateVersion = "25.11";
+          services.graphiv.enable = true;
+          services.graphiv.settings.endpoints.LLM_NAME = "probe";
+        }
+      ];
+    };
+    keysOf = prefix: tables: lib.concatLists (lib.mapAttrsToList (k: v:
+      if builtins.isAttrs v then keysOf (prefix ++ [ k ]) v else [ (lib.concatStringsSep "." (prefix ++ [ k ])) ]
+    ) tables);
+    declared = keysOf [ ] probe.config.services.graphiv.settings;
+    shipped = keysOf [ ] (lib.importTOML ./config.toml);
+    undeclared = lib.subtractLists declared shipped;
+    unshipped = lib.subtractLists shipped declared;
   in {
     packages.${system} = {
       default = graphiv;
       inherit graphiv;
+      # what the manager's config tab renders, for a manager run from the checkout
+      config-schema = pkgs.runCommand "graphiv-config-schema.json" { } ''
+        cp ${probe.config.systemd.services.graphiv-manager.environment.GRAPHIV_CONFIG_SCHEMA} $out
+      '';
     };
+
+    # every key config.toml ships is a module option, and every option a key it ships
+    checks.${system}.config-keys = pkgs.runCommand "graphiv-config-keys" { } (
+      if undeclared == [ ] && unshipped == [ ] then "touch $out"
+      else "echo 'not a module option: ${toString undeclared}'; echo 'not in config.toml: ${toString unshipped}'; exit 1"
+    );
 
     overlays.default = overlay;
 

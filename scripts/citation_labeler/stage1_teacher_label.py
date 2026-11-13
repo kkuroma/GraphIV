@@ -21,6 +21,7 @@ import psycopg
 from labels import parse_labels
 
 from src.core.config import load_config
+from src.core.llm import headers
 
 SAMPLE = """
 SELECT source_id, target_id, COALESCE(section, ''), sentence
@@ -35,18 +36,22 @@ class Teacher:
     The winning prompt applied to real citations
     """
 
-    def __init__(self, model: str, prompt_path: str, api: str, parallel: int) -> None:
+    def __init__(
+        self, model: str, prompt_path: str, api: str, parallel: int, key: str = ""
+    ) -> None:
         """
         Args:
             model: model name the endpoint answers to.
             prompt_path: the winning prompt written by the APE stage.
             api: OpenAI-compatible base URL.
             parallel: concurrent requests.
+            key: the API key, empty for an endpoint that takes none.
         """
         self.model = model
         self.root = Path(prompt_path).parent
         self.prompt = Path(prompt_path).read_text(encoding="utf-8")
         self.api = api.rstrip("/")
+        self.key = key
         self.parallel = parallel
 
     def _chat(self, user: str, max_tokens: int) -> str:
@@ -63,7 +68,7 @@ class Teacher:
         req = urllib.request.Request(
             f"{self.api}/chat/completions",
             data=json.dumps(payload).encode(),
-            headers={"Content-Type": "application/json"},
+            headers=headers(self.key),
         )
         try:
             with urllib.request.urlopen(req, timeout=600) as r:
@@ -177,8 +182,9 @@ def main() -> None:
     teacher = Teacher(
         model=str(cl["LABELER_APE_MODEL"]),
         prompt_path=str(Path(root) / "best.txt"),
-        api=str(cfg["endpoints"]["LLM_API"]),
+        api=str(cfg["endpoints"]["LLM_ENDPOINT"]),
         parallel=int(cl["LABELER_APE_PARALLEL"]),
+        key=str(cfg["endpoints"]["LLM_API_KEY"]),
     )
     _ = teacher.label(
         str(cfg["database"]["PG_DEST"]),

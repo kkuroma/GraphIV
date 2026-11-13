@@ -2,7 +2,7 @@
 Every runnable file under scripts, read off the files themselves rather than a list kept here
 
 A script's flags come from its own --help, so a new flag appears on the page with no edit here
-What a script needs is read from its source: torch means the GPU, LLM_API the model, and so on
+What a script needs is read from its source: torch means the GPU, LLM_ENDPOINT the model, and so on
 """
 
 from __future__ import annotations
@@ -79,9 +79,9 @@ def needs(source: str) -> list[str]:
     out = ["store"] if "PG_DEST" in source else []
     if re.search(r"^\s*(import|from) (torch|transformers)\b", source, re.MULTILINE):
         out.append("gpu")
-    if "LLM_API" in source or "LABELER_APE_MODEL" in source:
+    if "LLM_ENDPOINT" in source or "LABELER_APE_MODEL" in source:
         out.append("llm")
-    if "EMBED_API" in source:
+    if "EmbeddingEndpoint" in source:
         out.append("embed")
     return out
 

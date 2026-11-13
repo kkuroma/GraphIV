@@ -23,6 +23,8 @@ import psycopg
 from huggingface_hub import HfApi
 from huggingface_hub.errors import HfHubHTTPError
 
+from src.core.llm import headers
+
 TIMEOUT = 4.0
 # a download step stops waiting below this, since a full disk fails half way through a batch
 DISK_FLOOR = 20 * 1024**3
@@ -111,21 +113,23 @@ def store(dsn: str) -> tuple[bool, str]:
     return True, "accepting connections"
 
 
-def models(url: str, want: str = "") -> tuple[bool, str]:
+def models(url: str, want: str = "", key: str = "") -> tuple[bool, str]:
     """
     Whether an OpenAI compatible endpoint lists the model this config names
 
     Args:
         url: The base url, with or without /v1.
         want: The model name, empty to accept any.
+        key: The API key, empty for an endpoint that takes none.
 
     Returns:
         Whether it answered with the model, and what it said.
     """
     base = url.rstrip("/")
     listing = f"{base}/models" if base.endswith("/v1") else f"{base}/v1/models"
+    request = urllib.request.Request(listing, headers=headers(key))
     try:
-        with urllib.request.urlopen(listing, timeout=TIMEOUT) as reply:
+        with urllib.request.urlopen(request, timeout=TIMEOUT) as reply:
             data = json.loads(reply.read())
     except (urllib.error.URLError, OSError, ValueError) as err:
         return False, f"no answer from {listing}: {err}"[:200]

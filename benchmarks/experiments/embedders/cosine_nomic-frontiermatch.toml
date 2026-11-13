@@ -1,0 +1,10 @@
+method = "embedder"
+dataset = "frontiermatch"
+split = "test"
+
+[run]
+ks = [20, 50, 100, 1000]
+vectors = "nomic"
+endpoint = "http://127.0.0.1:11434/embedding/nomic-embed-text-v2-moe"
+prompt = "search_query: "
+unload = false

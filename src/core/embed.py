@@ -1,7 +1,8 @@
 """
-The query vector, from the endpoint the documents were encoded with
+Query and document vectors, from the endpoint the corpus was encoded with
 
 Documents carry a prompt prefix, so a query missing its own lands elsewhere in the space
+A document is cut to the window with the server's own tokenizer, so the host must be llama-server
 """
 
 from __future__ import annotations
@@ -10,38 +11,69 @@ import json
 import math
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
 from typing import Any
 
-QUERY_PREFIX = "search_query: "
+from src.core.llm import headers
+
 TIMEOUT = 180
-# the model's window in tokens, less the two special tokens
-WINDOW = 510
+# the window loses the two special tokens the server adds
+SPECIAL_TOKENS = 2
 # no text this short can overflow the window, so it skips the tokenizer
 SAFE_CHARS = 400
 MAX_CHARS = 4000
 FITTERS = 8
 
 
-def embed(api: str, model: str, text: str) -> list[float]:
+@dataclass(frozen=True)
+class EmbeddingEndpoint:
+    """
+    The embedding server and everything a request to it needs, from `[endpoints]`
+    """
+
+    url: str
+    name: str
+    key: str = ""
+    query_prefix: str = ""
+    document_prefix: str = ""
+    max_seq: int = 512
+
+    @classmethod
+    def from_config(cls, config: dict[str, Any]) -> EmbeddingEndpoint:
+        """
+        Reads the endpoint from a parsed config
+
+        Args:
+            config: The parsed config.toml.
+
+        Returns:
+            The endpoint.
+        """
+        ep = config["endpoints"]
+        return cls(
+            url=str(ep["EMBEDDING_ENDPOINT"]).rstrip("/"),
+            name=str(ep["EMBEDDING_NAME"]),
+            key=str(ep["EMBEDDING_API_KEY"]),
+            query_prefix=str(ep["EMBEDDING_QUERY_PREFIX"]),
+            document_prefix=str(ep["EMBEDDING_DOCUMENT_PREFIX"]),
+            max_seq=int(ep["EMBEDDING_MAX_SEQ"]),
+        )
+
+
+def embed(endpoint: EmbeddingEndpoint, text: str) -> list[float]:
     """
     One query vector, unit normalized
 
     Args:
-        api: The embedding server's base url.
-        model: Which model to ask.
+        endpoint: The embedding server.
         text: The question.
 
     Returns:
         The vector.
     """
-    request = urllib.request.Request(
-        f"{api.rstrip('/')}/v1/embeddings",
-        data=json.dumps({"model": model, "input": [f"{QUERY_PREFIX}{text}"]}).encode(),
-        headers={"Content-Type": "application/json"},
-    )
-    with urllib.request.urlopen(request, timeout=TIMEOUT) as response:
-        raw = [float(x) for x in json.load(response)["data"][0]["embedding"]]
-    return unit(raw)
+    body = {"model": endpoint.name, "input": [f"{endpoint.query_prefix}{text}"]}
+    raw = post(endpoint, "/v1/embeddings", body)["data"][0]["embedding"]
+    return unit([float(x) for x in raw])
 
 
 def unit(raw: list[float]) -> list[float]:
@@ -58,30 +90,31 @@ def unit(raw: list[float]) -> list[float]:
     return [x / norm for x in raw]
 
 
-def post(url: str, payload: dict[str, Any]) -> Any:
+def post(endpoint: EmbeddingEndpoint, route: str, payload: dict[str, Any]) -> Any:
     """
     One json request to the embedding server
 
     Args:
-        url: The full endpoint url.
+        endpoint: The embedding server.
+        route: The path under its url.
         payload: The request body.
 
     Returns:
         The decoded reply.
     """
     request = urllib.request.Request(
-        url, json.dumps(payload).encode(), {"Content-Type": "application/json"}
+        f"{endpoint.url}{route}", json.dumps(payload).encode(), headers(endpoint.key)
     )
     with urllib.request.urlopen(request, timeout=TIMEOUT) as response:
         return json.load(response)
 
 
-def fit(api: str, text: str) -> str:
+def fit(endpoint: EmbeddingEndpoint, text: str) -> str:
     """
     Cuts one document to the model's window using the server's own tokenizer
 
     Args:
-        api: The embedding server's base url.
+        endpoint: The embedding server.
         text: The prefixed document.
 
     Returns:
@@ -89,22 +122,27 @@ def fit(api: str, text: str) -> str:
     """
     if len(text) <= SAFE_CHARS:
         return text
-    base = api.rstrip("/")
-    tokens = post(f"{base}/tokenize", {"content": text, "add_special": False})["tokens"]
-    if len(tokens) <= WINDOW:
+    window = endpoint.max_seq - SPECIAL_TOKENS
+    tokens = post(endpoint, "/tokenize", {"content": text, "add_special": False})["tokens"]
+    if len(tokens) <= window:
         return text
-    return str(post(f"{base}/detokenize", {"tokens": tokens[:WINDOW]})["content"])
+    keep = window
+    while True:
+        cut = str(post(endpoint, "/detokenize", {"tokens": tokens[:keep]})["content"])
+        # detokenized text can tokenize longer than the tokens it came from
+        again = post(endpoint, "/tokenize", {"content": cut, "add_special": False})["tokens"]
+        if len(again) <= window:
+            return cut
+        keep -= 1
 
 
-def embed_documents(api: str, model: str, texts: list[str], prefix: str) -> list[list[float]]:
+def embed_documents(endpoint: EmbeddingEndpoint, texts: list[str]) -> list[list[float]]:
     """
-    Many document vectors in one call, each cut to the window first
+    Many document vectors in one call, each prefixed and cut to the window first
 
     Args:
-        api: The embedding server's base url.
-        model: Which model to ask.
+        endpoint: The embedding server.
         texts: The documents, without their prefix.
-        prefix: The document prompt the corpus was encoded with.
 
     Returns:
         One unit vector per document, in order.
@@ -112,8 +150,10 @@ def embed_documents(api: str, model: str, texts: list[str], prefix: str) -> list
     if not texts:
         return []
     with ThreadPoolExecutor(max_workers=FITTERS) as pool:
-        held = list(pool.map(lambda t: fit(api, prefix + t[:MAX_CHARS]), texts))
-    rows = post(f"{api.rstrip('/')}/v1/embeddings", {"model": model, "input": held})["data"]
+        held = list(
+            pool.map(lambda t: fit(endpoint, endpoint.document_prefix + t[:MAX_CHARS]), texts)
+        )
+    rows = post(endpoint, "/v1/embeddings", {"model": endpoint.name, "input": held})["data"]
     return [
         unit([float(x) for x in r["embedding"]]) for r in sorted(rows, key=lambda r: r["index"])
     ]

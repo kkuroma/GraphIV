@@ -1,0 +1,11 @@
+method = "embedder"
+dataset = "scholarcatalyst"
+split = "subfield"
+
+[run]
+ks = [5, 20, 100]
+ndcg = [20]
+vectors = "nemotron-8b"
+endpoint = "http://127.0.0.1:11434/embedding/nemotron-3-embed-8b"
+prompt = "query: "
+unload = true

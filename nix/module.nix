@@ -4,6 +4,7 @@
   config,
   lib,
   pkgs,
+  options,
   ...
 }:
 
@@ -31,17 +32,77 @@ let
     mkOption {
       inherit description;
       default = { };
-      type = types.submodule {
-        freeformType = toml.type;
-        inherit options;
-      };
+      type = types.submodule { inherit options; };
     };
 
-  # the retrieval and miner constants ship with the code, under whatever the host names
-  shipped = lib.importTOML ../config.toml;
-  file = toml.generate "graphiv-config.toml" (
-    lib.recursiveUpdate { inherit (shipped) retrieve miner; } s
+  file = toml.generate "graphiv-config.toml" s;
+
+  # every section and key with its kind and description, which the manager's config tab renders
+  kinds = {
+    str = "str";
+    int = "int";
+    unsignedInt16 = "int";
+    float = "float";
+    bool = "bool";
+    listOf = "list";
+  };
+  describe =
+    prefix: opts:
+    let
+      inner = lib.filterAttrs (n: _: n != "_module") (opts.type.getSubOptions [ ]);
+      plain = lib.filterAttrs (_: o: o.type.name != "submodule") inner;
+      nested = lib.filterAttrs (_: o: o.type.name == "submodule") inner;
+      name = lib.concatStringsSep "." prefix;
+    in
+    lib.optional (prefix != [ ]) {
+      inherit name;
+      description = opts.description or "";
+      keys = lib.mapAttrsToList (
+        key: o:
+        {
+          inherit key;
+          kind = kinds.${o.type.name};
+          description = lib.removeSuffix "\n" (o.description or "");
+        }
+        // lib.optionalAttrs (o.type.name == "listOf") { item = kinds.${o.type.nestedTypes.elemType.name}; }
+      ) plain;
+    }
+    ++ lib.concatLists (lib.mapAttrsToList (n: o: describe (prefix ++ [ n ]) o) nested);
+  # attribute sets are sorted, so the tab takes its order from the lines of the shipped config.toml
+  order =
+    let
+      step =
+        acc: line:
+        let
+          header = builtins.match "\\[([A-Za-z_.]+)].*" line;
+          entry = builtins.match "([A-Za-z_]+) *=.*" line;
+        in
+        if header != null then
+          {
+            section = builtins.head header;
+            out = acc.out ++ header;
+          }
+        else if entry != null then
+          acc // { out = acc.out ++ [ "${acc.section}.${builtins.head entry}" ]; }
+        else
+          acc;
+    in
+    (builtins.foldl' step {
+      section = "";
+      out = [ ];
+    } (lib.splitString "\n" (builtins.readFile ../config.toml))).out;
+  schema = pkgs.writeText "graphiv-config-schema.json" (
+    builtins.toJSON {
+      inherit order;
+      sections = describe [ ] options.services.graphiv.settings;
+    }
   );
+  override = "${toString cfg.stateDir}/config-override.toml";
+  configEnv = {
+    GRAPHIV_CONFIG = "${file}";
+    GRAPHIV_CONFIG_OVERRIDE = override;
+    GRAPHIV_CONFIG_SCHEMA = "${schema}";
+  };
 
   # where systemd puts the manager's Hugging Face token, readable by that unit alone
   credential = "/run/credentials/graphiv-manager.service/hf-token";
@@ -95,8 +156,7 @@ let
     ++ cfg.endpointUnits;
     requires = [ "graphiv-venv.service" ] ++ lib.optionals (role == "api") store;
     unitConfig.RequiresMountsFor = mounts;
-    environment = {
-      GRAPHIV_CONFIG = "${file}";
+    environment = configEnv // {
       GRAPHIV_VENV = venv;
     };
     serviceConfig = hardened // {
@@ -244,7 +304,6 @@ in
       default = { };
       description = "config.toml, one attribute per key, written into the store and read by every unit.";
       type = types.submodule {
-        freeformType = toml.type;
         options = {
           database = section "The store." {
             PG_DEST =
@@ -322,6 +381,39 @@ in
                 "The extractor read_paper falls back to for a paper with no usable HTML.";
           };
 
+          retrieve = section "The retrieval pipeline every recipe runs." {
+            COSINE_LIMIT = opt types.int 5000 "Papers the cosine retriever returns.";
+            EXPANSION_LIMIT = opt types.int 20000 "Most papers each expander appends.";
+            DEPTH = opt types.int 4 "Hops the decay terms reach.";
+            DECAY = opt types.float 0.5 "Weight kept per hop in the decay terms.";
+          };
+
+          miner = section "The miner that turns a ranking into lines." {
+            FOCUS = opt types.float 4.0 "Exponent on closeness when scoring an argued-with paper.";
+            WALK_PREFIX = opt types.int 30 "Head of the ranking the walks run on.";
+            CONNECTORS = opt types.int 40 "Most bridging papers kept.";
+            DECAY = opt types.float 0.5 "Weight kept per hop of a paper's reach.";
+            KNOCKDOWN = opt types.float 0.4 "Weight left on a paper once a line takes it.";
+            SEEDS = opt types.int 10 "Papers the walks start from.";
+            WALKS = opt types.int 50 "Walks per seed.";
+            BRANCH = opt types.int 1 "Papers a walk steps to at a time.";
+            ARGUES = opt (types.listOf types.str) [
+              "extends"
+              "critiques"
+              "compares"
+            ] "Intents that count as arguing with a paper.";
+            SUCCESSOR_DAYS = opt types.int 240 "Days before the cap a successor may date from.";
+            SUCCESSOR_FLOOR = opt types.float 0.6 "Lowest intent score a successor's citation needs.";
+            weights = section "Weight of each citation intent in the miner." {
+              extends = opt types.float 1.0 "Extends.";
+              critiques = opt types.float 1.0 "Critiques.";
+              compares = opt types.float 0.8 "Compares.";
+              uses = opt types.float 0.4 "Uses.";
+              motivates = opt types.float 0.15 "Motivates.";
+              background = opt types.float 0.0 "Background.";
+            };
+          };
+
           manager = section "The manager." {
             PORT = opt types.port 6868 "The page.";
             STATE_PATH = derived types.str "${toString cfg.stateDir}/manager" ''"''${stateDir}/manager"'' ''
@@ -346,18 +438,25 @@ in
           };
 
           endpoints = section "The models, all of them served elsewhere." {
-            EMBED_API = opt types.str "http://127.0.0.1:11434/embedding/nomic-embed-text-v2-moe" ''
+            EMBEDDING_ENDPOINT = opt types.str "http://127.0.0.1:11434/embedding/nomic-embed-text-v2-moe" ''
               A llama-server hosting the embedding model, which must expose /tokenize, or a
               llama-router's path for one embedding model, which loads it on the first call.
             '';
-            EMBED_NAME = opt types.str "nomic-embed-text-v2-moe" ''
+            EMBEDDING_API_KEY = opt types.str "" ''
+              The embedding endpoint's key, which stays empty here and is set in the manager.
+            '';
+            EMBEDDING_NAME = opt types.str "nomic-embed-text-v2-moe" ''
               The embedding model, which has to be the one the corpus was built with.
             '';
-            EMBED_PARALLEL = opt types.int 1 "Embedding requests in flight.";
-            EMBED_BATCH = opt types.int 256 "Documents per embedding request.";
-            EMBED_MAX_SEQ = opt types.int 512 "Tokens a document is truncated to.";
-            EMBED_PREFIX = opt types.str "search_document: " "What a stored document is prefixed with.";
-            LLM_API = opt types.str "http://127.0.0.1:11434/v1" "Any OpenAI compatible host.";
+            EMBEDDING_PARALLEL = opt types.int 1 "Embedding requests in flight.";
+            EMBEDDING_BATCH = opt types.int 256 "Documents per embedding request.";
+            EMBEDDING_MAX_SEQ = opt types.int 512 "Tokens a document is truncated to, the two special tokens included.";
+            EMBEDDING_DOCUMENT_PREFIX = opt types.str "search_document: " "What a stored document is prefixed with.";
+            EMBEDDING_QUERY_PREFIX = opt types.str "search_query: " "What a question is prefixed with.";
+            LLM_ENDPOINT = opt types.str "http://127.0.0.1:11434/v1" "Any OpenAI compatible host.";
+            LLM_API_KEY = opt types.str "" ''
+              The chat endpoint's key, which stays empty here and is set in the manager.
+            '';
             LLM_NAME = mkOption {
               type = types.str;
               example = "Wordslop-Qwen3.6-27B";
@@ -470,6 +569,10 @@ in
         message = "services.graphiv.settings needs API_PORT, FRONTEND_PORT and manager.PORT to differ";
       }
       {
+        assertion = s.endpoints.LLM_API_KEY == "" && s.endpoints.EMBEDDING_API_KEY == "";
+        message = "services.graphiv.settings.endpoints API keys would land in the world-readable store, so set them in the manager";
+      }
+      {
         assertion = !pg.enable || lib.hasPrefix "/run/" pg.socketDir;
         message = "services.graphiv.postgres.socketDir has to sit under /run, which the unit creates";
       }
@@ -488,9 +591,14 @@ in
 
     # setgid so a human in the group can read and delete what a daemon wrote
     # A d rule touches only the directory it names, so a symlinked corpus is left alone
+    # the default sits beside the override as a link into the store, and the override holds the API keys
     systemd.tmpfiles.rules =
       map (d: "d ${d} 2775 ${cfg.user} ${cfg.group} - -") shared
-      ++ lib.optional pg.enable "d ${toString pg.dataDir} 0700 ${cfg.user} ${cfg.group} - -";
+      ++ lib.optional pg.enable "d ${toString pg.dataDir} 0700 ${cfg.user} ${cfg.group} - -"
+      ++ [
+        "L+ ${toString cfg.stateDir}/config.toml - - - - ${file}"
+        "f ${override} 0600 ${cfg.user} ${cfg.group} - -"
+      ];
 
     systemd.services.graphiv-pg = lib.mkIf pg.enable {
       description = "GraphIV postgres";
@@ -577,8 +685,7 @@ in
       unitConfig.RequiresMountsFor = mounts;
       # the dump stage runs pg_dump, which cannot be older than the cluster
       path = cfg.manager.path ++ lib.optional pg.enable pg.package;
-      environment = {
-        GRAPHIV_CONFIG = "${file}";
+      environment = configEnv // {
         GRAPHIV_VENV = venv;
         HF_HOME = "${s.serve.CACHE_PATH}/huggingface";
         # umap and pynndescent compile with numba, whose cache cannot sit beside the store's source
@@ -604,6 +711,19 @@ in
           ]
         );
       };
+    };
+
+    systemd.paths.graphiv-config = lib.mkIf (cfg.api.enable || cfg.frontend.enable) {
+      description = "GraphIV config override";
+      wantedBy = [ "paths.target" ];
+      unitConfig.RequiresMountsFor = [ (toString cfg.stateDir) ];
+      pathConfig.PathChanged = override;
+    };
+
+    systemd.services.graphiv-config = lib.mkIf (cfg.api.enable || cfg.frontend.enable) {
+      description = "Restart graphiv-api and graphiv-frontend onto a new config override";
+      serviceConfig.Type = "oneshot";
+      script = "systemctl try-restart graphiv-api.service graphiv-frontend.service";
     };
 
     systemd.paths.graphiv-graph = lib.mkIf (cfg.api.enable && cfg.api.restartOnExport) {

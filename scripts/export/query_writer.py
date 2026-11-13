@@ -15,6 +15,8 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
+from src.core.llm import headers
+
 LOG = logging.getLogger(__name__)
 
 ABSTRACT_CHARS = 1400
@@ -40,7 +42,7 @@ class GemmaWriter:
     Asks the local router for one question, and remembers what it said
     """
 
-    def __init__(self, api: str, model: str, cache: str | Path) -> None:
+    def __init__(self, api: str, model: str, cache: str | Path, key: str = "") -> None:
         """
         Holds the endpoint and where a written question is kept
 
@@ -48,9 +50,11 @@ class GemmaWriter:
             api: The OpenAI-compatible base url.
             model: Which model to ask.
             cache: Directory the questions are written into.
+            key: The API key, empty for an endpoint that takes none.
         """
         self.api = api.rstrip("/")
         self.model = model
+        self.key = key
         self.cache = Path(cache)
 
     def _complete(self, prompt: str, max_tokens: int = 160) -> str:
@@ -74,7 +78,7 @@ class GemmaWriter:
         request = urllib.request.Request(
             f"{self.api}/chat/completions",
             data=json.dumps(body).encode(),
-            headers={"Content-Type": "application/json"},
+            headers=headers(self.key),
         )
         for _ in range(3):
             try:

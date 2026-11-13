@@ -17,6 +17,7 @@ discover.py  finds every runnable script and its flags from the files themselves
 probes.py    the health checks for the store, the endpoints, the GPU, the disks and the queues
 snapshot.py  the snapshot in use, the resumable fetch of a new one, and the commit
 routes.py    the json routes and the page
+settings.py  the graphiv-mcp tab: every config key, its default, the override, and the checks on a save
 webui/       the page, in the same four palettes as the dashboard
 ```
 
@@ -30,3 +31,8 @@ The state directory is `[manager] STATE_PATH`, created on first start.
 It holds `jobs/<id>/{job.json,log}`, `stats/<query>.json`, `rates.json` from finished stages, and one snapshot check per file.
 Two managers on one state directory would both run jobs, so a scratch copy needs a directory of its own.
 The stages connect as `PGUSER` when it is set, which is how the `graphiv-manager` unit writes tables its own user can only read.
+
+The graphiv-mcp tab writes `config-override.toml`, which `GRAPHIV_CONFIG_OVERRIDE` names and which otherwise sits beside the config, and every reader merges it over `config.toml`.
+A save is refused when a check fails: the LLM endpoint has to list `LLM_NAME`, and the embedding endpoint has to answer `/tokenize` and re-embed a stored paper at cosine 0.99 or more.
+Its sections come from the module's schema when `GRAPHIV_CONFIG_SCHEMA` names it, which `nix build .#config-schema` builds for a scratch copy, and from `config.toml` otherwise.
+The manager reads the config again on every use, so a save applies at the next job or probe without a restart.

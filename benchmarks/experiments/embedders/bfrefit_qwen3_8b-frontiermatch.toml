@@ -1,0 +1,11 @@
+method = "embedder"
+dataset = "frontiermatch"
+split = "test"
+
+[run]
+ks = [20, 50, 100, 1000]
+vectors = "qwen3-8b"
+endpoint = "http://127.0.0.1:11434/embedding/qwen3-embedding-8b"
+prompt = "Instruct: Given a research question, retrieve the arXiv papers a literature review answering it would cite\nQuery: "
+unload = true
+recipe = "frontier_qwen3_8b"

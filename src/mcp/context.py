@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Any
 
 from src.core.config import load_config
-from src.core.embed import embed, embed_documents
+from src.core.embed import EmbeddingEndpoint, embed, embed_documents
 from src.core.llm import Gemma
 from src.core.parse_graph_export import GraphExport, load_graph_export
 from src.miner.recipe import Recipe, build_recipe
@@ -78,8 +78,7 @@ class Context:
         Returns:
             The unit vector.
         """
-        ends = self.config["endpoints"]
-        return embed(str(ends["EMBED_API"]), str(ends["EMBED_NAME"]), text)
+        return embed(EmbeddingEndpoint.from_config(self.config), text)
 
     def embed_documents(self, texts: list[str]) -> list[list[float]]:
         """
@@ -91,10 +90,7 @@ class Context:
         Returns:
             One unit vector each.
         """
-        ends = self.config["endpoints"]
-        return embed_documents(
-            str(ends["EMBED_API"]), str(ends["EMBED_NAME"]), texts, str(ends["EMBED_PREFIX"])
-        )
+        return embed_documents(EmbeddingEndpoint.from_config(self.config), texts)
 
 
 @lru_cache(maxsize=1)
@@ -118,7 +114,12 @@ def load() -> Context:
         config=config,
         dsn=dsn,
         graph=graph,
-        model=Gemma(str(ends["LLM_API"]), str(ends["LLM_NAME"]), Path(str(serve["CACHE_PATH"]))),
+        model=Gemma(
+            str(ends["LLM_ENDPOINT"]),
+            str(ends["LLM_NAME"]),
+            Path(str(serve["CACHE_PATH"])),
+            str(ends["LLM_API_KEY"]),
+        ),
         pipes=pipes,
         weights=weights,
         seed_limit=int(retrieve["COSINE_LIMIT"]),
