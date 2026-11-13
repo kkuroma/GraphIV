@@ -614,8 +614,8 @@ b, strong { font-weight: 650; }
 
 /* the config tab: one hue per group, primary for an override, yellow for an unsaved edit, red for a pending revert */
 .cfg { max-width: 1500px; }
-.cfg-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 10px; align-items: start; }
-.cfg-cols > .cfg-sec:only-child { grid-column: 1 / -1; }
+.cfg-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px; align-items: start; }
+.cfg-col { min-width: 0; }
 .cfg-bar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 0; background: var(--base); border-bottom: 1px solid var(--line); margin-bottom: 4px; }
 .cfg-search { flex: 1 1 260px; min-width: 0; font: inherit; font-size: 13px; padding: 7px 12px; border-radius: 9px; border: 1px solid var(--line); background: var(--mantle); color: var(--text); }
 .cfg-search:focus, .cfg-text:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 18%, transparent); }
@@ -636,7 +636,7 @@ b, strong { font-weight: 650; }
 .cfg-n { margin-left: auto; font-size: 11.5px; color: var(--overlay1); }
 .cfg-rows { display: none; border-top: 1px solid var(--line); }
 .cfg-sec.open .cfg-rows { display: block; }
-.cfg-row { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr) 28px; gap: 12px; align-items: center; padding: 5px 12px 5px 13px; border-left: 3px solid transparent; }
+.cfg-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 28px; gap: 12px; align-items: center; padding: 5px 12px 5px 13px; border-left: 3px solid transparent; }
 .cfg-row + .cfg-row { border-top: 1px solid color-mix(in oklab, var(--line) 60%, transparent); }
 .cfg-row[data-state="over"] { border-left-color: var(--primary); }
 .cfg-row[data-state="over"] .cfg-k code { color: var(--primary); }

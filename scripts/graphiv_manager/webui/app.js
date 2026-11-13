@@ -1152,13 +1152,14 @@ function historyTab() {
 // -- config ----------------------------------------------------------------------------------
 
 // each group borrows one palette hue, the way the dashboard's areas do
+// the left column serves and stores, the right column builds and measures
 const CFG_GROUPS = [
-  ["Models", "--secondary", ["endpoints"]],
-  ["MCP and retrieval", "--primary", ["serve", "retrieve", "miner", "miner.weights"]],
-  ["Corpus and storage", "--yellow", ["database", "source", "download", "dataset", "export"]],
-  ["Preprocessing", "--green", ["survey", "umap", "topics", "citation_labeler"]],
-  ["Benchmarks", "--sky", ["surveymatch", "benchmarks"]],
-  ["Manager", "--overlay1", ["manager"]],
+  ["Models", "--secondary", ["endpoints"], 0],
+  ["MCP and retrieval", "--primary", ["serve", "retrieve", "miner", "miner.weights"], 0],
+  ["Corpus and storage", "--yellow", ["database", "source", "download", "dataset", "export"], 0],
+  ["Preprocessing", "--green", ["survey", "umap", "topics", "citation_labeler"], 1],
+  ["Benchmarks", "--sky", ["surveymatch", "benchmarks"], 1],
+  ["Manager", "--overlay1", ["manager"], 1],
 ];
 const BUILT_TIP = "nix also builds the units, caddy or the sandbox around this, so a change applies fully only after a rebuild";
 
@@ -1280,9 +1281,9 @@ function sectionHtml(sec, hue) {
 function grouped() {
   const byName = Object.fromEntries(CFG.sections.map((s) => [s.name, s]));
   const placed = new Set(CFG_GROUPS.flatMap((g) => g[2]));
-  const groups = CFG_GROUPS.map(([title, hue, names]) => [title, hue, names.filter((n) => byName[n]).map((n) => byName[n])]);
+  const groups = CFG_GROUPS.map(([title, hue, names, col]) => [title, hue, names.filter((n) => byName[n]).map((n) => byName[n]), col]);
   const rest = CFG.sections.filter((s) => !placed.has(s.name));
-  if (rest.length) groups.push(["Other", "--overlay1", rest]);
+  if (rest.length) groups.push(["Other", "--overlay1", rest, 1]);
   return groups.filter((g) => g[2].length);
 }
 
@@ -1304,8 +1305,8 @@ function configDraw() {
     ${CFG_PROBLEMS.length ? `<div class="cfg-alert"><b>The save was refused</b><ul>${CFG_PROBLEMS.map((p) => `<li>${esc(p)}</li>`).join("")}</ul>
       <button class="btn danger sm" id="cfgforce">Save without the checks</button></div>` : ""}
     ${c.stale.length ? `<div class="cfg-alert"><b>In the override but no longer a setting</b><ul>${c.stale.map((s) => `<li><code>${esc(s)}</code> <button class="btn sm" data-stale="${esc(s)}">Remove</button></li>`).join("")}</ul></div>` : ""}
-    ${grouped().map(([title, hue, secs]) => `<div class="cfg-group" style="--hue: var(${hue})"><div class="rh"><i class="cfg-dot"></i>${esc(title)}</div>
-      <div class="cfg-cols">${secs.map((s) => sectionHtml(s, hue)).join("")}</div></div>`).join("")}
+    <div class="cfg-cols">${[0, 1].map((col) => `<div class="cfg-col">${grouped().filter((g) => g[3] === col).map(([title, hue, secs]) => `<div class="cfg-group" style="--hue: var(${hue})"><div class="rh"><i class="cfg-dot"></i>${esc(title)}</div>
+      ${secs.map((s) => sectionHtml(s, hue)).join("")}</div>`).join("")}</div>`).join("")}</div>
     <div class="cfg-foot tech">Defaults from ${c.source === "nix" ? "the NixOS module" : "config.toml"}, overrides in <code>${esc(c.override)}</code>
       <button class="btn sm danger" id="cfgall" ${over ? "" : "disabled"}>Revert all</button></div></div>`;
   configWire();

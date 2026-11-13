@@ -309,180 +309,146 @@ in
             PG_DEST =
               derived types.str "host=${pg.socketDir} port=${toString pg.port} dbname=${pg.database}"
                 ''"host=''${postgres.socketDir} port=''${postgres.port} dbname=''${postgres.database}"''
-                "libpq connection string every unit and stage opens.";
+                "Postgres connection string (libpq)";
           };
 
           source = section "Source URLs" {
             SOURCE_URL =
               opt types.str "https://www.kaggle.com/api/v1/datasets/download/Cornell-University/arxiv"
-                "The snapshot archive, which Kaggle serves anonymously as a redirect.";
+                "Snapshot download URL (Kaggle)";
             SOURCE_PATH =
               derived types.str "${toString cfg.dataDir}/arxiv.json" ''"''${dataDir}/arxiv.json"''
-                "The snapshot in use, with a fetched one staged beside it as arxiv-new.json.";
+                "Snapshot in use";
             PDF_BASE_URL =
               opt types.str "https://storage.googleapis.com/arxiv-dataset/arxiv/arxiv/pdf"
-                "The bulk PDF mirror.";
-            PDF_LEGACY_BASE_URL = opt types.str "https://storage.googleapis.com/arxiv-dataset/arxiv" ''
-              PDF mirror root for the old slash ids.
-            '';
-            HTML_BASE_URL = opt types.str "https://arxiv.org/html" "HTML source tried first.";
-            HTML_FALLBACK_URL = opt types.str "https://ar5iv.labs.arxiv.org/html" ''
-              The HTML source tried when the first has no render.
-            '';
+                "Bulk PDF mirror";
+            PDF_LEGACY_BASE_URL = opt types.str "https://storage.googleapis.com/arxiv-dataset/arxiv" "PDF mirror for old slash ids";
+            HTML_BASE_URL = opt types.str "https://arxiv.org/html" "Primary HTML source";
+            HTML_FALLBACK_URL = opt types.str "https://ar5iv.labs.arxiv.org/html" "Fallback HTML source";
           };
 
           download = section "Download Settings" {
-            PDF_BATCH = opt types.int 500 "Papers per aria2c invocation.";
-            PDF_N_PARALLEL = opt types.int 8 "Connections per aria2c invocation.";
-            HTML_RATE = opt types.float 8.0 ''
-              Requests a second over every worker, where a miss on the first source costs two.
-            '';
-            HTML_BATCH = opt types.int 200 "Papers per HTML batch.";
-            HTML_N_PARALLEL = opt types.int 16 "HTML workers.";
+            PDF_BATCH = opt types.int 500 "Papers per aria2c call";
+            PDF_N_PARALLEL = opt types.int 8 "Connections per aria2c call";
+            HTML_RATE = opt types.float 8.0 "Max HTML requests per second";
+            HTML_BATCH = opt types.int 200 "Papers per HTML batch";
+            HTML_N_PARALLEL = opt types.int 16 "HTML download workers";
           };
 
           dataset = section "Storage Paths" {
-            PDF_PATH = derived types.str "${toString cfg.dataDir}/arxiv/pdfs" ''"''${dataDir}/arxiv/pdfs"'' ''
-              PDF full text as YYMM/<id>v<n>.pdf, named by its real path so the units wait on the right mount.
-            '';
-            HTML_PATH = derived types.str "${toString cfg.dataDir}/arxiv/html" ''"''${dataDir}/arxiv/html"'' ''
-              HTML full text as YYMM/<id>.html, which a fetch also writes into.
-            '';
+            PDF_PATH = derived types.str "${toString cfg.dataDir}/arxiv/pdfs" ''"''${dataDir}/arxiv/pdfs"'' "PDF full text (real path, no symlink)";
+            HTML_PATH = derived types.str "${toString cfg.dataDir}/arxiv/html" ''"''${dataDir}/arxiv/html"'' "HTML full text (real path, no symlink)";
             GRAPH_PATH =
               derived types.str "${toString cfg.dataDir}/citation_graph_export.npy"
                 ''"''${dataDir}/citation_graph_export.npy"''
-                "The citation graph export, which the api loads once and the last stage rewrites.";
+                "Citation graph export";
           };
 
           serve = section "MCP Server and Library" {
-            HOST = opt types.str "127.0.0.1" "The interface every listener binds, the manager's too.";
-            API_PORT = opt types.port 6767 "Port of graphiv-api, the MCP tool server.";
-            FRONTEND_PORT = opt types.port 6969 "Port of graphiv-frontend, the research library.";
-            ALLOWED_HOSTS = opt (types.listOf types.str) [ ] ''
-              Host headers the transport answers to beyond its own address, which a proxy forwards.
-            '';
+            HOST = opt types.str "127.0.0.1" "Bind address for every listener";
+            API_PORT = opt types.port 6767 "MCP tool server port";
+            FRONTEND_PORT = opt types.port 6969 "Research library port";
+            ALLOWED_HOSTS = opt (types.listOf types.str) [ ] "Extra Host headers accepted (proxy)";
             RECIPE_PATH =
               derived types.str "${cfg.package}/share/graphiv/retrieval_recipes"
                 ''"''${package}/share/graphiv/retrieval_recipes"''
-                "The tuned recipes, which ship with the package.";
-            RUNS_PATH = derived types.str "${toString cfg.stateDir}/runs" ''"''${stateDir}/runs"'' ''
-              One directory per report written, which the dashboard lists.
-            '';
-            CACHE_PATH = derived types.str "${toString cfg.stateDir}/cache" ''"''${stateDir}/cache"'' ''
-              Model replies keyed by their prompt, safe to delete at any time.
-            '';
-            FETCH = opt types.bool true ''
-              Whether a paper the corpus never had may be fetched from arXiv into the corpus.
-            '';
+                "Tuned retrieval recipes";
+            RUNS_PATH = derived types.str "${toString cfg.stateDir}/runs" ''"''${stateDir}/runs"'' "Saved report runs";
+            CACHE_PATH = derived types.str "${toString cfg.stateDir}/cache" ''"''${stateDir}/cache"'' "Model reply cache (safe to delete)";
+            FETCH = opt types.bool true "Fetch missing papers from arXiv";
             PDFTOTEXT =
               derived types.str (lib.getExe' pkgs.poppler-utils "pdftotext")
                 ''"''${poppler-utils}/bin/pdftotext"''
-                "The extractor read_paper falls back to for a paper with no usable HTML.";
+                "pdftotext binary (no-HTML fallback)";
           };
 
           retrieve = section "Retrieval" {
-            COSINE_LIMIT = opt types.int 5000 "Papers the cosine retriever returns.";
-            EXPANSION_LIMIT = opt types.int 20000 "Most papers each expander appends.";
-            DEPTH = opt types.int 4 "Hops the decay terms reach.";
-            DECAY = opt types.float 0.5 "Weight kept per hop in the decay terms.";
+            COSINE_LIMIT = opt types.int 5000 "Papers from the cosine retriever";
+            EXPANSION_LIMIT = opt types.int 20000 "Max papers per expander";
+            DEPTH = opt types.int 4 "Hops the decay terms reach";
+            DECAY = opt types.float 0.5 "Decay weight kept per hop";
           };
 
           miner = section "LeyLine Miner" {
-            FOCUS = opt types.float 4.0 "Exponent on closeness when scoring an argued-with paper.";
-            WALK_PREFIX = opt types.int 30 "Head of the ranking the walks run on.";
-            CONNECTORS = opt types.int 40 "Most bridging papers kept.";
-            DECAY = opt types.float 0.5 "Weight kept per hop of a paper's reach.";
-            KNOCKDOWN = opt types.float 0.4 "Weight left on a paper once a line takes it.";
-            SEEDS = opt types.int 10 "Papers the walks start from.";
-            WALKS = opt types.int 50 "Walks per seed.";
-            BRANCH = opt types.int 1 "Papers a walk steps to at a time.";
+            FOCUS = opt types.float 4.0 "Closeness exponent for magnets";
+            WALK_PREFIX = opt types.int 30 "Ranking head the walks use";
+            CONNECTORS = opt types.int 40 "Max bridging papers";
+            DECAY = opt types.float 0.5 "Reach weight kept per hop";
+            KNOCKDOWN = opt types.float 0.4 "Weight left once a line takes a paper";
+            SEEDS = opt types.int 10 "Papers the walks start from";
+            WALKS = opt types.int 50 "Walks per seed";
+            BRANCH = opt types.int 1 "Papers per walk step";
             ARGUES = opt (types.listOf types.str) [
               "extends"
               "critiques"
               "compares"
-            ] "Intents that count as arguing with a paper.";
-            SUCCESSOR_DAYS = opt types.int 240 "Days before the cap a successor may date from.";
-            SUCCESSOR_FLOOR = opt types.float 0.6 "Lowest intent score a successor's citation needs.";
+            ] "Intents that count as arguing";
+            SUCCESSOR_DAYS = opt types.int 240 "Successor window before the cap (days)";
+            SUCCESSOR_FLOOR = opt types.float 0.6 "Min intent score for a successor";
             weights = section "LeyLine Intent Weights" {
-              extends = opt types.float 1.0 "Weight of a citation labeled extends.";
-              critiques = opt types.float 1.0 "Weight of a citation labeled critiques.";
-              compares = opt types.float 0.8 "Weight of a citation labeled compares.";
-              uses = opt types.float 0.4 "Weight of a citation labeled uses.";
-              motivates = opt types.float 0.15 "Weight of a citation labeled motivates.";
-              background = opt types.float 0.0 "Weight of a citation labeled background.";
+              extends = opt types.float 1.0 "Weight of extends citations";
+              critiques = opt types.float 1.0 "Weight of critiques citations";
+              compares = opt types.float 0.8 "Weight of compares citations";
+              uses = opt types.float 0.4 "Weight of uses citations";
+              motivates = opt types.float 0.15 "Weight of motivates citations";
+              background = opt types.float 0.0 "Weight of background citations";
             };
           };
 
           manager = section "Manager" {
-            PORT = opt types.port 6868 "Port of this manager page.";
-            STATE_PATH = derived types.str "${toString cfg.stateDir}/manager" ''"''${stateDir}/manager"'' ''
-              Where the manager keeps job logs, cached charts and measured rates.
-            '';
+            PORT = opt types.port 6868 "Manager port";
+            STATE_PATH = derived types.str "${toString cfg.stateDir}/manager" ''"''${stateDir}/manager"'' "Job logs, charts and measured rates";
             HF_TOKEN_PATH =
               derived types.str (lib.optionalString (cfg.manager.huggingface.tokenFile != null) credential)
                 ''"${credential}" when manager.huggingface.tokenFile is set, and "" otherwise''
-                "Where the manager reads the Hugging Face token, empty when there is none.";
+                "Hugging Face token file";
           };
 
           export = section "Export and Publishing" {
-            EXPORT_PATH = derived types.str "${toString cfg.dataDir}/export" ''"''${dataDir}/export"'' ''
-              Where the manager writes graphiv-<date>.dump, the full backup, and graphiv-<date>/, the Parquet release, and graphiv-benchmarks-<cutoff>/.
-            '';
-            DATA_REPO = opt types.str "" "The Hugging Face dataset repo the publish stage uploads the release to, empty to skip it.";
-            CITATION_REPO = opt types.str "" "The model repo for the citation intent classifier, empty to skip it.";
-            SURVEY_REPO = opt types.str "" "The model repo for the survey classifier, empty to skip it.";
-            BENCHMARK_REPO = opt types.str "" "The dataset repo for the benchmarks, empty to skip it.";
+            EXPORT_PATH = derived types.str "${toString cfg.dataDir}/export" ''"''${dataDir}/export"'' "Store dumps and Parquet releases";
+            DATA_REPO = opt types.str "" "Data release HF repo (empty skips)";
+            CITATION_REPO = opt types.str "" "Intent classifier HF repo (empty skips)";
+            SURVEY_REPO = opt types.str "" "Review classifier HF repo (empty skips)";
+            BENCHMARK_REPO = opt types.str "" "Benchmarks HF repo (empty skips)";
             QUERY_CACHE = derived types.str "${toString cfg.stateDir}/cache/queries" ''"''${stateDir}/cache/queries"''
-              "Each benchmark question the model wrote, cached by its input so a re-export keeps it.";
+              "Cached benchmark questions";
           };
 
           endpoints = section "Model Endpoints" {
-            EMBEDDING_ENDPOINT = opt types.str "http://127.0.0.1:11434/embedding/nomic-embed-text-v2-moe" ''
-              llama-server, or a llama-router path, serving the embedding model, which has to expose /tokenize.
-            '';
-            EMBEDDING_API_KEY = opt types.str "" ''
-              Bearer key for the embedding endpoint, empty for none, set in the manager and never in nix.
-            '';
-            EMBEDDING_NAME = opt types.str "nomic-embed-text-v2-moe" ''
-              The embedding model, which has to be the one the corpus was built with.
-            '';
-            EMBEDDING_PARALLEL = opt types.int 1 "Embedding requests in flight.";
-            EMBEDDING_BATCH = opt types.int 256 "Documents per embedding request.";
-            EMBEDDING_MAX_SEQ = opt types.int 512 "Tokens a document is truncated to, the two special tokens included.";
-            EMBEDDING_DOCUMENT_PREFIX = opt types.str "search_document: " "Prefix on every stored document.";
-            EMBEDDING_QUERY_PREFIX = opt types.str "search_query: " "Prefix on every question.";
-            LLM_ENDPOINT = opt types.str "http://127.0.0.1:11434/v1" "OpenAI compatible base url of the chat model.";
-            LLM_API_KEY = opt types.str "" ''
-              Bearer key for the chat endpoint, empty for none, set in the manager and never in nix.
-            '';
+            EMBEDDING_ENDPOINT = opt types.str "http://127.0.0.1:11434/embedding/nomic-embed-text-v2-moe" "llama-server URL (needs /tokenize)";
+            EMBEDDING_API_KEY = opt types.str "" "Embedding API key (set in the manager)";
+            EMBEDDING_NAME = opt types.str "nomic-embed-text-v2-moe" "Embedding model (must match the corpus)";
+            EMBEDDING_PARALLEL = opt types.int 1 "Concurrent embedding requests";
+            EMBEDDING_BATCH = opt types.int 256 "Documents per embedding request";
+            EMBEDDING_MAX_SEQ = opt types.int 512 "Max tokens per document";
+            EMBEDDING_DOCUMENT_PREFIX = opt types.str "search_document: " "Document prefix";
+            EMBEDDING_QUERY_PREFIX = opt types.str "search_query: " "Question prefix";
+            LLM_ENDPOINT = opt types.str "http://127.0.0.1:11434/v1" "Chat model URL (OpenAI compatible)";
+            LLM_API_KEY = opt types.str "" "Chat API key (set in the manager)";
             LLM_NAME = mkOption {
               type = types.str;
               example = "Wordslop-Qwen3.6-27B";
-              description = "Chat model every call goes to, a 26B instruct class being the reference.";
+              description = "Chat model";
             };
           };
 
           survey = section "Review Classifier" {
             MODEL_PATH =
               derived types.str "${toString cfg.dataDir}/survey_detection" ''"''${dataDir}/survey_detection"''
-                ''
-                  Review classifier checkpoint and the recipe that trained it.
-                '';
-            BATCH = opt types.int 64 "Papers per classifier forward pass.";
-            CHUNK = opt types.int 50000 "Papers per database commit.";
+                "Review classifier checkpoint";
+            BATCH = opt types.int 64 "Papers per inference batch";
+            CHUNK = opt types.int 50000 "Papers per database commit";
           };
 
           umap = section "UMAP Projection" {
             UMAP_MODEL_PATH =
               derived types.str "${toString cfg.dataDir}/umap_50.joblib" ''"''${dataDir}/umap_50.joblib"''
-                ''
-                  The fitted model, a pickle that loads only under the umap-learn it was fitted with.
-                '';
-            UMAP_SAMPLE = opt types.int 400000 "Papers a refit samples.";
-            UMAP_SEED = opt types.int 69420 "The seed, which forces a refit onto one core.";
-            UMAP_DIM = opt types.int 50 "Dimensions UMAP projects to.";
-            UMAP_BATCH = opt types.int 50000 "Papers per transform call.";
-            UMAP_WORKERS = opt types.int 4 "Transform processes, each loading its own copy of the model.";
+                "Fitted UMAP model (pickle)";
+            UMAP_SAMPLE = opt types.int 400000 "Papers sampled for a refit";
+            UMAP_SEED = opt types.int 69420 "Seed (forces a single-core refit)";
+            UMAP_DIM = opt types.int 50 "Output dimensions";
+            UMAP_BATCH = opt types.int 50000 "Papers per transform call";
+            UMAP_WORKERS = opt types.int 4 "Transform processes";
           };
 
           topics = section "Topic Tree" {
@@ -490,56 +456,52 @@ in
               "kmeans"
               "kmeans"
               "kmeans"
-            ] "Clustering method per tree level.";
-            TREE_K = opt types.int 16 "Children per node.";
-            TREE_MIN_CLUSTER_SIZE = opt types.int 60 "Smallest leaf, in papers.";
-            TREE_N_PARALLEL = opt types.int 8 "Clustering workers.";
-            TREE_BATCH = opt types.int 50000 "Rows per database write.";
-            TREE_SEED = opt types.int 69420 "Clustering seed.";
-            N_TOPIC_LABEL = opt types.int 10 "Papers shown to the namer, nearest the leaf centroid.";
-            TOPIC_BATCH = opt types.int 8 "Naming calls in flight.";
+            ] "Clustering method per level";
+            TREE_K = opt types.int 16 "Children per node";
+            TREE_MIN_CLUSTER_SIZE = opt types.int 60 "Min papers per leaf";
+            TREE_N_PARALLEL = opt types.int 8 "Clustering workers";
+            TREE_BATCH = opt types.int 50000 "Rows per database write";
+            TREE_SEED = opt types.int 69420 "Clustering seed";
+            N_TOPIC_LABEL = opt types.int 10 "Papers shown per leaf when naming";
+            TOPIC_BATCH = opt types.int 8 "Concurrent naming calls";
           };
 
           citation_labeler = section "Citation Labeler" {
             LABELER_PATH =
               derived types.str "${toString cfg.dataDir}/citation_labeler" ''"''${dataDir}/citation_labeler"''
-                ''
-                  The student checkpoint and the ground truth it is scored on.
-                '';
-            LABELER_MODEL = opt types.str "distilbert/distilbert-base-uncased" "Base model the student is fine-tuned from.";
-            LABELER_BATCH = opt types.int 48 "Sentences per forward pass.";
-            LABELER_MAX_SEQ = opt types.int 256 "Tokens a sentence is truncated to.";
-            LABELER_APE_MODEL = derived types.str s.endpoints.LLM_NAME "settings.endpoints.LLM_NAME" ''
-              The teacher that evolves the prompt.
-            '';
-            LABELER_APE_GENERATIONS = opt types.int 6 "Rounds of prompt evolution.";
-            LABELER_APE_PARALLEL = opt types.int 4 "Teacher calls in flight.";
-            LABELER_TEACHER_SAMPLE = opt types.int 10000 "Citations the teacher labels.";
-            LABELER_SEED = opt types.int 0 "Seed for the teacher sample and the splits.";
-            LABELER_SPLITS = opt (types.listOf types.float) [ 0.8 0.1 0.1 ] "Train, validation and test fractions.";
-            LABELER_EPOCHS = opt types.int 12 "Training epochs of the student.";
-            LABELER_TRAIN_BATCH = opt types.int 64 "Sentences per training batch.";
-            LABELER_LR = opt types.float 2.0e-5 "Learning rate of the student.";
+                "Student checkpoint and ground truth";
+            LABELER_MODEL = opt types.str "distilbert/distilbert-base-uncased" "Student base model";
+            LABELER_BATCH = opt types.int 48 "Sentences per inference batch";
+            LABELER_MAX_SEQ = opt types.int 256 "Max tokens per sentence";
+            LABELER_APE_MODEL = derived types.str s.endpoints.LLM_NAME "settings.endpoints.LLM_NAME" "Teacher model for prompt evolution";
+            LABELER_APE_GENERATIONS = opt types.int 6 "Prompt evolution rounds";
+            LABELER_APE_PARALLEL = opt types.int 4 "Concurrent teacher calls";
+            LABELER_TEACHER_SAMPLE = opt types.int 10000 "Citations the teacher labels";
+            LABELER_SEED = opt types.int 0 "Sampling and split seed";
+            LABELER_SPLITS = opt (types.listOf types.float) [ 0.8 0.1 0.1 ] "Train, validation, test fractions";
+            LABELER_EPOCHS = opt types.int 12 "Student training epochs";
+            LABELER_TRAIN_BATCH = opt types.int 64 "Sentences per training batch";
+            LABELER_LR = opt types.float 2.0e-5 "Student learning rate";
           };
 
           surveymatch = section "Review Case Selection" {
-            SURVEY_THRESHOLD = opt types.float 0.5 "Review classifier score a case needs.";
-            MUTUAL_COSINE_THRESHOLD = opt types.float 0.65 "The cosine two reviews in one case share.";
-            SURVEYMATCH_LEVEL = opt types.int 2 "The tree level cases group by.";
+            SURVEY_THRESHOLD = opt types.float 0.5 "Min review classifier score";
+            MUTUAL_COSINE_THRESHOLD = opt types.float 0.65 "Min cosine between a case's reviews";
+            SURVEYMATCH_LEVEL = opt types.int 2 "Topic tree level cases group by";
           };
 
           benchmarks = section "Benchmark Release" {
-            CUTOFF = opt types.str "2026-10-22" "The last day a mined review may carry, which names the version.";
-            SURVEYMATCH_FLOOR = opt types.int 100 "Resolved references a SurveyMatch review needs.";
-            FRONTIERMATCH_FLOOR = opt types.int 25 "Resolved references a FrontierMatch review needs.";
-            CONSENSUSMATCH_FLOOR = opt types.int 25 "Resolved references a ConsensusMatch review needs.";
-            SURVEY_THRESHOLD = opt types.float 0.95 "Review classifier score a mined review needs.";
-            GAP_DAYS = opt types.int 190 "Widest gap between two reviews of one case, in days.";
-            FRONTIER_COSINE = opt types.float 0.8 "The cosine two FrontierMatch reviews share.";
-            FRONTIER_MIN_KEY = opt types.int 10 "The smallest FrontierMatch answer key.";
-            FRONTIER_WINDOW_DAYS = opt types.int 730 "Days before the earlier review a frontier answer may date from.";
-            CONSENSUS_COSINE = opt types.float 0.75 "The cosine three ConsensusMatch reviews share.";
-            CONSENSUS_MIN_KEY = opt types.int 5 "The smallest ConsensusMatch answer key.";
+            CUTOFF = opt types.str "2026-10-22" "Last mined review date (release version)";
+            SURVEYMATCH_FLOOR = opt types.int 100 "Min refs per SurveyMatch review";
+            FRONTIERMATCH_FLOOR = opt types.int 25 "Min refs per FrontierMatch review";
+            CONSENSUSMATCH_FLOOR = opt types.int 25 "Min refs per ConsensusMatch review";
+            SURVEY_THRESHOLD = opt types.float 0.95 "Min review classifier score";
+            GAP_DAYS = opt types.int 190 "Max gap between a case's reviews (days)";
+            FRONTIER_COSINE = opt types.float 0.8 "Min cosine between FrontierMatch reviews";
+            FRONTIER_MIN_KEY = opt types.int 10 "Min FrontierMatch answer key size";
+            FRONTIER_WINDOW_DAYS = opt types.int 730 "Max age of a frontier answer (days)";
+            CONSENSUS_COSINE = opt types.float 0.75 "Min cosine among ConsensusMatch reviews";
+            CONSENSUS_MIN_KEY = opt types.int 5 "Min ConsensusMatch answer key size";
           };
         };
       };
