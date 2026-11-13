@@ -1305,7 +1305,7 @@ function configDraw() {
       <button class="btn danger sm" id="cfgforce">Save without the checks</button></div>` : ""}
     ${c.stale.length ? `<div class="cfg-alert"><b>In the override but no longer a setting</b><ul>${c.stale.map((s) => `<li><code>${esc(s)}</code> <button class="btn sm" data-stale="${esc(s)}">Remove</button></li>`).join("")}</ul></div>` : ""}
     ${grouped().map(([title, hue, secs]) => `<div class="cfg-group" style="--hue: var(${hue})"><div class="rh"><i class="cfg-dot"></i>${esc(title)}</div>
-      ${secs.map((s) => sectionHtml(s, hue)).join("")}</div>`).join("")}
+      <div class="cfg-cols">${secs.map((s) => sectionHtml(s, hue)).join("")}</div></div>`).join("")}
     <div class="cfg-foot tech">Defaults from ${c.source === "nix" ? "the NixOS module" : "config.toml"}, overrides in <code>${esc(c.override)}</code>
       <button class="btn sm danger" id="cfgall" ${over ? "" : "disabled"}>Revert all</button></div></div>`;
   configWire();
