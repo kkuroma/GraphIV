@@ -1,0 +1,214 @@
+\section{Baselines}
+\label{app:baselines}
+
+\begin{table}[t]
+\caption{PPR's setting picked for each benchmark.}
+\label{tab:ppr}
+\centering
+\small
+\begin{tabular}{llrll}
+\toprule
+benchmarks & fit on & damping & teleport & direction \\
+\midrule
+% benchmarks/data/fit_cache/ppr/77daccb12fe9.json
+SurveyMatch, SurGE & SurveyMatch R@250 & 0.95 & core & both \\
+% benchmarks/data/fit_cache/ppr/9e44e60fb9e5.json
+FrontierMatch & FrontierMatch R@100 & 0.5 & core & both \\
+% benchmarks/data/fit_cache/ppr/624c84a61718.json
+ConsensusMatch & ConsensusMatch R@50 & 0.85 & core & both \\
+% benchmarks/data/fit_cache/ppr/b28f171152fe.json
+PaSa, ScholarCatalyst & PaSa R@20 & 0.3 & core & backward \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Every baseline we ran saw what BoundedField saw: the titles and abstracts of the same frozen corpus, cut to papers dated on or before the case's cap, with the case's anchors, the reviews its answer key came from, removed. Each returned its top 1,000 papers. The reported rows of \cref{tab:existing,tab:scholarcatalyst} were copied from Tables 5 and 6 of \citet{he2025pasa} and Table 3 of \citet{kim2026scholarcatalyst}, and were not rerun.
+
+\paragraph{BM25:}
+BM25 \citep{robertson2009bm25} through the \texttt{bm25s} library at its default parameters, over each paper's title and abstract, with the English Snowball stemmer and English stop words.
+
+\paragraph{SPECTER2:}
+The \texttt{allenai/specter2\_base} model, with the proximity adapter for papers and the \texttt{adhoc\_query} adapter for questions, as its model card advises for search \citep{singh2022scirepeval}. A paper is its title, the separator token, and its abstract, truncated to 512 tokens, and its vector is the first token's final hidden state. Papers are ranked by cosine to the question.
+
+\paragraph{SciNCL:}
+The \texttt{malteos/scincl} model, loaded and pooled as its model card does \citep{ostendorff2022scincl}, with the same paper text and the first token's vector, normalized. SciNCL has no query encoder, so a question is encoded as any other text.
+
+\paragraph{Nomic cosine:}
+The nomic-embed-text-v2-moe vectors of \cref{sec:dataset}, searched through the store's HNSW index with \texttt{ef\_search} at 1,000. This is the first pool BoundedField starts from, so it isolates what the scorer adds.
+
+\paragraph{OpenScholar rerank:}
+The OpenScholar reranker \citep{asai2024openscholar} in half precision, rescoring the top 1,000 papers of Nomic cosine against the question by each paper's title and abstract.
+
+\paragraph{GAR:}
+Graph-based adaptive reranking \citep{macavaney2022gar} through \texttt{pyterrier\_adaptive}, with the same reranker, a budget of 1,000 papers, and a batch of 16. GAR alternates between the next papers of the initial ranking and the graph neighbors of the best papers scored so far. In GAR (similarity), a paper's neighbors are its 16 nearest papers by Nomic cosine, and in GAR (citations) its references and citers in GraphIV. A neighbor past the cap or among the anchors is never offered.
+
+\paragraph{PPR:}
+Personalized PageRank \citep{page1999pagerank} over the same pool BoundedField's \term{survey} recipe scores, so the scorer is the only difference. Rank flows backward, from a citing paper to what it cites, or along citations in both directions, and teleports by cosine to the question, over the 200-paper core or the whole pool, iterated until it changes by less than $10^{-10}$, with ties broken by cosine. The damping, the teleport set, and the direction were picked from a grid over damping $\{0.1, 0.3, 0.5, 0.7, 0.85, 0.95\}$ on 200 train cases of each benchmark at the $k$ its recipe was tuned on (\cref{tab:ppr}). ConsensusMatch's train split holds 58 cases, all used, and PaSa's fit used its validation split.
+
+\FloatBarrier
+\section{Ablations}
+\label{app:ablations}
+
+\input{tables/ablation}
+
+We removed one term at a time from each tuned recipe, keeping every other exponent as tuned, and reran the recipe on its own benchmark's test split with the Nomic embedding (\cref{tab:ablation}). The last rows of each block keep only \term{cos} and \term{anc}, score the expanded pool by cosine alone, apply the tuned exponents to the cosine pool without the citation hop, and order the cosine pool by cosine with no scorer.
+
+\FloatBarrier
+\section{Recipes Across Benchmarks and Embedders}
+\label{app:recipes}
+
+\input{tables/recipes_proposed}
+\input{tables/recipes_existing}
+\input{tables/recipes_sc}
+\input{tables/transfer}
+
+Each recipe was tuned for one search mode, and the main results run each benchmark under its own mode's recipe. \Cref{tab:recipes-proposed,tab:recipes-existing,tab:recipes-sc} run all four recipes on every benchmark with the Nomic embedding, beside the baselines of \cref{tab:retrieval}. \Cref{tab:transfer} runs the recipes on the other seven embedders twice, once as fit on Nomic and once refit on each embedder, which \cref{sec:discussion} compares.
+
+\FloatBarrier
+\section{LeyLine}
+\label{app:leyline}
+
+A \term{lineage} is a chain of papers, oldest first, in which each paper cites the one before it, running through the papers a field takes a position on rather than the ones it only names. Following one tells how an idea developed: a method, the works that extended it, and the ones that critiqued or compared against those, up to the present. As 69.1\% of citations are \term{background} (\cref{fig:dataset}), a chain of plain citations mostly passes through the surveys and tools every paper cites, so LeyLine weighs each paper by the intents it is cited with, which keeps the chain on the papers that moved the idea. \texttt{trace\_lineages} returns each lineage with the sentence in which each paper cites the one before it, labeled so a report can cite the step.
+
+LeyLine traces how a field developed through the papers a search returned, and backs \texttt{trace\_lineages} (\cref{sec:mcp}). It reads a typed graph $G = (V, E)$, where $(c, p, i) \in E$ means paper $c$ cites paper $p$ with intent $i$. $V$ is the first 30 papers of a search together with everything they cite, and each node $v$ carries its closeness $s(v) = \max(\cos(q, v), 0)$ to the question $q$.
+
+\paragraph{Magnets:}
+A \term{magnet} is a paper the field takes a position on, rather than one it merely names. With intent weights $W_i$ of 1.0 for \term{extends} and \term{critiques}, 0.8 for \term{compares}, 0.4 for \term{uses}, 0.15 for \term{motivates}, and 0 for \term{background},
+\begin{equation}
+    \label{eq:magnet}
+    m(p) = \frac{1}{Z}\, \text{stance}(p) \cdot \frac{\text{stance}(p)}{\text{total}(p)} \cdot \left(\frac{s(p)}{\max_{v} s(v)}\right)^{\phi},
+\end{equation}
+where $\text{stance}(p) = \sum_{(c,p,i) \in E} W_i\, s(c)$, $\text{total}(p) = \sum_{(c,p,i) \in E} s(c)$, $Z$ scales the strongest magnet to 1, and $\phi = 4$. The first factor removes papers no one takes a position on, the second removes papers cited as background by everything, and the third removes papers argued about for reasons other than the question.
+
+\paragraph{Reach:}
+For magnet weights $w$, starting at $m$, the reach $\rho(v) = \sum_{u : w(u) > 0} w(u)\, \lambda^{h(v,u)}$ is the magnet mass reachable forward in time from $v$, where $h(v,u)$ is the fewest citation hops from $u$ back to $v$ and $\lambda = 0.5$.
+
+\begin{algorithm}[t]
+\caption{LeyLine's lineages}
+\label{alg:leyline}
+\begin{algorithmic}
+\FOR{seed $= 1, \dots, S$}
+    \STATE $w \gets m$
+    \FOR{walk $= 1, \dots, T$}
+        \STATE $v \gets \arg\max_{u : \rho(u) > 0,\, w(u) > 0} \rho(u)\, w(u)$; $\pi \gets (v)$
+        \WHILE{some paper citing $v$ has $\rho > 0$}
+            \STATE draw $v$ among the papers citing $v$ with probability $\propto \rho$; append $v$ to $\pi$
+        \ENDWHILE
+        \STATE count one more run of $\pi$; $w(u) \gets \kappa\, w(u)$ for every magnet $u \in \pi$; recompute $\rho$
+    \ENDFOR
+\ENDFOR
+\STATE drop every path another path contains
+\STATE \textbf{return} the paths ranked by $\text{runs}(\pi) \cdot \sum_{u \in \pi} m(u)$
+\end{algorithmic}
+\end{algorithm}
+
+\paragraph{Lineages:}
+\Cref{alg:leyline} walks forward in time from the paper with the most magnet mass ahead of it, drawing each step toward the mass still ahead, and knocks down every magnet a walk collected so the next walk explores elsewhere, with $S = 10$ seeds, $T = 50$ walks per seed, and $\kappa = 0.4$. As every seed fixes the sampler, the same graph always returns the same lineages.
+
+\paragraph{Successors:}
+As the lineages look backward, LeyLine also returns \term{successors}: papers outside the search, dated within 240 days before the cap, that \term{extend}, \term{critique}, or \term{compare} against at least one paper of the search with an intent score of at least 0.60, ranked by the number of such papers times their cosine to the question. A successor needs no citations of its own, which reaches the brand new papers that BoundedField's citation terms cannot.
+
+\FloatBarrier
+\section{Test Questions}
+\label{app:questions}
+
+The automated research system was tested on 21 questions, one for each of three fields and seven question types, each run once at every effort level for 63 runs in all (\cref{tab:questions}). The types cover how an idea developed, how methods compare, what remains open, and what a field works on now. The questions were frozen before the first counted run, and none was searched in GraphIV beforehand.
+
+\begin{table*}[t]
+\caption{The 21 test questions, by field and type.}
+\label{tab:questions}
+\centering
+\small
+\begin{tabular}{llp{0.72\textwidth}}
+\toprule
+field & type & question \\
+\midrule
+CS & lineage & How did we get from the paper proving that channel polarization achieves the capacity of symmetric binary-input channels with successive cancellation decoding to polar codes being adopted for 5G control channels? \\
+CS & comparison & What protocols have been proposed for Byzantine fault-tolerant state machine replication under partial synchrony, and how do they compare in reported message complexity, latency and throughput? \\
+CS & open & What are the unanswered questions in fine-grained complexity: which conditional lower bounds rest on which hypotheses, and which problems still lack a tight bound under any of them? \\
+CS & frontier & What are the modern methods for distributed graph coloring and network decomposition in the LOCAL and CONGEST models? \\
+CS & lineage-comparison & How did maximum flow algorithms develop from the interior point methods that used electrical flows to the almost-linear-time algorithm, and how do the successive algorithms compare in their running time bounds? \\
+CS & frontier-open & What are the modern methods for reconfigurable intelligent surfaces in wireless communication, and which questions about their channel estimation and real-world gains remain unanswered? \\
+CS & frontier-comparison & What are the modern methods for approximate nearest neighbor search over large vector collections, and how do they compare in reported recall and queries per second, on which benchmarks? \\
+ML & lineage & How did we get from the paper that trained a network to reverse a gradual noising process with a variational bound to latent diffusion and transformer-backbone image generators? \\
+ML & comparison & What methods have been proposed for parameter-efficient fine-tuning of large language models, and how do they compare with full fine-tuning in reported accuracy, trainable parameters and memory, on which models and benchmarks? \\
+ML & open & What are the unanswered questions about grokking, where a network generalizes long after fitting its training data, and which proposed explanations do later papers contest? \\
+ML & frontier & What are the modern methods for aligning language models to human preferences without training a separate reward model? \\
+ML & lineage-comparison & How did state space models for long sequences develop from the paper that parameterized a linear state space layer with a structured HiPPO matrix, and how do the successive models along that line compare against Transformers in reported quality and throughput, on which benchmarks? \\
+ML & frontier-open & What are the modern methods for extending the context length of language models, and which questions about whether models actually use that context remain unanswered? \\
+ML & frontier-comparison & What are the modern methods for real-time 3D scene reconstruction from images, and how do they compare in reported rendering quality and speed, on which datasets? \\
+Physics & lineage & How did we get from the paper that encoded logical qubits in the topology of a qubit lattice on a torus to experiments showing logical error falling as surface code distance grows? \\
+Physics & comparison & What measurements of the Hubble constant have been made, and how do they compare in value and uncertainty across methods and data? \\
+Physics & open & What are the unanswered questions about superconductivity in magic-angle twisted bilayer graphene since the experiment that first reported it next to correlated insulating states? \\
+Physics & frontier & What are the modern methods for classically simulating quantum circuits and many-body dynamics, of the kind used to challenge claims of quantum advantage? \\
+Physics & lineage-comparison & How did liquid xenon dark matter detectors develop from early two-phase time projection chambers to multi-tonne experiments, and how do the successive experiments compare in their reported limits on the WIMP-nucleon cross section, at which masses? \\
+Physics & frontier-open & What are the modern methods for computing the hadronic vacuum polarization contribution to the muon's anomalous magnetic moment, and which questions about the disagreement between them remain unanswered? \\
+Physics & frontier-comparison & What are the modern machine-learned interatomic potentials, and how do they compare in reported energy and force errors, on which datasets, at what cost relative to DFT? \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\FloatBarrier
+\section{Research Runs}
+\label{app:runs}
+
+\input{tables/results_modes}
+
+All 63 runs are public, each with its report, its calls, and the agent's reasoning.\footnote{\furl{https://graphiv.kuroma.dev}} \Cref{tab:runs} lists every run.
+
+\subsection{Tools and Effort}
+\label{app:agent}
+
+\paragraph{Recall Paper:}
+This function returns \textbf{a single paper} matching a description, such as a method name or what the paper did, or none. An LLM checks each candidate of the \term{focused} recipe against its abstract.
+
+\paragraph{Search Papers:}
+This function returns \textbf{a list of papers} answering a question under one of the four recipes: \term{focused}, \term{survey}, \term{frontier}, or \term{consensus}. A paper can replace the question, its embedding taking the question's, and an author filter keeps only their papers.
+
+\paragraph{Read Papers:}
+This function returns \textbf{a list of claims} answering a question about each paper, each backed by a verbatim quote. It splits the paper into chunks, retrieves the likeliest by fused cosine and BM25, and has an LLM answer from them. Each claim carries a label of the first author's surname and a run-wide count, such as [Joestar67].
+
+\paragraph{List Citations:}
+This function returns \textbf{a list of citations} of a paper, its citers or its references, each with its intent and labeled citing sentence. Filtering by intent shows who extended, compared against, or critiqued a paper.
+
+\paragraph{Trace Lineages:}
+This function returns \textbf{a list of lineages} through a set of papers, typically a whole search, following \term{extends}, \term{compares}, and \term{critiques} citations, each line oldest first with its labeled citing sentences.
+
+\paragraph{Save Report:}
+This function returns \textbf{a pass or a list of faults} for the agent's report before saving it. Every label must resolve to a quote, every number on a cited line must appear in the paragraph behind its label, every paper cited must have been read, and every sentence of 12 or more words must carry a label or begin with ``Inference''.
+
+\paragraph{Effort:}
+The agent's instructions carry three effort presets, named in the question: \term{quick}, 3 to 5 minutes, 1 or 2 searches, and 4 to 6 papers read; \term{standard}, about 10 minutes, 2 to 4 searches, and 8 to 12 papers; and \term{deep}, at most 20 minutes, up to 6 searches, and 12 to 20 papers, adding a comparison table, lineages, and open questions. The server does not enforce them, so a run can exceed them.
+
+\FloatBarrier
+\subsection{Time and Calls}
+
+\input{tables/runs}
+\input{tables/budget}
+
+Reading took most of every run (\cref{tab:budget}): 0.64 of the wall time at \term{quick} and \term{standard}, and 0.65 at \term{deep}, at 41 to 47 seconds per \texttt{read\_paper} call, since each read retrieves paragraphs and has the reader answer from them on the same GPU the agent runs on. Searches took 0.02 to 0.03 of the time, and the citation, lineage, and save calls under 0.01. The agent spent the remaining third reasoning and writing. Most of a run came before its first save, 5.2, 10.2, and 16.3 minutes at the three efforts, and 1.5 to 4.0 minutes followed it, revising the report until it passed.
+
+The agent kept to its budget on its own, as the server enforces none. 38 of the 63 runs restated the effort's preset in their first reasoning step, and 41 said in their reasoning that they had enough, such as ``I have enough information now to write a report on how polar codes went from theory to 5G adoption'' 3.7 minutes into a \term{quick} run. \texttt{recall\_paper} found no match for 17 of its 47 calls.
+
+\paragraph{Search modes:}
+The mode followed the question (\cref{tab:modes}). Frontier questions used the \term{frontier} mode for 26\% of searches, more than any other type, and lineage-comparison questions the \term{survey} mode for 74\%, as what a field is built on is what a lineage traces. Frontier questions that also asked for comparisons or open problems switched to \term{focused} to find specific papers. The \term{consensus} mode was never used.
+
+\FloatBarrier
+\section{A Run in Detail}
+\label{app:trace}
+
+\input{tables/trace}
+
+\Cref{tab:trace} follows one \term{deep} run from the question to the saved report.\footnote{\furl{https://graphiv.kuroma.dev/\#/run/2026-11-11-104945-what-are-the-modern-methods-for-aligning-language}} The agent restated its budget, searched in the \term{survey} and \term{frontier} modes, and recalled the papers it named. \texttt{recall\_paper} found no match for GRPO, so the agent searched for it in the \term{focused} mode and later read DeepSeekMath, where GRPO was introduced. It read 14 papers over six calls, asked who extended, compared against, or critiqued DPO and SimPO, traced lineages through 12 of the papers, which returned four lines over 73 papers, and searched once more for what is still open.
+
+Its first save failed with 15 faults over 50 markers. Nine were statements with no marker, and two were searches the report described but the agent had never run. The agent ran those two searches with the words the report used, failed once more on numbers placed in the wrong paragraph, and passed on its third save with 58 markers, 11.7 minutes in. Seven runs answered a failed first save with new searches, and ten with new reads, rather than only rewording.
+
+\FloatBarrier
+\section{Faults}
+\label{app:faults}
+
+\input{tables/results_faults}
+
+61 of the 63 runs failed their first save, with 683 faults between them, and passed after 4.2 saves on average (\cref{tab:faults}). The commonest faults were unlabeled statements and numbers absent from the paragraph their label points to, followed by names the cited papers never mention, each a claim the agent wrote without support and had to fix or remove before saving.
+
+\FloatBarrier

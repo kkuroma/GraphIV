@@ -1,0 +1,254 @@
+{
+ "deep-cs-comparison": {
+  "slug": "2026-11-11-074758-what-protocols-have-been-proposed-for-byzantine-fault",
+  "seconds": 1176.0
+ },
+ "deep-cs-frontier": {
+  "slug": "2026-11-11-012209-what-are-the-modern-methods-for-distributed-graph",
+  "seconds": 833.0
+ },
+ "deep-cs-frontier-comparison": {
+  "slug": "2026-11-11-081554-what-are-the-modern-methods-for-approximate-nearest",
+  "seconds": 1581.0
+ },
+ "deep-cs-frontier-open": {
+  "slug": "2026-11-11-082943-what-are-the-modern-methods-for-reconfigurable-intelligent",
+  "seconds": 849.0
+ },
+ "deep-cs-lineage": {
+  "slug": "2026-11-11-091101-how-did-we-get-from-the-paper-proving",
+  "seconds": 749.0
+ },
+ "deep-cs-lineage-comparison": {
+  "slug": "2026-11-11-085200-how-did-maximum-flow-algorithms-develop-from-the",
+  "seconds": 1701.0
+ },
+ "deep-cs-open": {
+  "slug": "2026-11-11-093119-what-are-the-unanswered-questions-in-fine-grained",
+  "seconds": 1316.0
+ },
+ "deep-ml-comparison": {
+  "slug": "2026-11-11-095032-what-methods-have-been-proposed-for-parameter-efficient",
+  "seconds": 1947.0
+ },
+ "deep-ml-frontier": {
+  "slug": "2026-11-11-104945-what-are-the-modern-methods-for-aligning-language",
+  "seconds": 714.0
+ },
+ "deep-ml-frontier-comparison": {
+  "slug": "2026-11-11-101655-what-are-the-modern-methods-for-real-time",
+  "seconds": 1159.0
+ },
+ "deep-ml-frontier-open": {
+  "slug": "2026-11-11-103436-what-are-the-modern-methods-for-extending-the",
+  "seconds": 835.0
+ },
+ "deep-ml-lineage": {
+  "slug": "2026-11-11-111606-how-did-we-get-from-the-paper-that",
+  "seconds": 634.0
+ },
+ "deep-ml-lineage-comparison": {
+  "slug": "2026-11-11-110318-how-did-state-space-models-for-long-sequences",
+  "seconds": 1031.0
+ },
+ "deep-ml-open": {
+  "slug": "2026-11-11-113053-what-are-the-unanswered-questions-about-grokking-where",
+  "seconds": 746.0
+ },
+ "deep-physics-comparison": {
+  "slug": "2026-11-11-131452-what-measurements-of-the-hubble-constant-have-been",
+  "seconds": 6937.0
+ },
+ "deep-physics-frontier": {
+  "slug": "2026-11-11-143344-what-are-the-modern-methods-for-classically-simulating",
+  "seconds": 1124.0
+ },
+ "deep-physics-frontier-comparison": {
+  "slug": "2026-11-11-135528-what-are-the-modern-machine-learned-interatomic-potentials",
+  "seconds": 1754.0
+ },
+ "deep-physics-frontier-open": {
+  "slug": "2026-11-11-141530-what-are-the-modern-methods-for-computing-the",
+  "seconds": 1180.0
+ },
+ "deep-physics-lineage": {
+  "slug": "2026-11-11-154256-how-did-we-get-from-the-paper-that",
+  "seconds": 876.0
+ },
+ "deep-physics-lineage-comparison": {
+  "slug": "2026-11-11-152251-how-did-liquid-xenon-dark-matter-detectors-develop",
+  "seconds": 3251.0
+ },
+ "deep-physics-open": {
+  "slug": "2026-11-11-155823-what-are-the-unanswered-questions-about-superconductivity-in",
+  "seconds": 952.0
+ },
+ "quick-cs-comparison": {
+  "slug": "2026-11-11-051725-what-protocols-have-been-proposed-for-byzantine-fault",
+  "seconds": 225.0
+ },
+ "quick-cs-frontier": {
+  "slug": "2026-11-10-222557-what-are-the-modern-methods-for-distributed-graph",
+  "seconds": 469.0
+ },
+ "quick-cs-frontier-comparison": {
+  "slug": "2026-11-11-052559-what-are-the-modern-methods-for-approximate-nearest",
+  "seconds": 651.0
+ },
+ "quick-cs-frontier-open": {
+  "slug": "2026-11-10-221813-what-are-the-modern-methods-for-reconfigurable-intelligent",
+  "seconds": 180.0
+ },
+ "quick-cs-lineage": {
+  "slug": "2026-11-11-054904-how-did-we-get-from-the-paper-proving",
+  "seconds": 266.0
+ },
+ "quick-cs-lineage-comparison": {
+  "slug": "2026-11-11-053925-how-did-maximum-flow-algorithms-develop-from-the",
+  "seconds": 992.0
+ },
+ "quick-cs-open": {
+  "slug": "2026-11-10-224501-what-are-the-unanswered-questions-in-fine-grained",
+  "seconds": 343.0
+ },
+ "quick-ml-comparison": {
+  "slug": "2026-11-10-224745-what-methods-have-been-proposed-for-parameter-efficient",
+  "seconds": 206.0
+ },
+ "quick-ml-frontier": {
+  "slug": "2026-11-10-225819-what-are-the-modern-methods-for-aligning-language",
+  "seconds": 179.0
+ },
+ "quick-ml-frontier-comparison": {
+  "slug": "2026-11-10-225014-what-are-the-modern-methods-for-real-time",
+  "seconds": 234.0
+ },
+ "quick-ml-frontier-open": {
+  "slug": "2026-11-10-225515-what-are-the-modern-methods-for-extending-the",
+  "seconds": 198.0
+ },
+ "quick-ml-lineage": {
+  "slug": "2026-11-10-230649-how-did-we-get-from-the-paper-that",
+  "seconds": 191.0
+ },
+ "quick-ml-lineage-comparison": {
+  "slug": "2026-11-11-055358-how-did-state-space-models-for-long-sequences",
+  "seconds": 305.0
+ },
+ "quick-ml-open": {
+  "slug": "2026-11-10-231056-what-are-the-unanswered-questions-about-grokking-where",
+  "seconds": 232.0
+ },
+ "quick-physics-comparison": {
+  "slug": "2026-11-10-231319-what-measurements-of-the-hubble-constant-have-been",
+  "seconds": 593.0
+ },
+ "quick-physics-frontier": {
+  "slug": "2026-11-11-070632-what-are-the-modern-methods-for-classically-simulating",
+  "seconds": 270.0
+ },
+ "quick-physics-frontier-comparison": {
+  "slug": "2026-11-11-065306-what-are-the-modern-machine-learned-interatomic-potentials",
+  "seconds": 654.0
+ },
+ "quick-physics-frontier-open": {
+  "slug": "2026-11-11-070202-what-are-the-modern-methods-for-computing-the",
+  "seconds": 497.0
+ },
+ "quick-physics-lineage": {
+  "slug": "2026-11-11-000431-how-did-we-get-from-the-paper-that",
+  "seconds": 241.0
+ },
+ "quick-physics-lineage-comparison": {
+  "slug": "2026-11-11-072633-how-did-liquid-xenon-dark-matter-detectors-develop",
+  "seconds": 1237.0
+ },
+ "quick-physics-open": {
+  "slug": "2026-11-11-073117-what-are-the-unanswered-questions-about-superconductivity-in",
+  "seconds": 233.0
+ },
+ "standard-cs-comparison": {
+  "slug": "2026-11-11-023044-what-protocols-have-been-proposed-for-byzantine-fault",
+  "seconds": 1339.0
+ },
+ "standard-cs-frontier": {
+  "slug": "2026-11-10-182541-what-are-the-modern-methods-for-distributed-graph",
+  "seconds": 506.0
+ },
+ "standard-cs-frontier-comparison": {
+  "slug": "2026-11-11-024824-what-are-the-modern-methods-for-approximate-nearest",
+  "seconds": 1179.0
+ },
+ "standard-cs-frontier-open": {
+  "slug": "2026-11-10-181529-what-are-the-modern-methods-for-reconfigurable-intelligent",
+  "seconds": 504.0
+ },
+ "standard-cs-lineage": {
+  "slug": "2026-11-11-031834-how-did-we-get-from-the-paper-proving",
+  "seconds": 406.0
+ },
+ "standard-cs-lineage-comparison": {
+  "slug": "2026-11-11-030705-how-did-maximum-flow-algorithms-develop-from-the",
+  "seconds": 1237.0
+ },
+ "standard-cs-open": {
+  "slug": "2026-11-11-033508-what-are-the-unanswered-questions-in-fine-grained",
+  "seconds": 1032.0
+ },
+ "standard-ml-comparison": {
+  "slug": "2026-11-10-191702-what-methods-have-been-proposed-for-parameter-efficient",
+  "seconds": 939.0
+ },
+ "standard-ml-frontier": {
+  "slug": "2026-11-10-193822-what-are-the-modern-methods-for-aligning-language",
+  "seconds": 388.0
+ },
+ "standard-ml-frontier-comparison": {
+  "slug": "2026-11-10-192327-what-are-the-modern-methods-for-real-time",
+  "seconds": 359.0
+ },
+ "standard-ml-frontier-open": {
+  "slug": "2026-11-11-034305-what-are-the-modern-methods-for-extending-the",
+  "seconds": 503.0
+ },
+ "standard-ml-lineage": {
+  "slug": "2026-11-10-195300-how-did-we-get-from-the-paper-that",
+  "seconds": 366.0
+ },
+ "standard-ml-lineage-comparison": {
+  "slug": "2026-11-11-060631-how-did-state-space-models-for-long-sequences",
+  "seconds": 461.0
+ },
+ "standard-ml-open": {
+  "slug": "2026-11-10-200016-what-are-the-unanswered-questions-about-grokking-where",
+  "seconds": 429.0
+ },
+ "standard-physics-comparison": {
+  "slug": "2026-11-11-040812-what-measurements-of-the-hubble-constant-have-been",
+  "seconds": 1436.0
+ },
+ "standard-physics-frontier": {
+  "slug": "2026-11-10-210928-what-are-the-modern-methods-for-classically-simulating",
+  "seconds": 503.0
+ },
+ "standard-physics-frontier-comparison": {
+  "slug": "2026-11-11-062508-what-are-the-modern-machine-learned-interatomic-potentials",
+  "seconds": 1330.0
+ },
+ "standard-physics-frontier-open": {
+  "slug": "2026-11-11-064244-what-are-the-modern-methods-for-computing-the",
+  "seconds": 799.0
+ },
+ "standard-physics-lineage": {
+  "slug": "2026-11-11-050321-how-did-we-get-from-the-paper-that",
+  "seconds": 530.0
+ },
+ "standard-physics-lineage-comparison": {
+  "slug": "2026-11-10-212539-how-did-liquid-xenon-dark-matter-detectors-develop",
+  "seconds": 1141.0
+ },
+ "standard-physics-open": {
+  "slug": "2026-11-11-051338-what-are-the-unanswered-questions-about-superconductivity-in",
+  "seconds": 622.0
+ }
+}

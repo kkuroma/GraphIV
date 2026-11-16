@@ -1,0 +1,127 @@
+\begin{tikzpicture}[
+  font=\sffamily\scriptsize,
+  ink/.style={text=inkc},
+  muted/.style={text=mutedc},
+  row/.style={anchor=west, text=inkc, text height=1.6ex, text depth=0.3ex},
+  stephead/.style={anchor=north west, align=left, font=\sffamily\scriptsize\bfseries, text=akred},
+  paper/.style={draw=outlinec, rounded corners=1.5pt, fill=white, inner sep=2.2pt, font=\sffamily\tiny, text=inkc},
+  edge/.style={-{Stealth[length=1.3mm]}, line width=0.75pt},
+  intent/.style={font=\sffamily\tiny, fill=white, inner sep=0.8pt},
+  box/.style={draw=outlinec, rounded corners=2pt, fill=white, inner sep=3pt, font=\sffamily\scriptsize, text=inkc, align=center},
+  loop/.style={-{Stealth[length=1.3mm]}, mutedc!80, line width=0.7pt},
+  feed/.style={-{Stealth[length=1.5mm]}, mutedc!70, line width=0.7pt},
+  bullet/.style={anchor=north west, text width=1.75cm, align=left, font=\sffamily\tiny, text=inkc, inner sep=0pt},
+]
+\definecolor{akred}{HTML}{902020}
+\definecolor{akredlight}{HTML}{E86060}
+\definecolor{blueink}{HTML}{1F74A8}
+\definecolor{ochreink}{HTML}{806000}
+\definecolor{purpleink}{HTML}{6048A0}
+\definecolor{inkc}{HTML}{2A1E18}
+\definecolor{mutedc}{HTML}{60504A}
+\definecolor{outlinec}{HTML}{D8C8C0}
+\definecolor{paperc}{HTML}{F0EAE4}
+\colorlet{cites}{akred}
+\colorlet{textmatch}{outlinec}
+\colorlet{recent}{akredlight!45!white}
+
+\fill[paperc, rounded corners=6pt] (-0.1,0.66) rectangle (17.7,6.62);
+
+% the question
+\fill[mutedc] (0.42,5.86) circle (0.15);
+\fill[mutedc, rounded corners=3pt] (0.17,5.12) rectangle (0.67,5.6);
+\draw[draw=purpleink!45, fill=purpleink!7!white, rounded corners=4pt] (0.95,4.86) rectangle (6.3,6.5);
+\draw[draw=purpleink!45, fill=purpleink!7!white] (0.95,5.55) -- (0.75,5.45) -- (0.95,5.35);
+\fill[purpleink!7!white] (0.96,5.56) rectangle (1.0,5.34);
+\node[anchor=north west, font=\sffamily\scriptsize\bfseries, text=purpleink] at (1.1,6.42) {A researcher asks};
+\node[anchor=north west, text width=5cm, align=left, ink, font=\sffamily\footnotesize\itshape] at (1.1,6.08) {How did speculative decoding develop, and which later work questions its speedups?};
+
+% deep research, the framing GraphIV departs from
+\draw[draw=outlinec, fill=outlinec!35!paperc, rounded corners=4pt] (6.6,4.86) rectangle (17.6,6.5);
+\fill[mutedc] (6.85,6.22) circle (0.13);
+\draw[white, line width=1.1pt] (6.79,6.16) -- (6.91,6.28) (6.79,6.28) -- (6.91,6.16);
+\node[anchor=west, font=\sffamily\scriptsize\bfseries, text=mutedc] at (7.02,6.22) {Deep research: literature review as multi-step semantic search};
+\node[box] (llm) at (7.45,5.68) {LLM};
+\node[box, text width=1.55cm] (ret) at (9.85,5.68) {similarity retriever};
+\foreach \i in {0,1,2} {
+  \draw[draw=outlinec, fill=white, rounded corners=1pt] (11.55+\i*0.18,5.38-\i*0.07) rectangle (12.15+\i*0.18,6.03-\i*0.07);
+  \foreach \l in {0,1,2,3} \draw[outlinec, line width=0.9pt] (11.62+\i*0.18,5.92-\i*0.07-\l*0.13) -- (12.06+\i*0.18,5.92-\i*0.07-\l*0.13);
+}
+\draw[loop] (llm) -- node[above, muted, font=\sffamily\tiny] {rewrite query} (ret);
+\draw[loop] (ret) -- node[above, muted, font=\sffamily\tiny] {top-k} (11.5,5.68);
+\draw[loop] (11.9,5.24) .. controls (11.9,5.08) and (7.45,5.08) .. node[pos=0.5, below=0pt, muted, font=\sffamily\tiny, inner sep=1pt] {read, then repeat, up to hundreds of tool calls} (llm.south);
+\foreach \t [count=\k] in {an LLM call at every step, sees only text similar to the query, nothing checks the report} {
+  \fill[mutedc] (13.55,6.02-\k*0.3) circle (0.05);
+  \node[anchor=west, ink] at (13.65,6.02-\k*0.3) {\t};
+}
+
+% GraphIV, the way a researcher does it
+\draw[draw=akred!70, fill=white, rounded corners=4pt] (0,0.8) rectangle (17.6,4.72);
+\fill[akred, rounded corners=4pt] (0,4.36) rectangle (17.6,4.72);
+\fill[akred] (0,4.36) rectangle (17.6,4.5);
+\fill[white] (0.3,4.54) circle (0.12);
+\draw[akred, line width=1.1pt] (0.24,4.54) -- (0.29,4.48) -- (0.38,4.6);
+\node[anchor=west, font=\sffamily\scriptsize\bfseries, text=white] at (0.47,4.54) {GraphIV: literature review the way a researcher does it};
+\foreach \x in {3.3,7.88,12.68} \draw[outlinec] (\x,1.0) -- (\x,4.1);
+
+\node[stephead] at (0.15,4.24) {0\ \ Store\\[-1pt]\textmd{\textcolor{mutedc}{built once, read by every step}}};
+\begin{scope}[shift={(0.72,2.55)}]
+  \fill[akred] (-0.36,0.42) -- (-0.36,-0.42) arc[start angle=180, end angle=360, x radius=0.36, y radius=0.1] -- (0.36,0.42) -- cycle;
+  \fill[akredlight!70!white] (0,0.42) ellipse[x radius=0.36, y radius=0.1];
+  \foreach \y in {0.14,-0.14} \draw[white, line width=1pt] (-0.36,\y) arc[start angle=180, end angle=360, x radius=0.36, y radius=0.1];
+\end{scope}
+\foreach \t/\y in {3.2M arXiv papers/2.95, {76.7M typed citations}/2.55, {100\% local, one 3090}/2.15} {
+  \fill[akred] (1.3,\y) circle (0.045);
+  \node[anchor=west, text width=1.8cm, align=left, font=\sffamily\tiny, text=inkc, inner sep=0pt] at (1.42,\y) {\t};
+}
+
+\node[stephead] at (3.4,4.24) {1\ \ Retrieve\\[-1pt]\textmd{\textcolor{mutedc}{walk citations from seed papers}}};
+\node[row] at (3.45,3.22) {1\ \ Spec. Sampling '23};
+\fill[textmatch] (5.550,3.11) rectangle (6.092,3.33);
+\fill[cites] (6.112,3.11) rectangle (7.521,3.33);
+\fill[recent] (7.541,3.11) rectangle (7.630,3.33);
+\node[row] at (3.45,2.88) {2\ \ Spec. Decoding '22};
+\fill[textmatch] (5.550,2.77) rectangle (6.053,2.99);
+\fill[cites] (6.073,2.77) rectangle (7.515,2.99);
+\fill[recent] (7.535,2.77) rectangle (7.621,2.99);
+\node[row] at (3.45,2.54) {3\ \ EAGLE '24};
+\fill[textmatch] (5.550,2.43) rectangle (6.055,2.65);
+\fill[cites] (6.075,2.43) rectangle (7.468,2.65);
+\fill[recent] (7.488,2.43) rectangle (7.602,2.65);
+\node[row] at (3.45,2.20) {4\ \ Medusa '24};
+\fill[textmatch] (5.550,2.09) rectangle (6.040,2.31);
+\fill[cites] (6.060,2.09) rectangle (7.462,2.31);
+\fill[recent] (7.482,2.09) rectangle (7.596,2.31);
+\node[row] at (3.45,1.86) {5\ \ EAGLE-2 '24};
+\fill[textmatch] (5.550,1.75) rectangle (6.032,1.97);
+\fill[cites] (6.052,1.75) rectangle (7.373,1.97);
+\fill[recent] (7.393,1.75) rectangle (7.522,1.97);
+\fill[cites] (3.47,1.47) rectangle (3.63,1.6); \node[row, muted, font=\sffamily\tiny] at (3.65,1.535) {citation walks};
+\fill[textmatch] (4.95,1.47) rectangle (5.11,1.6); \node[row, muted, font=\sffamily\tiny] at (5.13,1.535) {text match};
+\fill[recent] (6.2,1.47) rectangle (6.36,1.6); \node[row, muted, font=\sffamily\tiny] at (6.38,1.535) {recency};
+\node[row, muted, font=\sffamily\tiny] at (3.45,1.12) {BoundedField: no LLM, about 1\,s per query};
+
+\node[stephead] at (7.98,4.24) {2\ \ Analyze\\[-1pt]\textmd{\textcolor{mutedc}{read why papers cite each other}}};
+\node[paper] (sps) at (8.72,2.75) {Spec.\ Sampling '23};
+\node[paper] (eagle) at (8.92,3.33) {EAGLE '24};
+\node[paper] (eagle2) at (10.62,3.33) {EAGLE-2 '24};
+\node[paper] (pard) at (10.2,2.17) {PARD '25};
+\node[paper] (dflash) at (12.0,2.75) {DFlash '26};
+\draw[edge, blueink] (eagle) -- node[intent, text=blueink, above=2pt] {extends} (eagle2);
+\draw[edge, mutedc] (sps) -- node[intent, text=mutedc, pos=0.42, below right=2pt] {compares} (eagle2);
+\draw[edge, blueink] (eagle2) -- node[intent, text=blueink, pos=0.45, above right=1pt] {extends} (dflash);
+\draw[edge, ochreink] (pard) -- node[intent, text=ochreink, below right=-1pt] {critiques} (dflash);
+\node[anchor=north west, text width=4.45cm, align=left, ink, font=\sffamily\tiny, fill=ochreink!6!white, draw=ochreink!35, rounded corners=2pt, inner sep=3pt] at (8.0,1.82) {DFlash on PARD: \itshape ``Prior work like An et al.\ naively applied a small diffusion model as a speculative drafter, which leads to poor acceptance length and limited speedups.''\upshape\ \textcolor{blueink}{\textbf{[Chen137]}}};
+
+\node[stephead] at (12.78,4.24) {3\ \ Summarize\\[-1pt]\textmd{\textcolor{mutedc}{cite only what was read}}};
+\node[anchor=north west, text width=4.5cm, align=left, ink, font=\sffamily\tiny, draw=outlinec, fill=white, rounded corners=2pt, inner sep=3pt] (report) at (12.8,3.45) {Speedups from 2--2.5x \textcolor{blueink}{\textbf{[Chen1]}} grew to 6.5x on code tasks \textcolor{blueink}{\textbf{[Li77]}}, while verification bottlenecks and batch size limits showed speedups degrade at scale \textcolor{blueink}{\textbf{[Liu101]}}.};
+\node[anchor=north west, text width=4.5cm, align=left, ink, font=\sffamily\tiny, fill=blueink!7!white, draw=blueink!35, rounded corners=2pt, inner sep=3pt] (li77) at (12.8,2.3) {\textcolor{blueink}{\textbf{Li77}} EAGLE-3, 2503.01840: \itshape ``EAGLE-3 achieves a speedup ratio up to 6.5x, with about 1.4x improvement over EAGLE-2.''};
+\draw[-{Stealth[length=1.3mm]}, blueink!70, line width=0.6pt] (report.south) -- node[right, muted, font=\sffamily\tiny] {resolves to the quote} (li77.north);
+\fill[akred] (12.94,1.15) circle (0.1);
+\draw[white, line width=0.9pt] (12.89,1.15) -- (12.93,1.1) -- (13.0,1.2);
+\node[anchor=west, ink] at (13.08,1.15) {saved: 74 citation markers checked, 0 faults};
+
+% the question feeds both
+\draw[feed] (3.6,4.86) -- (3.6,4.72);
+\draw[feed] (6.3,5.72) -- (6.6,5.72);
+\end{tikzpicture}

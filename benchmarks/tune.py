@@ -173,7 +173,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     _ = ap.add_argument("--recipe", choices=RECIPES, action="append", help="a recipe to tune, repeatable, in the order given")
     _ = ap.add_argument("--promote", action="store_true", help="copy data/recipes/ into the checkout's retrieval_recipes/")
-    _ = ap.add_argument("--embedder", help="a section of tuning/embedders.toml, pooled exactly from its npy, written as <recipe>_<embedder>")
+    _ = ap.add_argument("--embedder", action="append", help="a section of tuning/embedders.toml, repeatable, pooled exactly from its npy, written as <recipe>_<embedder>")
     _ = ap.add_argument("--workers", type=int, default=8, help="processes scoring cases")
     args = ap.parse_args()
     if bool(args.recipe) == args.promote:
@@ -182,8 +182,9 @@ def main() -> None:
         promote()
         return
     common.guard()
-    for name in args.recipe:
-        tune(name, args.embedder, args.workers)
+    for embedder in args.embedder or [None]:
+        for name in args.recipe:
+            tune(name, embedder, args.workers)
 
 
 if __name__ == "__main__":

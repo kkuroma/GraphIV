@@ -1,0 +1,73 @@
+% nonacm for arXiv, anonymous,review for the submission
+\documentclass[sigconf,nonacm]{acmart}
+
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+
+\newcommand{\theHalgorithm}{\arabic{algorithm}}
+
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\usepackage{mathtools}
+\usepackage[capitalize,noabbrev]{cleveref}
+\setlength{\marginparwidth}{2cm}
+\usepackage[textsize=tiny]{todonotes}
+
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\furl}[1]{{\scriptsize\url{#1}}}
+
+\renewcommand{\dbltopfraction}{0.9}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\dblfloatpagefraction}{0.5}
+\renewcommand{\floatpagefraction}{0.85}
+\setcounter{dbltopnumber}{3}
+
+\setlength{\emergencystretch}{1em}
+\makeatletter
+\newcommand{\FloatBarrier}{\par\begingroup\let\@elt\relax\edef\@tempa{\@botlist\@deferlist\@dbldeferlist}\ifx\@tempa\@empty\endgroup\else\endgroup\clearpage\fi}
+\makeatother
+\begin{document}
+
+\title[GraphIV]{GraphIV: An Updated, Open Citation Intent Graph of arXiv for Citation-Aware Retrieval and Automated Research Agents}
+
+\author{KK Thuwajit}
+\affiliation{
+  \institution{University of California, Los Angeles}
+  \city{Los Angeles}
+  \state{California}
+  \country{USA}
+}
+\email{contact@kuroma.dev}
+
+\input{sections/00_abstract}
+
+\begin{teaserfigure}
+\input{figures/teaser}
+\Description{A question about speculative decoding feeds two panels. The upper panel, in gray, shows deep research as a loop between an LLM and a similarity retriever. The lower panel, in red, shows GraphIV in four steps: a database of 3.2M arXiv papers and 76.7M typed citations built once and run locally; a ranked list of five papers with score bars mostly from citation walks; a small graph of five papers joined by edges labeled extends, compares and critiques with one citing sentence quoted; and a report excerpt whose label resolves to the quote it rests on, with 74 citation markers checked and 0 faults.}
+\caption{GraphIV reviews literature the way a researcher does. Top: typical deep research agent treat literature as multi-step semantic search. Bottom: GraphIV approaches the same qieru from a citatiopn graph. BoundedField walks citations from the papers most similar to the question with no LLM/ \texttt{list\_citations} and \texttt{trace\_lineages} explains why each paper cites another, and \texttt{save\_report} saves the report only after all quotes are mechanically checked.}
+\label{fig:teaser}
+\end{teaserfigure}
+
+\maketitle
+
+\input{sections/01_introduction}
+\input{sections/02_related_work}
+\input{sections/03_method}
+\input{sections/04_results}
+\input{sections/05_discussion}
+\input{sections/06_conclusion}
+\input{sections/07_impact_statement}
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{references}
+
+\onecolumn
+\appendix
+\input{sections/08_appendix}
+
+\end{document}

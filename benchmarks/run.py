@@ -200,14 +200,14 @@ def run(path: Path, rerun: bool) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    _ = ap.add_argument("--experiment", help="a toml path, or a name under experiments/")
+    _ = ap.add_argument("--experiment", nargs="+", help="toml paths, or names under experiments/, run in the order given")
     _ = ap.add_argument("--run-all", action="store_true", help="every toml under experiments/")
     _ = ap.add_argument("--rerun", action="store_true", help="redo runs whose results already exist")
     args = ap.parse_args()
     if bool(args.experiment) == args.run_all:
         ap.error("pass --experiment or --run-all, not both")
     common.guard()
-    paths = sorted(EXPERIMENTS.glob("*.toml")) if args.run_all else [find(args.experiment)]
+    paths = sorted(EXPERIMENTS.glob("*.toml")) if args.run_all else [find(e) for e in args.experiment]
     # a run another reads as its first stage goes first, so a rerun never hands on stale results
     paths.sort(key=lambda p: "first_stage" in tomllib.loads(p.read_text())["run"])
     for path in paths:

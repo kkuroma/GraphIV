@@ -16,7 +16,7 @@ benchmarks/
   src/
     schema.py                 Dataset, a split's cases, and Method, fit and retrieve
     common.py                 paths, jsonl, the frozen graph, and the call into graphiv/
-    graphiv/                  scripts run in the checkout's environment, importing its src and nothing here, terms.py and fit.py among them
+    graphiv/                  scripts run in the checkout's environment, importing its src and nothing here, terms.py, fit.py and ablate.py among them
     datasets/                 surveymatch, frontiermatch, consensusmatch, pasa, surge, scholarcatalyst
     methods/                  boundedfield, nomic, ppr, bm25, specter2, scincl, gar
   data -> /Vault/graphiv/benchmarks
@@ -33,7 +33,7 @@ direnv exec .. .venv/bin/python run.py --experiment gar_cite-surge --rerun
 direnv exec .. .venv/bin/python make_table.py
 ```
 
-`--experiment` takes a name under `experiments/` or a path to a toml anywhere.
+`--experiment` takes names under `experiments/` or paths to tomls anywhere, run in the order given.
 A run whose results exist is skipped, and named as stale when its toml has changed since, until `--rerun` is passed.
 A fit is never redone by `--rerun`; deleting its file under `fit_cache/` is what refits it.
 
@@ -50,6 +50,15 @@ Each recipe pools every train and val case at every core of its grid and caches 
 The expanders hop from the core, so each core builds its own pool on one shared cosine retrieval.
 `fit.py` then fits the free exponents at each core by minibatch gradient on a smooth recall@k from a neutral start, searches the exact recall with CMA-ES from there, and picks the core and the point on val.
 A case's anchors are blocked from the retriever, both expanders and the hub count, so no case sees its own review.
+
+`--embedder` pools from another embedder's npy under `data/index_cache/` instead of the store, one section of `tuning/embedders.toml` each, and writes `<recipe>_<embedder>`.
+The embedder comparison is three runs per embedder and benchmark under `experiments/embedders/`: `cosine_` alone, `bf_` on the nomic recipe and `bfrefit_` on its own.
+
+```sh
+direnv exec .. .venv/bin/python run.py --experiment experiments/embedders/{cosine,bf}_*.toml
+direnv exec .. .venv/bin/python tune.py --recipe survey --recipe frontier --recipe focused --recipe consensus --embedder qwen3_8b --embedder harrier_27b
+direnv exec .. .venv/bin/python run.py --experiment experiments/embedders/bfrefit_*.toml
+```
 
 | key | what it does |
 | --- | --- |
@@ -103,6 +112,7 @@ ks = [100, 1000]
 | `recipes/{recipe}.toml` | the tuned recipe as `tune.py` wrote it, which BoundedField and PPR run |
 | `leaked-2026-11-05/` | the recipes, runs, fits and tuning made before anchors were blocked past the retriever, kept to compare against |
 | `tables.md` | what `make_table.py` writes |
+| `ablation/{recipe}-{dataset}_{shard}.jsonl` | one line per test case: every variant's recall at each stored k, as `src/graphiv/ablate.py` writes it |
 | `runs/{name}.jsonl` | one line per case: its ranking, its recall at each k, and its seconds when measured |
 | `runs/{name}.json` | the summary: mean recall at each k, mean seconds, the fit's key, the toml it ran with, and the recipe file as it ran |
 | `logs/{name}.log` | each run's output |

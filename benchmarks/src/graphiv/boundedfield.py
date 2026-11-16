@@ -31,7 +31,8 @@ def main() -> None:
     config = load_config(str(ROOT / "config.toml"))
     endpoint = EmbeddingEndpoint.from_config(config)
     recipe = read_recipe(Path(args.recipe))
-    pipeline = build_pipeline(recipe, config["retrieve"], load_graph_export(args.graph), str(config["database"]["PG_DEST"]))
+    graph = load_graph_export(args.graph)
+    pipeline = build_pipeline(recipe, config["retrieve"], graph, str(config["database"]["PG_DEST"]))
     limit = get_seed_limit(config["retrieve"])
     with open(args.cases) as f:
         cases = [json.loads(line) for line in f]
@@ -42,7 +43,8 @@ def main() -> None:
             v = embed(endpoint, c["query"])
             cap = date.fromisoformat(c["cutoff"])
             pipeline.block(c["anchors"])
-            pool = pipeline.build_pool(c["query"], v, retrieve_limit=limit, max_date=cap)
+            # the live store holds papers newer than the frozen graph, which it cannot score
+            pool = [p for p in pipeline.build_pool(c["query"], v, retrieve_limit=limit, max_date=cap) if p.arxiv_id in graph.index]
             papers = pipeline.score_pool(c["query"], v, pool, max_date=cap)
             ranked = [p.arxiv_id for p in papers if allowed is None or p.arxiv_id in allowed][:RETURN]
             seconds = time.perf_counter() - started

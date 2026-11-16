@@ -129,13 +129,15 @@
         pg-stop
         pg-console
         # LaTeX for the experiment reports, the paper and the slides.
-        # scheme-medium lacks tcolorbox, which the beamer theme requires.
+        # scheme-medium lacks tcolorbox, which the beamer theme requires, and acmart, which the paper uses.
         (texlive.combine {
           inherit (texlive)
             scheme-medium
             tcolorbox tikzfill pgf environ trimspaces pdfcol
             unicode-math ragged2e etoolbox kvoptions
-            beamer translator;
+            beamer translator
+            acmart comment figureversions fontaxes hyperxmp ifmtarg inconsolata libertine
+            mmap mweights ncctools newtx preprint totpages upquote;
         })
       ];
       DEV_SHELL = "GraphIV";
