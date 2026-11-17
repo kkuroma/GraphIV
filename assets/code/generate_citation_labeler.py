@@ -16,13 +16,13 @@ from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.lines import Line2D
 from style import (
     INK,
+    LEAD,
     LEFT,
     MUTED,
     PANEL,
+    PURPLE,
     RIGHT,
     ROOT,
-    ROSE,
-    VIOLET,
     Page,
     apply_theme,
     intents,
@@ -39,7 +39,7 @@ def agreement(axis: Axes, matrix: np.ndarray) -> None:
     """
     rows = np.arange(len(SHOWN))
     shares = matrix / np.maximum(matrix.sum(axis=1, keepdims=True), 1)
-    ramp = LinearSegmentedColormap.from_list("rose", [PANEL, ROSE])
+    ramp = LinearSegmentedColormap.from_list("lead", [PANEL, LEAD])
     axis.pcolormesh(
         np.arange(len(SHOWN) + 1) - 0.5,
         np.arange(len(SHOWN) + 1) - 0.5,
@@ -96,8 +96,8 @@ def performance(axis: Axes, student: np.ndarray, teacher: np.ndarray) -> None:
     rows = np.arange(len(SHOWN))
     handles = []
     for name, matrix, color, marker, offset in (
-        ("teacher", teacher, VIOLET, "s", -0.16),
-        ("student", student, ROSE, "o", 0.16),
+        ("teacher", teacher, PURPLE, "s", -0.16),
+        ("student", student, LEAD, "o", 0.16),
     ):
         f1 = scores(matrix)[2]
         axis.plot(f1, rows + offset, marker, color=color, markersize=9, zorder=3)
@@ -163,7 +163,7 @@ def draw(data: dict[str, Any], release: dict[str, Any], out: Path) -> None:
     intents(page.ax, 6.65, 2.65, RIGHT - 6.65, counts, order[3:])
 
     page.panel_title(LEFT, 5.45, "Agreement with the teacher", 2)
-    page.key(6.2, 5.45, [(f"macro F1 {macro:.3f}", ROSE)])
+    page.key(6.2, 5.45, [(f"macro F1 {macro:.3f}", LEAD)])
     agreement(page.place(1.85, 5.8, 4.35, 4.35), matrix)
     page.panel_title(6.95, 5.45, "Student performance", 3)
     performance(page.place(6.95, 5.8, RIGHT - 6.95, 4.35), np.array(data["truth"]), teacher_truth())

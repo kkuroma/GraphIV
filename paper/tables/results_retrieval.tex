@@ -12,7 +12,7 @@
 \toprule
  & \multicolumn{3}{c}{SurveyMatch} & \multicolumn{3}{c}{FrontierMatch} & \multicolumn{3}{c}{ConsensusMatch} \\
 \cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}
-method & R@100 & R@200 & R@500 & R@20 & R@50 & R@100 & R@20 & R@50 & R@100 \\
+Method & R@100 & R@200 & R@500 & R@20 & R@50 & R@100 & R@20 & R@50 & R@100 \\
 \midrule
 % benchmarks/data/runs/bm25-surveymatch.jsonl, benchmarks/data/runs/bm25-frontiermatch.jsonl, benchmarks/data/runs/bm25-consensusmatch.jsonl
 BM25 & 0.066 & 0.100 & 0.162 & 0.027 & 0.051 & 0.080 & 0.058 & 0.113 & 0.167 \\
@@ -47,7 +47,7 @@ BoundedField (Nemotron 8B) & \textbf{0.246} & \textbf{0.363} & \textbf{0.529} & 
 \toprule
  & \multicolumn{3}{c}{AutoScholarQuery} & \multicolumn{3}{c}{RealScholarQuery} & \multicolumn{3}{c}{SurGE} \\
 \cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}
-method & R@20 & R@50 & R@100 & R@20 & R@50 & R@100 & R@100 & R@200 & R@500 \\
+Method & R@20 & R@50 & R@100 & R@20 & R@50 & R@100 & R@100 & R@200 & R@500 \\
 \midrule
 % benchmarks/data/runs/bm25-pasa_test.jsonl, benchmarks/data/runs/bm25-pasa_real.jsonl, benchmarks/data/runs/bm25-surge.jsonl
 BM25 & 0.238 & 0.313 & 0.376 & 0.169 & 0.255 & 0.317 & 0.150 & 0.192 & 0.258 \\
@@ -100,9 +100,9 @@ PaSa-7b-ensemble & 0.533 & 0.639 & 0.710 & \underline{0.599} & \underline{0.688}
 \label{tab:scholarcatalyst}
 \begin{tabular}{lrrrrrrrr}
 \toprule
- & \multicolumn{4}{c}{core, 207 queries} & \multicolumn{4}{c}{subfield, 687 queries} \\
+ & \multicolumn{4}{c}{Core, 207 queries} & \multicolumn{4}{c}{Subfield, 687 queries} \\
 \cmidrule(lr){2-5}\cmidrule(lr){6-9}
-method & nDCG@20 & R@5 & R@20 & R@100 & nDCG@20 & R@5 & R@20 & R@100 \\
+Method & nDCG@20 & R@5 & R@20 & R@100 & nDCG@20 & R@5 & R@20 & R@100 \\
 \midrule
 % benchmarks/data/runs/bm25-scholarcatalyst_core.jsonl, benchmarks/data/runs/bm25-scholarcatalyst_subfield.jsonl
 BM25 & 0.170 (0.180) & 0.139 (0.150) & 0.234 (0.251) & 0.396 (0.428) & 0.213 (0.225) & 0.126 (0.139) & 0.268 (0.291) & 0.473 (0.513) \\

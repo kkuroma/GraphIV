@@ -55,7 +55,7 @@ function apply(palette, mode) {
 }
 
 function theme() {
-  let palette = "haruhana";
+  let palette = "akiba";
   let mode = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
   try {
     palette = localStorage.getItem("graphiv.palette") || palette;

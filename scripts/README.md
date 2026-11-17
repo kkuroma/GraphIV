@@ -21,7 +21,7 @@ The topic tree and the citations only read papers at stage 3 and write their own
 `citation_labeler/` sits off the main path.
 It writes no table, only the checkpoint that `citation_preprocess/stage1_label_citation.py` loads.
 
-Each directory has its own README with its stages, and `docs/preprocess.md` walks through the whole build in order.
+Each directory has its own README with its stages, and `docs/01_preprocessing.md` walks through the whole build in order.
 
 ## Flags
 
@@ -40,7 +40,7 @@ Tuning and scoring the recipes on them lives in `benchmarks/`, which writes `ret
 
 ## Export
 
-`export/` writes the full `pg_dump` that `docs/restore.md` restores and the Parquet release we publish, both under `[export] EXPORT_PATH`.
+`export/` writes the full `pg_dump` that `docs/01_preprocessing.md` restores and the Parquet release we publish, both under `[export] EXPORT_PATH`.
 
 ```sh
 uv run python scripts/export/stage0_dump_store.py

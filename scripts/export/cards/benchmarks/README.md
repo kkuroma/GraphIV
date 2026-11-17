@@ -68,7 +68,7 @@ FrontierMatch was designed to evaluate how well a retriever finds "rising" paper
 
 ### ConsensusMatch
 
-ConsensusMatch asks what every review of a field agrees on. For each research question, three reviews of the same topic released within 190 days of each other are retrieved, and only the papers all three of them cite, published before the first of the three, are labeled as the answer. These answers are small, 9 papers at the median, so it is scored at 100 rather than 1,000.
+ConsensusMatch asks what every review of a field agrees on. For each research question, three reviews of the same topic released within 190 days of each other are retrieved, and only the papers all three of them cite, published before the first of the three, are labeled as the answer. These answers are small, 9 papers at the median.
 
 ![How a ConsensusMatch case is built](benchmarks-consensusmatch.png)
 
@@ -86,31 +86,31 @@ from datasets import load_dataset
 test = load_dataset("kkuroma/GraphIV_benchmarks", "frontiermatch", split="test")
 ```
 
-To score a case, retrieve from the GraphIV corpus with every paper dated after `date_max` and every paper in `anchors` removed, then report the share of `citations` found in the top `headline_k`.
+To score a case, retrieve from the GraphIV corpus with every paper dated after `date_max` and every paper in `anchors` removed, then report the share of `citations` found in the top $k$. The GraphIV paper reports SurveyMatch at R@100, R@200 and R@500, and FrontierMatch and ConsensusMatch at R@20, R@50 and R@100.
 
 ## Columns
 
-| column | type | holds |
+| Column | Type | Holds |
 | --- | --- | --- |
-| `case_id` | string | the anchors joined by `_` |
+| `case_id` | string | The anchors joined by `_` |
 | `split` | string | train, val or test |
-| `query_text` | string | the question the case asks |
-| `query_drafter` | string | the model that wrote it |
-| `date_max` | date | the latest date a retrieved paper may carry: the review's date, the later review's for frontiermatch, the first review's for consensusmatch |
-| `anchors` | list of string | the case's own reviews, which a retriever must never return |
+| `query_text` | string | The question the case asks |
+| `query_drafter` | string | The model that wrote it |
+| `date_max` | date | The latest date a retrieved paper may carry: the review's date, the later review's for frontiermatch, the first review's for consensusmatch |
+| `anchors` | list of string | The case's own reviews, which a retriever must never return |
 | `anchor_titles` | list of string | |
 | `anchor_dates` | list of date | |
-| `anchor_survey_probability` | list of float | the survey labeler's score for each anchor |
-| `citations` | list of string | the answer |
+| `anchor_survey_probability` | list of float | The survey labeler's score for each anchor |
+| `citations` | list of string | The answer |
 | `n_citations` | int | |
-| `headline_k` | int | the cutoff recall is reported at |
-| `topic_l0`, `topic_l1`, `topic_l2` | int | the case's field, subfield and topic in the topic tree |
+| `headline_k` | int | The cutoff the release was first scored at, which the paper replaces with the three cutoffs above |
+| `topic_l0`, `topic_l1`, `topic_l2` | int | The case's field, subfield and topic in the topic tree |
 | `topic_l0_name`, `topic_l1_name`, `topic_l2_name` | string | |
-| `split_group` | string | the case's subfield, as `topic_l0.topic_l1` |
+| `split_group` | string | The case's subfield, as `topic_l0.topic_l1` |
 | `gap_days`, `cosine` | int, float | frontiermatch only, the gap and the similarity between the two reviews |
 
 ## Limitations
 
 Every answer is what a later document cited, so all three reward work that was already being noticed, and none of them can score a paper too new to be cited. Two reviews on one topic written within three months agree at recall 0.265, so past a point a higher score means matching one author's selection more than the field's.
 
-The full definitions are in [docs/benchmarks.md](https://git.kuroma.dev/kkuroma/graphiv/src/branch/main/docs/benchmarks.md), and the code that mines, splits and exports these is at [git.kuroma.dev/kkuroma/graphiv](https://git.kuroma.dev/kkuroma/graphiv), licensed as AGPLv3.
+The full definitions are in [docs/01_preprocessing.md](https://git.kuroma.dev/kkuroma/graphiv/src/branch/main/docs/01_preprocessing.md#benchmarks), the results of every retriever on them in [docs/02_retrieval.md](https://git.kuroma.dev/kkuroma/graphiv/src/branch/main/docs/02_retrieval.md), and the code that mines, splits and exports these is at [git.kuroma.dev/kkuroma/graphiv](https://git.kuroma.dev/kkuroma/graphiv), licensed as AGPLv3.

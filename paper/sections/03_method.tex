@@ -29,18 +29,18 @@ For each paper with an HTML version, we parsed its bibliography and the sentence
 Method & Citations \\
 \midrule
 arXiv id in the text & 21,831,361 \\
-exact title and year & 16,478,534 \\
-journal reference & 13,397,614 \\
+Exact title and year & 16,478,534 \\
+Journal reference & 13,397,614 \\
 arXiv id in the link & 10,058,637 \\
-fuzzy title & 8,491,441 \\
+Fuzzy title & 8,491,441 \\
 DOI & 4,108,520 \\
-exact title, year disagrees & 2,366,811 \\
+Exact title, year disagrees & 2,366,811 \\
 \midrule
-resolved & 76,732,918 \\
-fuzzy match rejected & 18,253,288 \\
-no match & 92,998,347 \\
+Resolved & 76,732,918 \\
+Fuzzy match rejected & 18,253,288 \\
+No match & 92,998,347 \\
 \midrule
-parsed & 187,984,553 \\
+Parsed & 187,984,553 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -66,7 +66,7 @@ Unparsable replies counted as misses, and the judge saw at most 60 misses per ge
 Reviews' reference lists are the answer keys of our benchmarks (\cref{sec:benchmarks}). A title regex over ``survey'', ``review'', and nine other words reached a recall of 0.185 at 0.409 precision, as 81\% of reviews carry none of them. Instead, a second DistilBERT read the title and abstract, trained on 24,000 papers labeled by Gemma 4 26B, half with a review word in the title. It reached 0.878 average precision against the LLM labels, and 140,449 papers scored above 0.5.
 
 \paragraph{Embeddings:}
-By default, every title and abstract was embedded by nomic-embed-text-v2-moe \citep{nussbaum2025moe} into 768 dimensions, truncated to 512 tokens, at 185 papers per second, or 5 hours for the corpus. The embedder is off the shelf by design, so it can be swapped: the 3,186,931 papers of the 2026-10-01 release were also embedded with seven open embedders from 0.6B to 27B parameters, Qwen3-Embedding 0.6B, 4B, and 8B \citep{zhang2025qwen3embedding}, Harrier-OSS-v1 0.6B and 27B \citep{microsoft2026harrier}, and Nemotron-3-Embed 1B and 8B \citep{nvidia2026nemotronembed}, each with its own document and query prompts (\cref{sec:embedders}).
+By default, every title and abstract was embedded by nomic-embed-text-v2-moe (Nomic) \citep{nussbaum2025moe} into 768 dimensions, truncated to 512 tokens, at 185 papers per second, or 5 hours for the corpus. The embedder is off the shelf by design, so it can be swapped: the 3,186,931 papers of the 2026-10-01 release were also embedded with seven open embedders from 0.6B to 27B parameters, Qwen3-Embedding (Qwen3) 0.6B, 4B, and 8B \citep{zhang2025qwen3embedding}, Harrier-OSS-v1 (Harrier) 0.6B and 27B \citep{microsoft2026harrier}, and Nemotron-3-Embed (Nemotron) 1B and 8B \citep{nvidia2026nemotronembed}, each with its own document and query prompts (\cref{sec:embedders}).
 
 \paragraph{Topic tree:}
 We projected each embedding to 50 dimensions with UMAP \citep{mcinnes2018umap} and clustered with $k$-means \citep{lloyd1982kmeans} three times at $k=16$, giving 16 topics, 256 subtopics, and 4,096 leaves. Gemma 4 26B named each node from the ten children, or papers for a leaf, nearest its centroid.
@@ -74,7 +74,7 @@ We projected each embedding to 50 dimensions with UMAP \citep{mcinnes2018umap} a
 \subsection{Benchmarks}
 \label{sec:benchmarks}
 
-We evaluated retrieval on five existing benchmarks from three sources and three of our own, capping every case at the date its answer key was drawn.
+We evaluated retrieval on five existing benchmarks from three sources and three of our own, capping every case at the date its answer key was drawn. We report R@$k$, the share of a case's answers among the top $k$ papers returned, and nDCG@$k$ where a benchmark's authors report it.
 
 \subsubsection{Existing Benchmarks}
 We used PaSa's AutoScholarQuery (29,886 train, 901 validation, and 899 test queries) and RealScholarQuery (49 queries) \citep{he2025pasa}, keeping queries whose answers are all in GraphIV. SurGE carries no arXiv ids, so we matched its papers by title, leaving 193 surveys \citep{su2025surge}. ScholarCatalyst's 207 core and 687 subfield queries were scored inside its own corpus \citep{kim2026scholarcatalyst}. Each benchmark was scored at its published $k$.

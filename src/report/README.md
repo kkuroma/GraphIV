@@ -21,14 +21,14 @@ A quote is checked against the one paragraph it came from, so a paragraph id is 
 
 | Fault | When |
 | --- | --- |
-| `unknown marker` | a label no read gave |
-| `number not in its paragraph` | a number on a cited line that no paragraph behind its labels holds |
-| `quote not in its paragraph` | a quoted phrase that none of the line's paragraphs holds |
-| `name not in the papers cited` | a name on a cited sentence that no cited paper's full text holds |
-| `paper cited but never read` | an arXiv id in the body that the reader never went through |
-| `paper never returned by a tool` | an arXiv id in the further reading that no tool returned |
-| `search claimed but never run` | a search the report describes with words the run never searched with |
-| `statement with no marker` | a sentence of 12 words or more with no label, outside a line opening on Inference |
+| `unknown marker` | A label no read gave |
+| `number not in its paragraph` | A number on a cited line that no paragraph behind its labels holds |
+| `quote not in its paragraph` | A quoted phrase that none of the line's paragraphs holds |
+| `name not in the papers cited` | A name on a cited sentence that no cited paper's full text holds |
+| `paper cited but never read` | An arXiv id in the body that the reader never went through |
+| `paper never returned by a tool` | An arXiv id in the further reading that no tool returned |
+| `search claimed but never run` | A search the report describes with words the run never searched with |
+| `statement with no marker` | A sentence of 12 words or more with no label, outside a line opening on Inference |
 
 `save_report` in `src/mcp` adds three of its own: a TL;DR that cites nothing, one over 40 words, and a body citing nothing.
 `split_tldr` takes the opening TL;DR paragraph off the report before the check.

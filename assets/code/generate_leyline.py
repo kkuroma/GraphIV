@@ -9,7 +9,6 @@ import math
 from pathlib import Path
 from typing import Any
 
-import benchmark_scores
 import example_run
 import leyline_scores
 import lineage_chart
@@ -18,21 +17,21 @@ import overview
 from matplotlib.axes import Axes
 from matplotlib.patches import FancyBboxPatch
 from style import (
-    BLUE,
     GRAY,
     GREEN,
     LEFT,
     MUTED,
+    PURPLE,
     RIGHT,
     ROOT,
-    ROSE,
     STANCE_COLORS,
-    VIOLET,
     Page,
     apply_theme,
     tint,
     write_runs,
 )
+
+from src.core.config import load_config
 
 # the strongest magnets the magnet panel names, beside the single most cited paper
 NAMED = 3
@@ -134,21 +133,21 @@ def toy(page: Page, left: float, top: float) -> None:
             2.45,
             boxstyle="round,pad=0,rounding_size=0.15",
             facecolor="white",
-            edgecolor=VIOLET,
+            edgecolor=PURPLE,
             linewidth=1.3,
             linestyle=(0, (4, 3)),
             zorder=1,
         )
     )
     page.ax.text(
-        left + 0.22, top + 0.32, "typed graph", fontsize=10.5, color=VIOLET, fontweight="semibold"
+        left + 0.22, top + 0.32, "typed graph", fontsize=10.5, color=PURPLE, fontweight="semibold"
     )
     at = {name: (left + x, top + y) for name, (x, y, _) in PAPERS.items()}
     size = {name: radius(m) for name, (_, _, m) in PAPERS.items()}
     page.ax.plot(
         [at[n][0] for n in WALK],
         [at[n][1] for n in WALK],
-        color=tint(VIOLET, 0.3),
+        color=tint(PURPLE, 0.3),
         linewidth=11,
         solid_capstyle="round",
         solid_joinstyle="round",
@@ -158,11 +157,11 @@ def toy(page: Page, left: float, top: float) -> None:
         color = STANCE_COLORS.get(intent, tint(GRAY, 0.75))
         overview.cite(page, at[citing], at[cited], color, (size[citing], size[cited]))
     for name, (_, _, m) in PAPERS.items():
-        overview.node(page, at[name], tint(VIOLET, 0.12 + 0.88 * m), VIOLET, size[name])
+        overview.node(page, at[name], tint(PURPLE, 0.12 + 0.88 * m), PURPLE, size[name])
     overview.label(page, at["root"], "root", below=False)
     x, y, cites = SUCCESSOR
     where = (left + x, top + y)
-    overview.node(page, where, "white", VIOLET, 0.12, dashed=True)
+    overview.node(page, where, "white", PURPLE, 0.12, dashed=True)
     overview.label(page, where, "successor")
     for cited, intent in cites:
         overview.cite(page, where, at[cited], STANCE_COLORS[intent], (0.12, size[cited]), 0.0, True)
@@ -214,8 +213,8 @@ def newcomers(
         )
         layers = (
             (t["newcomers"], tint(GRAY, 0.35)),
-            (t["successor_set"], tint(VIOLET, 0.45)),
-            (t["successor_top"], VIOLET),
+            (t["successor_set"], tint(PURPLE, 0.45)),
+            (t["successor_top"], PURPLE),
         )
         for count, color in layers:
             page.ax.add_patch(
@@ -256,12 +255,12 @@ def magnets(axis: Axes, page: Page, nodes: list[dict[str, Any]]) -> None:
     held = [n for n in nodes if n["cited_by"] > 0]
     xs = np.array([n["cited_by"] for n in held], dtype=float)
     ys = np.array([n["magnet"] for n in held])
-    axis.scatter(xs, ys, s=22, color=tint(VIOLET, 0.55), edgecolors="none", zorder=3)
+    axis.scatter(xs, ys, s=22, color=tint(PURPLE, 0.55), edgecolors="none", zorder=3)
     strongest = sorted(held, key=lambda n: -n["magnet"])[:NAMED]
     cited = max(held, key=lambda n: n["cited_by"])
     for n in strongest + ([cited] if cited not in strongest else []):
         name = page.fit(n["title"].split(":")[0], 1.6, 9.5)
-        axis.scatter([n["cited_by"]], [n["magnet"]], s=30, color=VIOLET, zorder=4)
+        axis.scatter([n["cited_by"]], [n["magnet"]], s=30, color=PURPLE, zorder=4)
         axis.annotate(
             name,
             (n["cited_by"], n["magnet"]),
@@ -289,26 +288,26 @@ def draw(config: Path, out: Path) -> None:
     """
     cold, run = leyline_scores.load(ROOT), example_run.load(config)
     topics, setup = cold["topics"], cold["setup"]
-    miner = benchmark_scores.exponents(config, run["mode"])["miner"]
+    miner = load_config(config)["miner"]
     page = Page(20.9)
     page.title(
         [
-            [("GraphIV's", True), ("LeyLine:", VIOLET)],
+            [("GraphIV's", True), ("LeyLine:", PURPLE)],
             [("Magnetic Monte Carlo Trajectory Miner", False)],
         ]
     )
 
     page.panel_title(LEFT, 2.35, "Overview", 1)
     key: list[tuple[str, bool | str]] = [
-        ("extends", GREEN),
+        ("extends", STANCE_COLORS["extends"]),
         ("·", MUTED),
-        ("critiques", ROSE),
+        ("critiques", STANCE_COLORS["critiques"]),
         ("·", MUTED),
-        ("compares", BLUE),
+        ("compares", STANCE_COLORS["compares"]),
         ("·", MUTED),
         ("other", GRAY),
         ("·", MUTED),
-        ("one walk", tint(VIOLET, 0.55)),
+        ("one walk", tint(PURPLE, 0.55)),
     ]
     page.key(RIGHT, 2.35, key)
     boxes = [
@@ -317,7 +316,7 @@ def draw(config: Path, out: Path) -> None:
         ("Monte Carlo walks", f"{miner['WALKS']} walks for each of {miner['SEEDS']} seeds"),
         ("Lineages", "paths ranked by runs and weight"),
     ]
-    below = overview.steps(page, 2.6, boxes, VIOLET)
+    below = overview.steps(page, 2.6, boxes, PURPLE)
     toy(page, LEFT, below + 0.3)
     right = 5.9
     last = overview.terms(page, right, below + 0.3, (1.05, 2.9, RIGHT - right - 3.95), TERMS)
@@ -326,7 +325,7 @@ def draw(config: Path, out: Path) -> None:
         max(last, below + 3.25) + 0.5,
         "Each factor of the magnet discounts one kind of paper:",
         FACTORS,
-        VIOLET,
+        PURPLE,
     )
 
     top = end + 0.75
@@ -334,9 +333,9 @@ def draw(config: Path, out: Path) -> None:
     ranked: list[tuple[str, bool | str]] = [
         ("BoundedField's top 20", GREEN),
         ("·", MUTED),
-        ("successor top 20", VIOLET),
+        ("successor top 20", PURPLE),
         ("·", MUTED),
-        ("successor set", tint(VIOLET, 0.45)),
+        ("successor set", tint(PURPLE, 0.45)),
         ("·", MUTED),
         ("all Unseen Newcomers", GRAY),
     ]
@@ -365,7 +364,7 @@ def draw(config: Path, out: Path) -> None:
         f" Every walk starts at the root, $\\mathrm{{argmax}}_v\\,\\rho(v)\\,w(v)$, with"
         f" $\\phi={miner['FOCUS']:g}$, $\\lambda={miner['DECAY']:g}$ and"
         f" $\\kappa={miner['KNOCKDOWN']:g}$.",
-        f"We asked each of the {len(topics)} Topic Queries in docs/supplement.md on"
+        f"We asked each of the {len(topics)} Topic Queries in docs/03_tools.md on"
         f" {setup['question date']}, with the citation graph running to"
         f" {setup['citation graph runs to'].split(',')[0]}. An Unseen Newcomer is a paper from the"
         " 365 days before the question with no citations on that date and 20 or more in the 18"

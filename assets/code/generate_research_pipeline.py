@@ -18,9 +18,9 @@ from style import (
     MUTED,
     OUTLINE,
     PANEL,
+    PURPLE,
     RIGHT,
     ROOT,
-    VIOLET,
     Page,
     apply_theme,
     tint,
@@ -100,7 +100,7 @@ def rows(run: dict[str, Any]) -> list[tuple[str, str, str, list[tuple[str, str]]
         (
             "mine",
             "LeyLine",
-            VIOLET,
+            PURPLE,
             [
                 (
                     f"{c['union']} papers and {c['edges']:,} citations, {c['magnets']} magnets,"

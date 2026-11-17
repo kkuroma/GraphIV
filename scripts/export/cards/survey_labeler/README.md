@@ -19,7 +19,7 @@ tags:
 
 # GraphIV's Survey Labeler
 
-This repository contains the DistilBERT model that scores how likely each paper in [GraphIV](https://huggingface.co/datasets/kkuroma/GraphIV) is a literature review. Filtering titles for words like "survey" or "review" finds fewer than one review in five, since 81% of reviews carry none of those words in their title. Reading the title and abstract instead, this labeler finds 88% of them at 78% precision, and it scored all 3.17M papers in GraphIV.
+This repository contains the DistilBERT model that scores how likely each paper in [GraphIV](https://huggingface.co/datasets/kkuroma/GraphIV) is a literature review. Filtering titles for words like "survey" or "review" finds fewer than one review in five, since 81% of reviews carry none of those words in their title. Reading the title and abstract instead, this labeler finds 88% of them at 78% precision, and it scored all 3.22M papers in GraphIV.
 
 ![The reviews it found across arXiv, its agreement with its teacher, and how it compares with existing filters](survey-labeler.png)
 
@@ -91,51 +91,51 @@ Is this paper a literature review of a research area?
 
 I tried four longer prompts on 90 papers whose title points the wrong way, and every added instruction either did nothing or cost accuracy, so the prompt stays one question. As a check, two other model families, Qwen 3.6 35B and GLM 4.7 Flash, relabeled 400 papers under the same prompt. All three answered 376 of them and agreed on 92%, and Gemma differs from the three-way majority on 2.1%.
 
-| pile | papers | labeled reviews |
+| Pile | Papers | Labeled reviews |
 |---|---|---|
-| review word in the title | 12,002 | 4,913, 40.9% |
-| no review word | 11,998 | 374, 3.1% |
+| Review word in the title | 12,002 | 4,913, 40.9% |
+| No review word | 11,998 | 374, 3.1% |
 
 ### Part 2: Teacher-student distillation
 
 The 24,000 labels are split into 19,200 train and 4,800 held out, and the split is fixed in the labeled set so every rerun scores against the same papers. DistilBERT reads the title and abstract and trains with cross-entropy, with reviews weighted 2.89 to make up for being the rarer class. The settings come from an Optuna search.
 
-| setting | value |
+| Setting | Value |
 |---|---|
-| base model | `distilbert/distilbert-base-uncased` |
-| input | title, a blank line, then the abstract, up to 256 tokens |
-| epochs | 2 |
-| batch | 16 |
-| optimizer | AdamW, weight decay 0.012 |
-| learning rate | 4.0e-5, warmed up linearly over 14.5% of the steps, then decayed linearly |
-| dropout | 0.15 on the classifier |
-| review weight | 2.89 |
-| seed | 0 |
+| Base model | `distilbert/distilbert-base-uncased` |
+| Input | Title, a blank line, then the abstract, up to 256 tokens |
+| Epochs | 2 |
+| Batch | 16 |
+| Optimizer | AdamW, weight decay 0.012 |
+| Learning rate | 4.0e-5, warmed up linearly over 14.5% of the steps, then decayed linearly |
+| Dropout | 0.15 on the classifier |
+| Review weight | 2.89 |
+| Seed | 0 |
 
 ## Evaluation
 
 Everything below is on the 4,799 held-out papers, against the teacher's labels.
 
-| held-out papers | average precision |
+| Held-out papers | Average precision |
 |---|---|
-| as drawn, in two equal piles | 0.989 |
-| weighted back to the corpus | **0.920** |
-| resampled at 100 non-reviews per review, 1,000 times | 0.877 ± 0.039 |
+| As drawn, in two equal piles | 0.989 |
+| Weighted back to the corpus | **0.920** |
+| Resampled at 100 non-reviews per review, 1,000 times | 0.877 ± 0.039 |
 
 The weighted number is the one that describes arXiv, since the sample as drawn holds far more reviews than the corpus does.
 
 Against existing filters, weighted the same way:
 
-| filter | recall | precision |
+| Filter | Recall | Precision |
 |---|---|---|
-| survey labeler at 0.5 | **0.876** | 0.783 |
+| Survey labeler at 0.5 | **0.876** | 0.783 |
 | Semantic Scholar's `Review` type | 0.699 | 0.446 |
-| title filter | 0.185 | 0.409 |
+| Title filter | 0.185 | 0.409 |
 | OpenAlex's `review` type | 0.021 | 0.966 |
 
 The labeler finds 97.6% of the reviews whose title carries a review word, and 85.3% of the 75 that do not. Semantic Scholar takes its type from a paper's published metadata, so 30% of these papers carry no type at all. OpenAlex resolves 97% of them, but types an arXiv paper by its venue, as an article or a preprint, so it calls almost none of them a review. Both were fetched on 2026-10-16.
 
-On one RTX 3090, the labeler scored a 48,895-paper update at 214 papers a second end to end, writing to the store included, so all 3.17M papers take about 4 hours.
+On one RTX 3090, the labeler scored a 48,895-paper update at 214 papers a second end to end, writing to the store included, so all 3.22M papers take about 4 hours.
 
 ## Limitations
 
@@ -153,9 +153,9 @@ Apache 2.0, the same as DistilBERT, which it is fine-tuned from, and Gemma 4, wh
 
 ```bibtex
 @misc{graphiv2026,
-  title={GraphIV: An Open, Reproducible Citation Knowledge Graph of arXiv},
-  author={kkuroma},
+  title={GraphIV: An Updated, Open Citation Intent Graph of arXiv for Citation-Aware Retrieval and Automated Research Agents},
+  author={Thuwajit, KK},
   year={2026},
-  howpublished={\url{https://huggingface.co/datasets/kkuroma/GraphIV}}
+  howpublished={\url{https://git.kuroma.dev/kkuroma/graphiv}}
 }
 ```

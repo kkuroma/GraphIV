@@ -14,15 +14,15 @@ from matplotlib.patches import Patch, Rectangle
 from release_counts import load
 from style import (
     INK,
+    LEAD,
     LEFT,
     MUTED,
     PANEL,
+    PURPLE,
     RIGHT,
     ROOT,
-    ROSE,
     STANCE_COLORS,
     STANCES,
-    VIOLET,
     Page,
     apply_theme,
     intents,
@@ -141,11 +141,11 @@ def draw(data: dict[str, Any], out: Path) -> None:
 
     page.panel_title(LEFT, 1.8, "Papers per year", 1)
     papers_axis = page.place(1.15, 2.15, 4.75, 3.0)
-    per_year(papers_axis, paper_years, VIOLET, reviews)
+    per_year(papers_axis, paper_years, PURPLE, reviews)
     legend = papers_axis.legend(
         handles=[
-            Patch(facecolor=tint(VIOLET, 0.38), label="papers"),
-            Patch(facecolor=VIOLET, label=f"literature reviews, {sum(reviews.values()):,}"),
+            Patch(facecolor=tint(PURPLE, 0.38), label="papers"),
+            Patch(facecolor=PURPLE, label=f"literature reviews, {sum(reviews.values()):,}"),
         ],
         loc="upper left",
         fontsize=11,
@@ -156,7 +156,7 @@ def draw(data: dict[str, Any], out: Path) -> None:
     page.marked.append((legend.get_texts()[1], 2))
 
     page.panel_title(6.65, 1.8, "Citations per year", 3)
-    per_year(page.place(7.3, 2.15, 4.7, 3.0), cite_years, ROSE, {})
+    per_year(page.place(7.3, 2.15, 4.7, 3.0), cite_years, LEAD, {})
 
     page.panel_title(LEFT, 6.35, "Citation intent breakdown", 4)
     intents(ax, LEFT, 6.65, 5.4, counts, sorted(counts, key=lambda k: -counts[k]))

@@ -38,9 +38,8 @@ TEACHER_TRUTH = [
     [0, 0, 0, 0, 167, 0],
     [0, 0, 2, 0, 2, 163],
 ]
-# citations labeled and seconds taken by stage1 on a delta, from the manager's measured rates
-RATE = (1_925_798, 957)
-SPEED = round(RATE[0] / RATE[1])
+# citations a second stage1 labeled the whole store at, as the paper states it
+SPEED = 1_762
 SAMPLE = 10_000
 EPOCH = re.compile(r"epoch (\d+) loss [\d.]+ val_acc ([\d.]+) val_macro_f1 ([\d.]+)")
 

@@ -10,7 +10,7 @@ from datetime import date
 from typing import Any
 
 from matplotlib.patches import FancyBboxPatch
-from style import INK, LEFT, MUTED, OUTLINE, PANEL, ROSE, Page, tint
+from style import INK, LEFT, MUTED, OUTLINE, PANEL, Page, tint
 
 ROW = 0.62
 
@@ -98,8 +98,8 @@ def timeline(
         x = x_of(f"{year}-01-01", start, stop, left, right)
         ax.text(x, top + high - 0.08, str(year), fontsize=9.5, color=MUTED, ha="center")
     x = x_of(example["date_max"], start, stop, left, right)
-    ax.plot([x, x], [top + 0.12, top + high - 0.28], color=ROSE, lw=1.2, ls=(0, (3, 2)), zorder=2)
-    ax.text(x, top + 0.1, "date_max", fontsize=9.5, color=ROSE, ha="center", fontweight="semibold")
+    ax.plot([x, x], [top + 0.12, top + high - 0.28], color=INK, lw=1.2, ls=(0, (3, 2)), zorder=2)
+    ax.text(x, top + 0.1, "date_max", fontsize=9.5, color=INK, ha="center", fontweight="semibold")
     return top + high
 
 

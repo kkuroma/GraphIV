@@ -9,7 +9,7 @@ from __future__ import annotations
 import itertools
 from typing import Any
 
-from style import GRAY, INK, MUTED, STANCE_COLORS, VIOLET, Page, tint
+from style import GRAY, INK, MUTED, PURPLE, STANCE_COLORS, Page, tint
 
 
 def lanes(
@@ -57,7 +57,7 @@ def lanes(
             ys[k] - 0.13 * scale,
             lane["name"],
             fontsize=8.5 * scale,
-            color=VIOLET,
+            color=PURPLE,
             fontweight="semibold",
             zorder=6,
             bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.6},
@@ -99,7 +99,7 @@ def lanes(
                 linewidth=1.0,
                 zorder=4,
             )
-    for item, color in [(c, INK) for c in columns] + [(s, VIOLET) for s in ahead]:
+    for item, color in [(c, INK) for c in columns] + [(s, PURPLE) for s in ahead]:
         page.ax.text(
             where[item["arxiv_id"]],
             top - 0.32 * scale,
@@ -129,4 +129,4 @@ def key(run: dict[str, Any]) -> list[tuple[str, bool | str]]:
     shown = (
         f"past the line, {len(run['successors'])} of the {run['counts']['successors']} successors"
     )
-    return [*out, ("other", GRAY), ("·", MUTED), (shown, VIOLET)]
+    return [*out, ("other", GRAY), ("·", MUTED), (shown, PURPLE)]

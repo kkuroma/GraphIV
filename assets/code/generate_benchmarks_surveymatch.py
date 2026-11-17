@@ -9,7 +9,7 @@ from pathlib import Path
 
 from benchmark_counts import load
 from case_diagram import construction
-from style import ROOT, VIOLET, Page, apply_theme
+from style import LEAD, ROOT, Page, apply_theme
 
 
 def main() -> None:
@@ -40,11 +40,11 @@ def main() -> None:
     ]
     top = construction(
         page,
-        [("SurveyMatch:", VIOLET), ("given one review, find what it cites", False)],
+        [("SurveyMatch:", LEAD), ("given one review, find what it cites", False)],
         steps,
         example,
         set(example["citations"]),
-        VIOLET,
+        LEAD,
         ["the review"],
     )
     notes = [

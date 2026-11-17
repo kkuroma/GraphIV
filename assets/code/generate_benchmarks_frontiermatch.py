@@ -9,7 +9,7 @@ from pathlib import Path
 
 from benchmark_counts import load
 from case_diagram import construction
-from style import ROOT, ROSE, Page, apply_theme
+from style import BLUE, ROOT, Page, apply_theme
 
 
 def main() -> None:
@@ -44,19 +44,19 @@ def main() -> None:
     ]
     top = construction(
         page,
-        [("FrontierMatch:", ROSE), ("given where a topic stood, find what came next", False)],
+        [("FrontierMatch:", BLUE), ("given where a topic stood, find what came next", False)],
         steps,
         example,
         set(example["citations"]),
-        ROSE,
+        BLUE,
         ["earlier review", "later review"],
         extra_note=True,
     )
     notes = [
         f"{example['titles'][0]} ({example['anchors'][0]}) and {example['titles'][1]}"
         f" ({example['anchors'][1]}). date_max is the later review's date.",
-        f"An answer is published at most {s['FRONTIER_WINDOW_DAYS']} days before the earlier"
-        " review, so it is what the topic was doing between the two.",
+        f"An answer is published no earlier than {s['FRONTIER_WINDOW_DAYS']} days before the"
+        " earlier review, so it is what the topic was doing between the two.",
     ]
     page.save(Path(str(args.out)), top, notes)
 

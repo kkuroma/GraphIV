@@ -8,12 +8,13 @@ A query missing from the cache is counted again from the store config.toml names
 from __future__ import annotations
 
 import json
-import tomllib
 from pathlib import Path
 from typing import Any, LiteralString
 
 import psycopg
 from style import DATA
+
+from src.core.config import load_config
 
 CACHE = DATA / "dataset.json"
 
@@ -75,7 +76,7 @@ def load(config: Path) -> dict[str, Any]:
     missing = [name for name in QUERIES if name not in out]
     if not missing:
         return out
-    dsn = str(tomllib.loads(config.read_text(encoding="utf-8"))["database"]["PG_DEST"])
+    dsn = str(load_config(config)["database"]["PG_DEST"])
     with psycopg.connect(dsn) as conn:
         # counting distinct citing papers per target sorts in memory rather than on disk
         _ = conn.execute("SET work_mem = '1GB'")

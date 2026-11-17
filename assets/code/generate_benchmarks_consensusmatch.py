@@ -9,7 +9,7 @@ from pathlib import Path
 
 from benchmark_counts import load
 from case_diagram import construction
-from style import GREEN, ROOT, Page, apply_theme
+from style import OCHRE, ROOT, Page, apply_theme
 
 
 def main() -> None:
@@ -45,11 +45,11 @@ def main() -> None:
     ]
     top = construction(
         page,
-        [("ConsensusMatch:", GREEN), ("find what every review of a topic agrees on", False)],
+        [("ConsensusMatch:", OCHRE), ("find what every review of a topic agrees on", False)],
         steps,
         example,
         set(example["citations"]),
-        GREEN,
+        OCHRE,
         ["first review", "second review", "third review"],
     )
     notes = [

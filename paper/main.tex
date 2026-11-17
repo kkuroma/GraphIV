@@ -4,6 +4,7 @@
 \usepackage{microtype}
 \usepackage{graphicx}
 \usepackage{subcaption}
+\usepackage{float}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta}
 
@@ -68,6 +69,9 @@
 
 \onecolumn
 \appendix
+\setcounter{table}{0}
+\renewcommand{\thetable}{\Alph{table}}
+\renewcommand{\theHtable}{appendix.\Alph{table}}
 \input{sections/08_appendix}
 
 \end{document}

@@ -22,8 +22,8 @@ The pool sizes and the miner's constants are shared by every mode and live in `c
 
 | Layer | Calls a model |
 | --- | --- |
-| `core`, `retrieve`, `miner`, `report` | never |
-| `mcp` | to answer a question from a paper's paragraphs in `read_paper`, and to rule on each candidate in `recall_paper` |
+| `core`, `retrieve`, `miner`, `report` | Never |
+| `mcp` | To answer a question from a paper's paragraphs in `read_paper`, and to rule on each candidate in `recall_paper` |
 
 Everything else is arithmetic over the citation graph or string matching, so a ranking can be reproduced from the query vector alone and a report's check needs no model.
 

@@ -11,27 +11,34 @@ from typing import Any
 from benchmark_counts import load
 from matplotlib.patches import FancyBboxPatch
 from style import (
-    GREEN,
+    BLUE,
     INK,
+    LEAD,
     LEFT,
     MUTED,
+    OCHRE,
     OUTLINE,
     PANEL,
+    PURPLE,
     RIGHT,
     ROOT,
-    ROSE,
-    VIOLET,
     Page,
     apply_theme,
     tint,
     write_runs,
 )
 
+# the cutoffs the GraphIV paper reports each benchmark at
+CUTOFFS = {
+    "surveymatch": "R@100, R@200, R@500",
+    "frontiermatch": "R@20, R@50, R@100",
+    "consensusmatch": "R@20, R@50, R@100",
+}
 # each benchmark as (folder, color, its reviews, what a case asks)
 PANELS = [
-    ("surveymatch", VIOLET, 1, "Given one review,\nfind what it cites"),
-    ("frontiermatch", ROSE, 2, "Given where a topic stood,\nfind what came next"),
-    ("consensusmatch", GREEN, 3, "Find what every review\nof a topic agrees on"),
+    ("surveymatch", LEAD, 1, "Given one review,\nfind what it cites"),
+    ("frontiermatch", BLUE, 2, "Given where a topic stood,\nfind what came next"),
+    ("consensusmatch", OCHRE, 3, "Find what every review\nof a topic agrees on"),
 ]
 SPLIT_SHARES = ("train", "val", "test")
 TITLES = {
@@ -147,7 +154,7 @@ def panel(
         left += part
     rows = [
         ("answer size", f"{info['answer_median']:g} papers, median"),
-        ("scored by", f"recall@{info['headline_k']:,}"),
+        ("scored by", CUTOFFS[folder]),
         ("years", f"{info['years'][0]} to {info['years'][1]}"),
         ("topics", f"{info['topics']} subfields, {info['leaves']:,} leaves"),
     ]
@@ -173,9 +180,9 @@ def main() -> None:
     cutoff = data["settings"]["CUTOFF"]
     subtitle: list[tuple[str, bool | str]] = [
         ("Three ways to score a retriever against what", False),
-        ("arXiv's reviews", VIOLET),
+        ("arXiv's reviews", PURPLE),
         ("cite, version", False),
-        (str(cutoff), ROSE),
+        (str(cutoff), LEAD),
     ]
     write_runs(page.fig, *page.at(LEFT, 1.6), subtitle, 15, "medium", INK)
     gap = 0.35
@@ -184,7 +191,7 @@ def main() -> None:
         panel(page, LEFT + index * (width + gap), 2.0, width, 5.75, spec, data[spec[0]])
     notes = [
         "A review is a paper GraphIV's survey labeler scores 0.95 or more.",
-        "Assigned per subfield with the seed 69420, so no subfield sits in two splits.",
+        "A seeded hash of the case's anchors under 69420, so a later version never moves a case.",
     ]
     page.save(Path(str(args.out)), 8.25, notes)
 

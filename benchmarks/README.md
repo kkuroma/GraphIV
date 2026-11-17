@@ -60,14 +60,14 @@ direnv exec .. .venv/bin/python tune.py --recipe survey --recipe frontier --reci
 direnv exec .. .venv/bin/python run.py --experiment experiments/embedders/bfrefit_*.toml
 ```
 
-| key | what it does |
+| Key | What it does |
 | --- | --- |
-| `dataset`, `train`, `val` | the dataset under `src/datasets/` and the splits fit and picked on |
-| `k` | the recall the fit maximizes and val picks on |
-| `cores` | the core grid, one term cache per value from one pool per case |
-| `terms` | the exponents the fit may move, every other at 0 and `cos` pinned at 1 |
-| `start` | every free exponent's starting value |
-| `[fit]` | the gradient steps and batch, the CMA-ES trials and the train sample they score, the seed, and a cap on train cases |
+| `dataset`, `train`, `val` | The dataset under `src/datasets/` and the splits fit and picked on |
+| `k` | The recall the fit maximizes and val picks on |
+| `cores` | The core grid, one term cache per value from one pool per case |
+| `terms` | The exponents the fit may move, every other at 0 and `cos` pinned at 1 |
+| `start` | Every free exponent's starting value |
+| `[fit]` | The gradient steps and batch, the CMA-ES trials and the train sample they score, the seed, and a cap on train cases |
 
 ## An Experiment
 
@@ -91,35 +91,35 @@ directions = ["back", "both"]
 ks = [100, 1000]
 ```
 
-| key | what it does |
+| Key | What it does |
 | --- | --- |
-| `method`, `dataset`, `split` | the module under `src/methods/` and `src/datasets/`, and the split scored |
-| `[fit] train` | the dataset the fit reads, which may differ from `dataset`, so a cross-fit is one line |
-| the rest of `[fit]` | the method's fit settings, hashed with the method and its `FIT_VERSION` into the fit's file name |
-| `[run] ks` | the cut-offs recall is written at |
-| `[run] ndcg` | the cut-offs nDCG is written at, none when absent |
-| the rest of `[run]` | the method's run settings |
+| `method`, `dataset`, `split` | The module under `src/methods/` and `src/datasets/`, and the split scored |
+| `[fit] train` | The dataset the fit reads, which may differ from `dataset`, so a cross-fit is one line |
+| The rest of `[fit]` | The method's fit settings, hashed with the method and its `FIT_VERSION` into the fit's file name |
+| `[run] ks` | The cut-offs recall is written at |
+| `[run] ndcg` | The cut-offs nDCG is written at, none when absent |
+| The rest of `[run]` | The method's run settings |
 
 ## The Data
 
-| path | holds |
+| Path | Holds |
 | --- | --- |
-| `sources/` | the 2026-10-22 release, PaSa's two query sets, SurGE with its title map, ScholarCatalyst from HF at `a5a7346`, and `graph_export.npy`, the graph frozen on 2026-10-21 |
-| `cases/{dataset}/{split}.jsonl` | each split as cases, built from `sources/` on first use |
+| `sources/` | The 2026-10-22 release, PaSa's two query sets, SurGE with its title map, ScholarCatalyst from HF at `a5a7346`, and `graph_export.npy`, the graph frozen on 2026-10-21 |
+| `cases/{dataset}/{split}.jsonl` | Each split as cases, built from `sources/` on first use |
 | `index_cache/` | `corpus.parquet` and `nomic.npy` exported from the store, and the SPECTER2 and SciNCL paper vectors in shards |
-| `fit_cache/{method}/{key}.json` | what a baseline's fit learned, with the `[fit]` table that made it |
+| `fit_cache/{method}/{key}.json` | What a baseline's fit learned, with the `[fit]` table that made it |
 | `tuning/{recipe}/` | `terms/{split}/core-{c}/shard-{i}/`, the cached terms, and `report.json`, every core's candidates and the pick |
-| `recipes/{recipe}.toml` | the tuned recipe as `tune.py` wrote it, which BoundedField and PPR run |
-| `leaked-2026-11-05/` | the recipes, runs, fits and tuning made before anchors were blocked past the retriever, kept to compare against |
-| `tables.md` | what `make_table.py` writes |
-| `ablation/{recipe}-{dataset}_{shard}.jsonl` | one line per test case: every variant's recall at each stored k, as `src/graphiv/ablate.py` writes it |
-| `runs/{name}.jsonl` | one line per case: its ranking, its recall at each k, and its seconds when measured |
-| `runs/{name}.json` | the summary: mean recall at each k, mean seconds, the fit's key, the toml it ran with, and the recipe file as it ran |
-| `logs/{name}.log` | each run's output |
+| `recipes/{recipe}.toml` | The tuned recipe as `tune.py` wrote it, which BoundedField and PPR run |
+| `leaked-2026-11-05/` | The recipes, runs, fits and tuning made before anchors were blocked past the retriever, kept to compare against |
+| `tables.md` | What `make_table.py` writes |
+| `ablation/{recipe}-{dataset}_{shard}.jsonl` | One line per test case: every variant's recall at each stored k, as `src/graphiv/ablate.py` writes it |
+| `runs/{name}.jsonl` | One line per case: its ranking, its recall at each k, and its seconds when measured |
+| `runs/{name}.json` | The summary: mean recall at each k, mean seconds, the fit's key, the toml it ran with, and the recipe file as it ran |
+| `logs/{name}.log` | Each run's output |
 
 | Footnote | |
 | --- | --- |
-| store | BoundedField, PPR and nomic still search the live store's HNSW index, so after an ingest they reproduce only against the 2026-10-21 dump |
+| Store | BoundedField, PPR and nomic still search the live store's HNSW index, so after an ingest they reproduce only against the 2026-10-21 dump |
 | gar_cite | `warm = ["sim"]` runs gar_sim first on each case and reuses its reranker scores, as the stored runs were made; without it the order shifts within the same 1,000 papers |
-| GAR cost | each variant scores its own 1,000 papers per case, where the stored runs shared one scoring pass across the three |
-| corpus | a dataset with a corpus of its own, ScholarCatalyst, has every ranking cut to it before scoring, and BoundedField cuts before its 1,000 |
+| GAR cost | Each variant scores its own 1,000 papers per case, where the stored runs shared one scoring pass across the three |
+| Corpus | A dataset with a corpus of its own, ScholarCatalyst, has every ranking cut to it before scoring, and BoundedField cuts before its 1,000 |

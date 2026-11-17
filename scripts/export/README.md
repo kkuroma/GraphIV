@@ -21,7 +21,7 @@ uv run python scripts/export/stage2_export_benchmarks.py --dry-run
 uv run python scripts/export/stage3_publish_hf.py --dry-run
 ```
 
-The dump is the backup that `docs/restore.md` restores, and the Parquet release is what we publish:
+The dump is the backup that `docs/01_preprocessing.md` restores, and the Parquet release is what we publish:
 
 ```
 graphiv-<date>/
@@ -51,7 +51,7 @@ graphiv-benchmarks-<cutoff>/
   README.md        the card, with this version's cutoff and counts filled in
 ```
 
-`cards/benchmarks/README.md` is the card and lists every column, and [`docs/benchmarks.md`](../../docs/benchmarks.md) defines each benchmark.
+`cards/benchmarks/README.md` is the card and lists every column, and [`docs/01_preprocessing.md`](../../docs/01_preprocessing.md#benchmarks) defines each benchmark.
 
 ## Publishing
 

@@ -14,12 +14,12 @@ from release_counts import load
 from style import (
     GREEN,
     INK,
+    LEAD,
     LEFT,
     MUTED,
+    PURPLE,
     RIGHT,
     ROOT,
-    ROSE,
-    VIOLET,
     Page,
     apply_theme,
     compact,
@@ -27,8 +27,8 @@ from style import (
 )
 
 # the field and subfield the tree opens, and the color of each level down that path
-OPENED = ("Applied Artificial Intelligence", "Large Language Models")
-LEVEL_COLORS = (GREEN, VIOLET, ROSE)
+OPENED = ("Artificial Intelligence", "Reasoning and Alignment")
+LEVEL_COLORS = (GREEN, PURPLE, LEAD)
 TREE_HIGH = 7.2
 
 

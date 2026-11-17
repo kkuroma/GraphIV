@@ -1,27 +1,6 @@
 \section{Baselines}
 \label{app:baselines}
 
-\begin{table}[t]
-\caption{PPR's setting picked for each benchmark.}
-\label{tab:ppr}
-\centering
-\small
-\begin{tabular}{llrll}
-\toprule
-benchmarks & fit on & damping & teleport & direction \\
-\midrule
-% benchmarks/data/fit_cache/ppr/77daccb12fe9.json
-SurveyMatch, SurGE & SurveyMatch R@250 & 0.95 & core & both \\
-% benchmarks/data/fit_cache/ppr/9e44e60fb9e5.json
-FrontierMatch & FrontierMatch R@100 & 0.5 & core & both \\
-% benchmarks/data/fit_cache/ppr/624c84a61718.json
-ConsensusMatch & ConsensusMatch R@50 & 0.85 & core & both \\
-% benchmarks/data/fit_cache/ppr/b28f171152fe.json
-PaSa, ScholarCatalyst & PaSa R@20 & 0.3 & core & backward \\
-\bottomrule
-\end{tabular}
-\end{table}
-
 Every baseline we ran saw what BoundedField saw: the titles and abstracts of the same frozen corpus, cut to papers dated on or before the case's cap, with the case's anchors, the reviews its answer key came from, removed. Each returned its top 1,000 papers. The reported rows of \cref{tab:existing,tab:scholarcatalyst} were copied from Tables 5 and 6 of \citet{he2025pasa} and Table 3 of \citet{kim2026scholarcatalyst}, and were not rerun.
 
 \paragraph{BM25:}
@@ -45,24 +24,45 @@ Graph-based adaptive reranking \citep{macavaney2022gar} through \texttt{pyterrie
 \paragraph{PPR:}
 Personalized PageRank \citep{page1999pagerank} over the same pool BoundedField's \term{survey} recipe scores, so the scorer is the only difference. Rank flows backward, from a citing paper to what it cites, or along citations in both directions, and teleports by cosine to the question, over the 200-paper core or the whole pool, iterated until it changes by less than $10^{-10}$, with ties broken by cosine. The damping, the teleport set, and the direction were picked from a grid over damping $\{0.1, 0.3, 0.5, 0.7, 0.85, 0.95\}$ on 200 train cases of each benchmark at the $k$ its recipe was tuned on (\cref{tab:ppr}). ConsensusMatch's train split holds 58 cases, all used, and PaSa's fit used its validation split.
 
+\begin{table}[H]
+\caption{PPR's setting picked for each benchmark.}
+\label{tab:ppr}
+\centering
+\small
+\begin{tabular}{llrll}
+\toprule
+Benchmarks & Fit on & Damping & Teleport & Direction \\
+\midrule
+% benchmarks/data/fit_cache/ppr/77daccb12fe9.json
+SurveyMatch, SurGE & SurveyMatch R@250 & 0.95 & \term{core} & Both \\
+% benchmarks/data/fit_cache/ppr/9e44e60fb9e5.json
+FrontierMatch & FrontierMatch R@100 & 0.5 & \term{core} & Both \\
+% benchmarks/data/fit_cache/ppr/624c84a61718.json
+ConsensusMatch & ConsensusMatch R@50 & 0.85 & \term{core} & Both \\
+% benchmarks/data/fit_cache/ppr/b28f171152fe.json
+PaSa, ScholarCatalyst & PaSa R@20 & 0.3 & \term{core} & Backward \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \FloatBarrier
 \section{Ablations}
 \label{app:ablations}
 
-\input{tables/ablation}
-
 We removed one term at a time from each tuned recipe, keeping every other exponent as tuned, and reran the recipe on its own benchmark's test split with the Nomic embedding (\cref{tab:ablation}). The last rows of each block keep only \term{cos} and \term{anc}, score the expanded pool by cosine alone, apply the tuned exponents to the cosine pool without the citation hop, and order the cosine pool by cosine with no scorer.
+
+\input{tables/ablation}
 
 \FloatBarrier
 \section{Recipes Across Benchmarks and Embedders}
 \label{app:recipes}
 
+Each recipe was tuned for one search mode, and the main results run each benchmark under its own mode's recipe. \Cref{tab:recipes-proposed,tab:recipes-existing,tab:recipes-sc} run all four recipes on every benchmark with the Nomic embedding, beside the baselines of \cref{tab:retrieval}. \Cref{tab:transfer} runs the recipes on the other seven embedders twice, once as fit on Nomic and once refit on each embedder, which \cref{sec:discussion} compares.
+
 \input{tables/recipes_proposed}
 \input{tables/recipes_existing}
 \input{tables/recipes_sc}
 \input{tables/transfer}
-
-Each recipe was tuned for one search mode, and the main results run each benchmark under its own mode's recipe. \Cref{tab:recipes-proposed,tab:recipes-existing,tab:recipes-sc} run all four recipes on every benchmark with the Nomic embedding, beside the baselines of \cref{tab:retrieval}. \Cref{tab:transfer} runs the recipes on the other seven embedders twice, once as fit on Nomic and once refit on each embedder, which \cref{sec:discussion} compares.
 
 \FloatBarrier
 \section{LeyLine}
@@ -114,47 +114,47 @@ As the lineages look backward, LeyLine also returns \term{successors}: papers ou
 
 The automated research system was tested on 21 questions, one for each of three fields and seven question types, each run once at every effort level for 63 runs in all (\cref{tab:questions}). The types cover how an idea developed, how methods compare, what remains open, and what a field works on now. The questions were frozen before the first counted run, and none was searched in GraphIV beforehand.
 
-\begin{table*}[t]
+\begin{table}[H]
 \caption{The 21 test questions, by field and type.}
 \label{tab:questions}
 \centering
 \small
 \begin{tabular}{llp{0.72\textwidth}}
 \toprule
-field & type & question \\
+Field & Type & Question \\
 \midrule
-CS & lineage & How did we get from the paper proving that channel polarization achieves the capacity of symmetric binary-input channels with successive cancellation decoding to polar codes being adopted for 5G control channels? \\
-CS & comparison & What protocols have been proposed for Byzantine fault-tolerant state machine replication under partial synchrony, and how do they compare in reported message complexity, latency and throughput? \\
-CS & open & What are the unanswered questions in fine-grained complexity: which conditional lower bounds rest on which hypotheses, and which problems still lack a tight bound under any of them? \\
-CS & frontier & What are the modern methods for distributed graph coloring and network decomposition in the LOCAL and CONGEST models? \\
-CS & lineage-comparison & How did maximum flow algorithms develop from the interior point methods that used electrical flows to the almost-linear-time algorithm, and how do the successive algorithms compare in their running time bounds? \\
-CS & frontier-open & What are the modern methods for reconfigurable intelligent surfaces in wireless communication, and which questions about their channel estimation and real-world gains remain unanswered? \\
-CS & frontier-comparison & What are the modern methods for approximate nearest neighbor search over large vector collections, and how do they compare in reported recall and queries per second, on which benchmarks? \\
-ML & lineage & How did we get from the paper that trained a network to reverse a gradual noising process with a variational bound to latent diffusion and transformer-backbone image generators? \\
-ML & comparison & What methods have been proposed for parameter-efficient fine-tuning of large language models, and how do they compare with full fine-tuning in reported accuracy, trainable parameters and memory, on which models and benchmarks? \\
-ML & open & What are the unanswered questions about grokking, where a network generalizes long after fitting its training data, and which proposed explanations do later papers contest? \\
-ML & frontier & What are the modern methods for aligning language models to human preferences without training a separate reward model? \\
-ML & lineage-comparison & How did state space models for long sequences develop from the paper that parameterized a linear state space layer with a structured HiPPO matrix, and how do the successive models along that line compare against Transformers in reported quality and throughput, on which benchmarks? \\
-ML & frontier-open & What are the modern methods for extending the context length of language models, and which questions about whether models actually use that context remain unanswered? \\
-ML & frontier-comparison & What are the modern methods for real-time 3D scene reconstruction from images, and how do they compare in reported rendering quality and speed, on which datasets? \\
-Physics & lineage & How did we get from the paper that encoded logical qubits in the topology of a qubit lattice on a torus to experiments showing logical error falling as surface code distance grows? \\
-Physics & comparison & What measurements of the Hubble constant have been made, and how do they compare in value and uncertainty across methods and data? \\
-Physics & open & What are the unanswered questions about superconductivity in magic-angle twisted bilayer graphene since the experiment that first reported it next to correlated insulating states? \\
-Physics & frontier & What are the modern methods for classically simulating quantum circuits and many-body dynamics, of the kind used to challenge claims of quantum advantage? \\
-Physics & lineage-comparison & How did liquid xenon dark matter detectors develop from early two-phase time projection chambers to multi-tonne experiments, and how do the successive experiments compare in their reported limits on the WIMP-nucleon cross section, at which masses? \\
-Physics & frontier-open & What are the modern methods for computing the hadronic vacuum polarization contribution to the muon's anomalous magnetic moment, and which questions about the disagreement between them remain unanswered? \\
-Physics & frontier-comparison & What are the modern machine-learned interatomic potentials, and how do they compare in reported energy and force errors, on which datasets, at what cost relative to DFT? \\
+CS & Lineage & How did we get from the paper proving that channel polarization achieves the capacity of symmetric binary-input channels with successive cancellation decoding to polar codes being adopted for 5G control channels? \\
+CS & Comparison & What protocols have been proposed for Byzantine fault-tolerant state machine replication under partial synchrony, and how do they compare in reported message complexity, latency and throughput? \\
+CS & Open & What are the unanswered questions in fine-grained complexity: which conditional lower bounds rest on which hypotheses, and which problems still lack a tight bound under any of them? \\
+CS & Frontier & What are the modern methods for distributed graph coloring and network decomposition in the LOCAL and CONGEST models? \\
+CS & Lineage-comparison & How did maximum flow algorithms develop from the interior point methods that used electrical flows to the almost-linear-time algorithm, and how do the successive algorithms compare in their running time bounds? \\
+CS & Frontier-open & What are the modern methods for reconfigurable intelligent surfaces in wireless communication, and which questions about their channel estimation and real-world gains remain unanswered? \\
+CS & Frontier-comparison & What are the modern methods for approximate nearest neighbor search over large vector collections, and how do they compare in reported recall and queries per second, on which benchmarks? \\
+ML & Lineage & How did we get from the paper that trained a network to reverse a gradual noising process with a variational bound to latent diffusion and transformer-backbone image generators? \\
+ML & Comparison & What methods have been proposed for parameter-efficient fine-tuning of large language models, and how do they compare with full fine-tuning in reported accuracy, trainable parameters and memory, on which models and benchmarks? \\
+ML & Open & What are the unanswered questions about grokking, where a network generalizes long after fitting its training data, and which proposed explanations do later papers contest? \\
+ML & Frontier & What are the modern methods for aligning language models to human preferences without training a separate reward model? \\
+ML & Lineage-comparison & How did state space models for long sequences develop from the paper that parameterized a linear state space layer with a structured HiPPO matrix, and how do the successive models along that line compare against Transformers in reported quality and throughput, on which benchmarks? \\
+ML & Frontier-open & What are the modern methods for extending the context length of language models, and which questions about whether models actually use that context remain unanswered? \\
+ML & Frontier-comparison & What are the modern methods for real-time 3D scene reconstruction from images, and how do they compare in reported rendering quality and speed, on which datasets? \\
+Physics & Lineage & How did we get from the paper that encoded logical qubits in the topology of a qubit lattice on a torus to experiments showing logical error falling as surface code distance grows? \\
+Physics & Comparison & What measurements of the Hubble constant have been made, and how do they compare in value and uncertainty across methods and data? \\
+Physics & Open & What are the unanswered questions about superconductivity in magic-angle twisted bilayer graphene since the experiment that first reported it next to correlated insulating states? \\
+Physics & Frontier & What are the modern methods for classically simulating quantum circuits and many-body dynamics, of the kind used to challenge claims of quantum advantage? \\
+Physics & Lineage-comparison & How did liquid xenon dark matter detectors develop from early two-phase time projection chambers to multi-tonne experiments, and how do the successive experiments compare in their reported limits on the WIMP-nucleon cross section, at which masses? \\
+Physics & Frontier-open & What are the modern methods for computing the hadronic vacuum polarization contribution to the muon's anomalous magnetic moment, and which questions about the disagreement between them remain unanswered? \\
+Physics & Frontier-comparison & What are the modern machine-learned interatomic potentials, and how do they compare in reported energy and force errors, on which datasets, at what cost relative to DFT? \\
 \bottomrule
 \end{tabular}
-\end{table*}
+\end{table}
 
 \FloatBarrier
 \section{Research Runs}
 \label{app:runs}
 
-\input{tables/results_modes}
-
 All 63 runs are public, each with its report, its calls, and the agent's reasoning.\footnote{\furl{https://graphiv.kuroma.dev}} \Cref{tab:runs} lists every run.
+
+\input{tables/runs}
 
 \subsection{Tools and Effort}
 \label{app:agent}
@@ -183,9 +183,6 @@ The agent's instructions carry three effort presets, named in the question: \ter
 \FloatBarrier
 \subsection{Time and Calls}
 
-\input{tables/runs}
-\input{tables/budget}
-
 Reading took most of every run (\cref{tab:budget}): 0.64 of the wall time at \term{quick} and \term{standard}, and 0.65 at \term{deep}, at 41 to 47 seconds per \texttt{read\_paper} call, since each read retrieves paragraphs and has the reader answer from them on the same GPU the agent runs on. Searches took 0.02 to 0.03 of the time, and the citation, lineage, and save calls under 0.01. The agent spent the remaining third reasoning and writing. Most of a run came before its first save, 5.2, 10.2, and 16.3 minutes at the three efforts, and 1.5 to 4.0 minutes followed it, revising the report until it passed.
 
 The agent kept to its budget on its own, as the server enforces none. 38 of the 63 runs restated the effort's preset in their first reasoning step, and 41 said in their reasoning that they had enough, such as ``I have enough information now to write a report on how polar codes went from theory to 5G adoption'' 3.7 minutes into a \term{quick} run. \texttt{recall\_paper} found no match for 17 of its 47 calls.
@@ -193,22 +190,25 @@ The agent kept to its budget on its own, as the server enforces none. 38 of the 
 \paragraph{Search modes:}
 The mode followed the question (\cref{tab:modes}). Frontier questions used the \term{frontier} mode for 26\% of searches, more than any other type, and lineage-comparison questions the \term{survey} mode for 74\%, as what a field is built on is what a lineage traces. Frontier questions that also asked for comparisons or open problems switched to \term{focused} to find specific papers. The \term{consensus} mode was never used.
 
+\input{tables/budget}
+\input{tables/results_modes}
+
 \FloatBarrier
 \section{A Run in Detail}
 \label{app:trace}
-
-\input{tables/trace}
 
 \Cref{tab:trace} follows one \term{deep} run from the question to the saved report.\footnote{\furl{https://graphiv.kuroma.dev/\#/run/2026-11-11-104945-what-are-the-modern-methods-for-aligning-language}} The agent restated its budget, searched in the \term{survey} and \term{frontier} modes, and recalled the papers it named. \texttt{recall\_paper} found no match for GRPO, so the agent searched for it in the \term{focused} mode and later read DeepSeekMath, where GRPO was introduced. It read 14 papers over six calls, asked who extended, compared against, or critiqued DPO and SimPO, traced lineages through 12 of the papers, which returned four lines over 73 papers, and searched once more for what is still open.
 
 Its first save failed with 15 faults over 50 markers. Nine were statements with no marker, and two were searches the report described but the agent had never run. The agent ran those two searches with the words the report used, failed once more on numbers placed in the wrong paragraph, and passed on its third save with 58 markers, 11.7 minutes in. Seven runs answered a failed first save with new searches, and ten with new reads, rather than only rewording.
 
+\input{tables/trace}
+
 \FloatBarrier
 \section{Faults}
 \label{app:faults}
 
-\input{tables/results_faults}
-
 61 of the 63 runs failed their first save, with 683 faults between them, and passed after 4.2 saves on average (\cref{tab:faults}). The commonest faults were unlabeled statements and numbers absent from the paragraph their label points to, followed by names the cited papers never mention, each a claim the agent wrote without support and had to fix or remove before saving.
+
+\input{tables/results_faults}
 
 \FloatBarrier

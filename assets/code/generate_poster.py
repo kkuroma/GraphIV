@@ -23,14 +23,14 @@ from matplotlib.patches import FancyBboxPatch, Polygon
 from style import (
     GRAY,
     GREEN,
+    LEAD,
     LEFT,
     MUTED,
     OUTLINE,
     PANEL,
+    PURPLE,
     ROOT,
-    ROSE,
     STANCE_COLORS,
-    VIOLET,
     Page,
     apply_theme,
     tint,
@@ -47,7 +47,7 @@ LINES = [
         ("- an LLM-free graph-driven retrieval at twice the recall of embedding search", MUTED),
     ],
     [
-        ("LeyLine", VIOLET),
+        ("LeyLine", PURPLE),
         (
             "- magnetic Monte Carlo lineage and trajectory mining, and a cited review in under"
             " 3 minutes on a single 3090",
@@ -164,7 +164,7 @@ def colors(layout: dict[str, Any]) -> dict[int, str]:
     Returns:
         Field to color.
     """
-    hues = [ROSE, GREEN, VIOLET, mix(ROSE, VIOLET), mix(VIOLET, GREEN)]
+    hues = [LEAD, GREEN, PURPLE, mix(LEAD, PURPLE), mix(PURPLE, GREEN)]
     field, xy = layout["field"], layout["xy"]
     middle = {f: xy[field == f].mean(axis=0) for f in range(len(layout["names"]))}
     out: dict[int, str] = {}
@@ -280,7 +280,7 @@ def counts(page: Page, x: float, top: float, width: float, release: dict[str, An
     ]
     y = top
     for big, small in facts:
-        page.ax.text(x, y, big, fontsize=19, fontweight="semibold", color=ROSE, va="baseline")
+        page.ax.text(x, y, big, fontsize=19, fontweight="semibold", color=LEAD, va="baseline")
         page.ax.text(x, y + 0.27, small, fontsize=10.5, color=MUTED, va="baseline")
         y += 0.72
     page.panel_title(x, y + 0.05, "Citations by intent")
@@ -351,7 +351,7 @@ def pipeline(
         (
             "mine",
             "LeyLine",
-            VIOLET,
+            PURPLE,
             [
                 f"{c['union']} papers and {c['edges']:,} citations,",
                 f"{c['magnets']} magnets and {c['lineages']} walked paths,",
@@ -510,7 +510,7 @@ def leyline(
         run: The example run.
         miner: The recipe's [miner] block.
     """
-    card(page, panel, VIOLET, "white", 1.8)
+    card(page, panel, PURPLE, "white", 1.8)
     x, top, width, high = panel
     x0 = x + 0.25
     heading(
@@ -518,7 +518,7 @@ def leyline(
         x0,
         top + 0.42,
         "LeyLine",
-        VIOLET,
+        PURPLE,
         "magnetic Monte Carlo lineage and trajectory mining",
     )
     about = (
@@ -574,7 +574,7 @@ def draw(config: Path, out: Path) -> None:
     below = upper[1] + upper[3] + 0.3
     lower = (right, below, page.right - right, BOTTOM - below)
     zoom(page, boxes["retrieve"], upper, GREEN)
-    zoom(page, boxes["mine"], lower, VIOLET)
+    zoom(page, boxes["mine"], lower, PURPLE)
     bounded_field(page, upper, run, recipe, scores)
     leyline(page, lower, run, recipe["miner"])
     page.save(out, page.high - 0.3, [])

@@ -12,14 +12,14 @@ import release_counts
 from matplotlib.patches import FancyBboxPatch
 from style import (
     INK,
+    LEAD,
     LEFT,
     MUTED,
     OUTLINE,
     PANEL,
+    PURPLE,
     RIGHT,
     ROOT,
-    ROSE,
-    VIOLET,
     Page,
     apply_theme,
 )
@@ -56,7 +56,7 @@ def areas(page: Page, x: float, top: float, width: float, data: dict[str, Any]) 
                 span * value,
                 0.18,
                 boxstyle="round,pad=0,rounding_size=0.03",
-                facecolor=ROSE if key == "weighted" else VIOLET,
+                facecolor=LEAD if key == "weighted" else PURPLE,
                 edgecolor="none",
                 zorder=3,
             )
@@ -67,7 +67,7 @@ def areas(page: Page, x: float, top: float, width: float, data: dict[str, Any]) 
             f"{value:.3f}",
             fontsize=10.5,
             va="center",
-            color=ROSE if key == "weighted" else INK,
+            color=LEAD if key == "weighted" else INK,
         )
 
 

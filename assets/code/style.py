@@ -1,7 +1,7 @@
 """
 The look every card figure shares, taken from ModernLayoutLM's README figures
 
-Colors come from the light half of themes/theme.json, text from static cuts of Google Sans Flex
+Colors come from the light half of themes/theme.json, Akiba, and text from Google Sans Flex
 """
 
 from __future__ import annotations
@@ -34,19 +34,21 @@ MUTED = THEME["mOnSurfaceVariant"]
 OUTLINE = THEME["mOutline"]
 PAGE = THEME["mSurface"]
 PANEL = THEME["mSurfaceVariant"]
-ROSE = THEME["mPrimary"]
-VIOLET = THEME["mTertiary"]
-GREEN = THEME["mSecondary"]
+LEAD = THEME["mPrimary"]
+PURPLE = THEME["mSecondary"]
+GREEN = THEME["terminal"]["normal"]["green"]
+OCHRE = THEME["terminal"]["normal"]["yellow"]
 GRAY = THEME["terminal"]["normal"]["white"]
-BLUE = THEME["terminal"]["normal"]["blue"]
+# the theme's blue saturated as the paper's figures draw it, so it stands apart from purple
+BLUE = "#1F74A8"
 
 # a card figure is this wide in inches, placed from its top left, with its own title size
 WIDE = 12.5
 LEFT, RIGHT = 0.5, 12.0
 HEADING = 27.0
 
-STANCES = ("extends", "compares", "critiques")
-STANCE_COLORS = {"extends": GREEN, "compares": BLUE, "critiques": ROSE}
+STANCES = ("extends", "critiques", "compares")
+STANCE_COLORS = {"extends": BLUE, "compares": PURPLE, "critiques": OCHRE}
 # what each intent means, condensed from the teacher prompt the labeler was distilled from
 MEANINGS = {
     "background": "general context, or a pointer to related work",
@@ -147,8 +149,8 @@ def tint(color: str, share: float) -> str:
 # what each kind of node in a method diagram is drawn with, as (fill, edge)
 KINDS = {
     "data": (PANEL, OUTLINE),
-    "model": (tint(ROSE, 0.13), ROSE),
-    "step": (tint(VIOLET, 0.11), VIOLET),
+    "model": (tint(LEAD, 0.13), LEAD),
+    "step": (tint(PURPLE, 0.11), PURPLE),
 }
 
 
@@ -168,7 +170,7 @@ def write_runs(
         fig: The figure to write on.
         x: Left edge in figure coordinates.
         y: Baseline in figure coordinates.
-        runs: (text, emphasis) pairs, the emphasis True for rose, a color for that color, or False.
+        runs: (text, emphasis) pairs, True for the lead red, a color for that color, or False.
         size: Font size in points.
         weight: Font weight of every run.
         ink: Color of the plain runs.
@@ -182,7 +184,7 @@ def write_runs(
     left = x
     for index, (text, emphasized) in enumerate(runs):
         piece = text if index == len(runs) - 1 else text + " "
-        color = emphasized if isinstance(emphasized, str) else ROSE if emphasized else ink
+        color = emphasized if isinstance(emphasized, str) else LEAD if emphasized else ink
         drawn = fig.text(left, y, piece, color=color, **style)
         # a trailing space is not measured, so it is measured on a probe ending in x
         probe = fig.text(0, 0, piece + "x", **style)
@@ -196,7 +198,7 @@ def write_runs(
     return left
 
 
-def mark(fig: Figure, artist: Any, number: int, color: str = ROSE) -> None:
+def mark(fig: Figure, artist: Any, number: int, color: str = LEAD) -> None:
     """
     A footnote number raised at the top right of a piece of text already drawn
 
@@ -507,7 +509,7 @@ class Page:
 
     def stage(self, x: float, top: float, letter: str, name: str, note: int = 0) -> None:
         """
-        A lettered stage's heading, the letter in a rose disc
+        A lettered stage's heading, the letter in a red disc
 
         Args:
             x: Left edge.
@@ -516,7 +518,7 @@ class Page:
             name: What the stage is.
             note: Its footnote, or 0.
         """
-        self.ax.add_patch(Circle((x + 0.16, top - 0.07), 0.16, facecolor=ROSE, zorder=3))
+        self.ax.add_patch(Circle((x + 0.16, top - 0.07), 0.16, facecolor=LEAD, zorder=3))
         self.ax.text(
             x + 0.16,
             top - 0.065,
@@ -534,7 +536,7 @@ class Page:
 
     def result(self, x: float, top: float, headline: str, detail: str, note: int = 0) -> None:
         """
-        What a stage came to, a rose line over a muted one, centered on a point
+        What a stage came to, a red line over a muted one, centered on a point
 
         Args:
             x: Center.
@@ -544,7 +546,7 @@ class Page:
             note: The result's footnote, or 0.
         """
         drawn = self.ax.text(
-            x, top, headline, ha="center", fontsize=12, color=ROSE, fontweight="semibold"
+            x, top, headline, ha="center", fontsize=12, color=LEAD, fontweight="semibold"
         )
         if note:
             self.marked.append((drawn, note))
@@ -608,7 +610,7 @@ class Page:
                     y,
                     str(number + 1),
                     fontsize=9,
-                    color=ROSE,
+                    color=LEAD,
                     fontweight="bold",
                     va="baseline",
                 )

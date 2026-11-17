@@ -2,6 +2,7 @@
 The cold-start measurement behind LeyLine's successors, read off the findings file that kept it
 
 Its code was deleted with the scratchpad task on 2026-09-26, so the findings file is the source
+The file sits in assets/data as git last held it, at de451c2~1:experiments/findings/
 """
 
 from __future__ import annotations
@@ -9,8 +10,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-FINDINGS = "experiments/findings/frontier-system-REPORT.md"
-# the topic each short name of the findings file stands for, as docs/supplement.md lists them
+FINDINGS = "assets/data/frontier-system-REPORT.md"
+# the topic each short name of the findings file stands for, as docs/03_tools.md lists them
 TOPICS = {
     "tabular": "Tabular foundation models",
     "mechinterp": "Mechanistic interpretability",

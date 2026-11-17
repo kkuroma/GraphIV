@@ -1,10 +1,9 @@
 # themes
 
-The palette and the typeface every figure in this project uses, copied from
-`~/Documents/coding-style` so the repository carries its own.
+The palette and the typeface every figure in this project uses: Akiba light, a red lead on warm paper, copied from the noctalia Akiba palette so the repository carries its own.
 
 ```
-theme.json        the source palette, dark and light, in the form the terminal and editor read
+theme.json        the Akiba palette, dark and light, in the form the terminal and editor read
 matplotlibrc      the light half of it as rcParams, plus the font and the Agg backend
 fonts/            Google Sans Flex, the variable font matplotlibrc uses, with its OFL.txt
 ```

@@ -2,7 +2,7 @@
 
 LeyLine, the miner.
 It takes the papers a search kept, never the question, and reads them as one citation graph to find what the field argues about and how it got there.
-The math is in [`docs/leyline.md`](../../docs/leyline.md).
+The math is in [`docs/03_tools.md`](../../docs/03_tools.md#leyline).
 
 ```
 leyline.py   LeyLine itself, on a typed graph, knowing nothing about papers
@@ -28,8 +28,8 @@ Lineages stop repeating once the graph gets wide, while successors keep growing 
 
 | Field | What it holds |
 | --- | --- |
-| `magnets` | the papers the list takes positions on, with their counts per intent |
-| `lineages` | dated paths through the graph, and how many runs repeated each one |
-| `disputes` | one sentence per citing pair that took a position |
-| `successors` | recent papers that extend, critique or compare against the list, which need no citations of their own |
-| `connectors` | papers outside the list that sit on a path between two papers inside it |
+| `magnets` | The papers the list takes positions on, with their counts per intent |
+| `lineages` | Dated paths through the graph, and how many runs repeated each one |
+| `disputes` | One sentence per citing pair that took a position |
+| `successors` | Recent papers that extend, critique or compare against the list, which need no citations of their own |
+| `connectors` | Papers outside the list that sit on a path between two papers inside it |

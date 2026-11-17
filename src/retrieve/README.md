@@ -2,7 +2,7 @@
 
 BoundedField, the retriever and reranker.
 A question goes in and a ranked pool of papers comes out, with no language model anywhere on the way.
-The math and the benchmarks are in [`docs/retrieval.md`](../../docs/retrieval.md).
+The math and the benchmarks are in [`docs/02_retrieval.md`](../../docs/02_retrieval.md).
 
 ```
 cosine.py   CosineRetriever, which picks the first pool by cosine

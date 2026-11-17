@@ -14,14 +14,14 @@ from release_counts import load
 from style import (
     GREEN,
     INK,
+    LEAD,
     LEFT,
     MUTED,
     OUTLINE,
     PANEL,
+    PURPLE,
     RIGHT,
     ROOT,
-    ROSE,
-    VIOLET,
     WIDE,
     Page,
     apply_theme,
@@ -39,11 +39,11 @@ TITLE: list[list[tuple[str, bool | str]]] = [
 ]
 SUBTITLE: list[tuple[str, bool | str]] = [
     ("Every", False),
-    ("arXiv paper,", VIOLET),
+    ("arXiv paper,", PURPLE),
     ("every", False),
-    ("citation", ROSE),
+    ("citation", LEAD),
     ("between them and its", False),
-    ("intent,", ROSE),
+    ("intent,", LEAD),
     ("and every paper's place among", False),
     ("4,096 topics", GREEN),
 ]
@@ -261,7 +261,7 @@ def draw(data: dict[str, Any], out: Path) -> None:
         ("three tables joined by arxiv_id", MUTED),
     ]
     write_runs(page.fig, *page.at(LEFT, 6.45), runs, 16, "bold")
-    tables = [("citations", citations, ROSE), ("papers", total, VIOLET), ("topics", total, GREEN)]
+    tables = [("citations", citations, LEAD), ("papers", total, PURPLE), ("topics", total, GREEN)]
     sizes = [card_size(page, COLUMNS[name]) for name, _, _ in tables]
     gap = (RIGHT - LEFT - sum(w for _, w in sizes)) / 2
     x, edges, keys = LEFT, [], []

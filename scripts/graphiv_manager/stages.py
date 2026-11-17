@@ -232,7 +232,7 @@ STAGES = [
         writes="graphiv-<date>.dump under EXPORT_PATH, a pg_dump custom archive at zstd:3",
         fetches="nothing",
         queue="store",
-        note="the full backup, sentences included, which docs/restore.md restores",
+        note="the full backup, sentences included, which docs/01_preprocessing.md restores",
         delta=False,
         disks=("State", "Export"),
     ),

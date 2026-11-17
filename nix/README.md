@@ -15,7 +15,7 @@ Every Python dependency comes from `uv.lock`, the same file the dev shell's `.ve
 
 `src/`, `scripts/`, `retrieval_recipes/`, `pyproject.toml`, `uv.lock` and `.python-version` are copied into `share/graphiv`, and `src` goes on `PYTHONPATH` rather than being installed.
 
-| wrapper | runs |
+| Wrapper | Runs |
 | --- | --- |
 | `bin/graphiv-sync` | `uv sync --frozen --no-install-project` into `GRAPHIV_VENV`, on the package's own `python313` |
 | `bin/graphiv-serve` | `scripts/serve.py` on that venv |
@@ -47,15 +47,15 @@ A key the module does not declare fails evaluation, and `nix flake check` holds 
 }
 ```
 
-| unit | port | holds |
+| Unit | Port | Holds |
 | --- | --- | --- |
-| `graphiv-pg` | socket only | the cluster, one postmaster of its own |
-| `graphiv-venv` | | a oneshot running `graphiv-sync` into `venvDir`, which every unit below requires |
-| `graphiv-api` | `serve.API_PORT`, 6767 | the six tools, the store, the graph export |
-| `graphiv-frontend` | `serve.FRONTEND_PORT`, 6969 | the dashboard, from a second process registering no tools |
-| `graphiv-manager` | `manager.PORT`, 6868 | the snapshot fetch and every preprocess stage, on the GPU |
-| `graphiv-graph` | | a path unit restarting the api when the graph export is rewritten |
-| `graphiv-config` | | a path unit restarting the api and the frontend when the config override is rewritten |
+| `graphiv-pg` | Socket only | The cluster, one postmaster of its own |
+| `graphiv-venv` | | A oneshot running `graphiv-sync` into `venvDir`, which every unit below requires |
+| `graphiv-api` | `serve.API_PORT`, 6767 | The six tools, the store, the graph export |
+| `graphiv-frontend` | `serve.FRONTEND_PORT`, 6969 | The dashboard, from a second process registering no tools |
+| `graphiv-manager` | `manager.PORT`, 6868 | The snapshot fetch and every preprocess stage, on the GPU |
+| `graphiv-graph` | | A path unit restarting the api when the graph export is rewritten |
+| `graphiv-config` | | A path unit restarting the api and the frontend when the config override is rewritten |
 
 The frontend opens neither the store nor the graph export, so it cannot reach the corpus.
 The manager writes the store and the corpus, so it belongs on a private vhost only.
@@ -99,12 +99,12 @@ A path, a port, `HOST`, `ALLOWED_HOSTS` and `PG_DEST` are marked built in the ta
 
 | | |
 | --- | --- |
-| network on the first sync | PyPI, for the wheels `uv.lock` names, cached under `CACHE_PATH/uv` |
-| the store | the dump restored into the cluster, or built by the manager from a snapshot |
-| the graph export | the manager's last stage writes it, and the dump does not carry it |
-| two endpoints | a llama-server for embedding, any OpenAI compatible host for the model |
-| a GPU, for the manager | the two classifiers load onto it, and `manager.path` carries `nvidia-smi` |
-| the corpus, optionally | the two trees above, which the manager's stages fill |
+| Network on the first sync | PyPI, for the wheels `uv.lock` names, cached under `CACHE_PATH/uv` |
+| The store | The dump restored into the cluster, or built by the manager from a snapshot |
+| The graph export | The manager's last stage writes it, and the dump does not carry it |
+| Two endpoints | A llama-server for embedding, any OpenAI compatible host for the model |
+| A GPU, for the manager | The two classifiers load onto it, and `manager.path` carries `nvidia-smi` |
+| The corpus, optionally | The two trees above, which the manager's stages fill |
 
 With no corpus, a paper is fetched from arXiv on the first read, one request every three seconds, into those same trees, so the second read is local.
 Set `settings.serve.FETCH = false` when they cannot be written, and the daemon then answers out of whatever is already there.

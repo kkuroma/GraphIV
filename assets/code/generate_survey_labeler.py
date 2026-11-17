@@ -13,12 +13,12 @@ import release_counts
 from matplotlib.axes import Axes
 from matplotlib.patches import FancyBboxPatch
 from style import (
+    LEAD,
     LEFT,
     MUTED,
+    PURPLE,
     RIGHT,
     ROOT,
-    ROSE,
-    VIOLET,
     Page,
     apply_theme,
 )
@@ -57,7 +57,7 @@ def fields(page: Page, x: float, top: float, width: float, rows: list[Any], bigg
                 length,
                 0.18,
                 boxstyle="round,pad=0,rounding_size=0.03",
-                facecolor=VIOLET,
+                facecolor=PURPLE,
                 edgecolor="none",
                 zorder=3,
             )
@@ -81,9 +81,9 @@ def agreement(axis: Axes, data: dict[str, Any]) -> None:
     """
     mid, sd = np.array(data["curve"]), np.array(data["sd"])
     model = data["model"]
-    axis.fill_between(GRID, mid - sd, np.minimum(mid + sd, 1.0), color=ROSE, alpha=0.18, lw=0)
-    axis.plot(GRID, mid, color=ROSE, linewidth=2.2, zorder=3)
-    axis.plot(model["recall"], model["precision"], "o", color=ROSE, markersize=9, zorder=4)
+    axis.fill_between(GRID, mid - sd, np.minimum(mid + sd, 1.0), color=LEAD, alpha=0.18, lw=0)
+    axis.plot(GRID, mid, color=LEAD, linewidth=2.2, zorder=3)
+    axis.plot(model["recall"], model["precision"], "o", color=LEAD, markersize=9, zorder=4)
     axis.annotate(
         f"threshold {THRESHOLD}",
         (model["recall"], model["precision"]),
@@ -92,7 +92,7 @@ def agreement(axis: Axes, data: dict[str, Any]) -> None:
         ha="right",
         va="top",
         fontsize=11,
-        color=ROSE,
+        color=LEAD,
         fontweight="semibold",
     )
     axis.set_xlim(0, 1.0)
@@ -116,8 +116,8 @@ def filters(axis: Axes, data: dict[str, Any]) -> None:
     rows = np.arange(len(FILTERS))
     scores = [data[key] if key in data else data["sources"][key] for _, key in FILTERS]
     for metric, color, marker, offset in (
-        ("recall", ROSE, "o", -0.16),
-        ("precision", VIOLET, "s", 0.16),
+        ("recall", LEAD, "o", -0.16),
+        ("precision", PURPLE, "s", 0.16),
     ):
         for y, entry in zip(rows, scores, strict=True):
             value = float(entry[metric])
@@ -171,10 +171,10 @@ def draw(data: dict[str, Any], release: dict[str, Any], out: Path) -> None:
 
     top = 2.6 + half * 0.42 + 0.9
     page.panel_title(LEFT, top, "Agreement with the teacher", 2)
-    page.key(6.0, top, [(f"average precision {data['areas']['weighted']:.3f}", ROSE)])
+    page.key(6.0, top, [(f"average precision {data['areas']['weighted']:.3f}", LEAD)])
     agreement(page.place(1.35, top + 0.35, 4.65, 4.0), data)
     page.panel_title(6.65, top, "Comparison with existing filters", 3)
-    page.key(RIGHT, top, [("recall", ROSE), ("·", MUTED), ("precision", VIOLET)])
+    page.key(RIGHT, top, [("recall", LEAD), ("·", MUTED), ("precision", PURPLE)])
     filters(page.place(8.3, top + 0.35, RIGHT - 8.3, 4.0), data)
 
     sources = data["sources"]

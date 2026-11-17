@@ -10,18 +10,18 @@ from typing import Any
 
 import numpy as np
 import release_counts
-from labeler_scores import GENERATIONS, KEPT, RATE, SAMPLE, SPEED, load, scores, teacher_truth
+from labeler_scores import GENERATIONS, KEPT, SAMPLE, SPEED, load, scores, teacher_truth
 from matplotlib.axes import Axes
 from matplotlib.patches import FancyBboxPatch
 from style import (
+    LEAD,
     LEFT,
     MUTED,
     OUTLINE,
     PANEL,
+    PURPLE,
     RIGHT,
     ROOT,
-    ROSE,
-    VIOLET,
     Page,
     apply_theme,
 )
@@ -48,12 +48,12 @@ def curve(
     axis = page.place(x, top, width, high)
     rounds = np.arange(len(points))
     axis.plot(rounds, points, color=MUTED, linewidth=1.4, zorder=2)
-    axis.plot(rounds, points, "o", color=VIOLET, markersize=5, zorder=3)
-    axis.plot([kept], [points[kept]], "o", color=ROSE, markersize=8, zorder=4)
+    axis.plot(rounds, points, "o", color=PURPLE, markersize=5, zorder=3)
+    axis.plot([kept], [points[kept]], "o", color=LEAD, markersize=8, zorder=4)
     # the first round sits low on a rising line, so its label goes to its right
     for index, text, color, offset, ha, va in (
         (0, f"{points[0]:.3f}", MUTED, (7, 0), "left", "center"),
-        (kept, f"{points[kept]:.3f}", ROSE, (0, 7), "center", "bottom"),
+        (kept, f"{points[kept]:.3f}", LEAD, (0, 7), "center", "bottom"),
     ):
         axis.annotate(
             text,
@@ -151,7 +151,7 @@ def draw(data: dict[str, Any], labeled: int, out: Path) -> None:
     teacher = page.box(8.9, row2, 2.05, high, "Gemma 4 26B", "25 citations a call", "model")
     page.arrow(((kept[0] + kept[1]) / 2, kept[3]), (teacher[0] + 0.45, teacher[2]))
     page.arrow(((sample[0] + sample[1]) / 2, sample[3]), (teacher[1] - 0.45, teacher[2]))
-    page.result(9.925, 6.0, f"{total:,} of {SAMPLE:,} labeled", "the unanswered dropped")
+    page.result(9.925, 6.0, f"{total:,} of {SAMPLE:,} labeled", f"{SAMPLE - total} failed to parse")
 
     # C, the student trained on those labels, then run over every citation
     page.stage(0.8, 7.95, "C", "Distillation", 5)
@@ -197,8 +197,8 @@ def draw(data: dict[str, Any], labeled: int, out: Path) -> None:
         " background.",
         "Rare intents are oversampled at inverse frequency to the power 0.6, and the epoch with the"
         " best validation macro F1 is kept.",
-        f"Measured end to end on one RTX 3090 over a {RATE[0]:,}-citation update, writing to the"
-        " store included.",
+        "Measured end to end on one RTX 3090 over every resolved citation in the store, writing to"
+        " the store included.",
     ]
     page.save(out, 10.95, notes)
 
