@@ -50,7 +50,7 @@
 \begin{teaserfigure}
 \input{figures/teaser}
 \Description{A question about speculative decoding feeds two panels. The upper panel, in gray, shows deep research as a loop between an LLM and a similarity retriever. The lower panel, in red, shows GraphIV in four steps: a database of 3.2M arXiv papers and 76.7M typed citations built once and run locally; a ranked list of five papers with score bars mostly from citation walks; a small graph of five papers joined by edges labeled extends, compares and critiques with one citing sentence quoted; and a report excerpt whose label resolves to the quote it rests on, with 74 citation markers checked and 0 faults.}
-\caption{GraphIV reviews literature the way a researcher does. Top: typical deep research agent treat literature as multi-step semantic search. Bottom: GraphIV approaches the same qieru from a citatiopn graph. BoundedField walks citations from the papers most similar to the question with no LLM/ \texttt{list\_citations} and \texttt{trace\_lineages} explains why each paper cites another, and \texttt{save\_report} saves the report only after all quotes are mechanically checked.}
+\caption{GraphIV reviews literature the way a researcher does. Top: typical deep research agents treat literature as multi-step semantic search. Bottom: GraphIV approaches the same query from a citation graph. BoundedField walks citations from the papers most similar to the question with no LLM. \texttt{list\_citations} and \texttt{trace\_lineages} explain why each paper cites another, and \texttt{save\_report} saves the report only after all quotes are mechanically checked.}
 \label{fig:teaser}
 \end{teaserfigure}
 
