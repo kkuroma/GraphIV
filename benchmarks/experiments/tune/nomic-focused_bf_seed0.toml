@@ -1,0 +1,4 @@
+retriever = "nomic"
+recipe = "focused"
+method = "bf"
+seed = 0

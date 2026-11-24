@@ -1,4 +1,9 @@
-\section{Baselines}
+\section{Retrieval Experiments}
+\label{app:retrieval}
+
+This appendix covers the baselines, how BoundedField and PPR were tuned, and the ablation, cross-recipe, and cross-embedder runs behind \cref{sec:results}. Every figure and table in it is generated from the runs on disk.
+
+\subsection{Baselines}
 \label{app:baselines}
 
 Every baseline we ran saw what BoundedField saw: the titles and abstracts of the same frozen corpus, cut to papers dated on or before the case's cap, with the case's anchors, the reviews its answer key came from, removed. Each returned its top 1,000 papers. The reported rows of \cref{tab:existing,tab:scholarcatalyst} were copied from Tables 5 and 6 of \citet{he2025pasa} and Table 3 of \citet{kim2026scholarcatalyst}, and were not rerun.
@@ -24,44 +29,58 @@ Graph-based adaptive reranking \citep{macavaney2022gar} through \texttt{pyterrie
 \paragraph{PPR:}
 Personalized PageRank \citep{page1999pagerank} over the same pool BoundedField's \term{survey} recipe scores, so the scorer is the only difference. Rank flows backward, from a citing paper to what it cites, or along citations in both directions, and teleports by cosine to the question, over the 200-paper core or the whole pool, iterated until it changes by less than $10^{-10}$, with ties broken by cosine. The damping, the teleport set, and the direction were picked from a grid over damping $\{0.1, 0.3, 0.5, 0.7, 0.85, 0.95\}$ on 200 train cases of each benchmark at the $k$ its recipe was tuned on (\cref{tab:ppr}). ConsensusMatch's train split holds 58 cases, all used, and PaSa's fit used its validation split.
 
-\begin{table}[H]
-\caption{PPR's setting picked for each benchmark.}
-\label{tab:ppr}
+\FloatBarrier
+\subsection{Tuning}
+\label{app:tuning}
+
+Every recipe was fit on the train split of its benchmark and scored on its val split at the $k$ of its recipe, for each embedder and for the cores of 200, 500, and 1,000 papers and pools of 1,000, 2,000, and 5,000 that the corpus cache holds. \Cref{fig:tuning} shows the val recall of every core and pool, and \cref{tab:tuning-picks} the pair each tune picked. \Cref{tab:exponents} gives the exponents each pick was fit to, which extends \cref{tab:recipes} from Nomic to all eight embedders. PPR's picks, from the grid of \cref{app:baselines}, are in \cref{tab:ppr}. To see how much the fit depends on its seed, we repeated each BoundedField tune with seeds 0 to 4 (\cref{tab:seeds}).
+
+\input{tables/tuning}
+
+\begin{figure*}[!htbp]
 \centering
-\small
-\begin{tabular}{llrll}
-\toprule
-Benchmarks & Fit on & Damping & Teleport & Direction \\
-\midrule
-% benchmarks/data/fit_cache/ppr/77daccb12fe9.json
-SurveyMatch, SurGE & SurveyMatch R@250 & 0.95 & \term{core} & Both \\
-% benchmarks/data/fit_cache/ppr/9e44e60fb9e5.json
-FrontierMatch & FrontierMatch R@100 & 0.5 & \term{core} & Both \\
-% benchmarks/data/fit_cache/ppr/624c84a61718.json
-ConsensusMatch & ConsensusMatch R@50 & 0.85 & \term{core} & Both \\
-% benchmarks/data/fit_cache/ppr/b28f171152fe.json
-PaSa, ScholarCatalyst & PaSa R@20 & 0.3 & \term{core} & Backward \\
-\bottomrule
-\end{tabular}
-\end{table}
+\includegraphics[width=\textwidth]{figures/tuning.pdf}
+\Description{Four line charts, one per recipe, with the nine core and pool pairs on the horizontal axis and validation recall on the vertical axis. Each chart has eight lines, one per embedder, grouped by embedder family in color, with the picked pair ringed. In the focused and survey charts the larger embedders sit higher. In the survey, frontier, and consensus charts recall is highest at a core of 200 and falls at a core of 1,000, while in the focused chart it is nearly flat across pools.}
+\caption{Val recall of BoundedField over each core and pool, by embedder, for each recipe at the $k$ it was tuned on. A ring marks the pair each tune picked.}
+\label{fig:tuning}
+\end{figure*}
+
+\input{tables/exponents}
+\input{tables/seeds}
+\input{tables/ppr}
 
 \FloatBarrier
-\section{Ablations}
+\subsection{Ablations}
 \label{app:ablations}
 
-We removed one term at a time from each tuned recipe, keeping every other exponent as tuned, and reran the recipe on its own benchmark's test split with the Nomic embedding (\cref{tab:ablation}). The last rows of each block keep only \term{cos} and \term{anc}, score the expanded pool by cosine alone, apply the tuned exponents to the cosine pool without the citation hop, and order the cosine pool by cosine with no scorer.
+We changed one term at a time in each tuned recipe and reran it on its own benchmark's test split with the Nomic embedding (\cref{tab:ablation}). Zeroing a term keeps every other exponent as tuned, while the refit tunes the recipe again without it. The last rows keep only \term{cos} and \term{anc}, score the expanded pool by cosine alone, apply the tuned exponents to the cosine pool without the citation hop, and order the cosine pool by cosine with no scorer. \Cref{fig:ablation} repeats the term changes on all eight embedders, as the change in recall from the full recipe.
 
 \input{tables/ablation}
 
+\begin{figure*}[!htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/ablation.pdf}
+\Description{Eight heatmaps in two rows of four, one column per recipe, with the eleven terms down the side and the eight embedders across. The top row zeroes the term and the bottom row refits without it. Cells are shaded red for a loss of recall and blue for a gain, and a dagger marks a significant loss. The darkest cells are the anc term of the consensus recipe, and the anc and cocite terms of the survey and frontier recipes are marked for every embedder.}
+\caption{The change in recall from zeroing a term (top) or refitting without it (bottom), by embedder, for each recipe on its own benchmark at the middle cutoff. A dagger marks a score significantly below the full recipe, by a one-sided Wilcoxon signed-rank test on per-case recall, Holm-corrected over the 704 comparisons, $p < 0.05$.}
+\label{fig:ablation}
+\end{figure*}
+
 \FloatBarrier
-\section{Recipes Across Benchmarks and Embedders}
+\subsection{Recipes Across Benchmarks}
 \label{app:recipes}
 
-Each recipe was tuned for one search mode, and the main results run each benchmark under its own mode's recipe. \Cref{tab:recipes-proposed,tab:recipes-existing,tab:recipes-sc} run all four recipes on every benchmark with the Nomic embedding, beside the baselines of \cref{tab:retrieval}. \Cref{tab:transfer} runs the recipes on the other seven embedders twice, once as fit on Nomic and once refit on each embedder, which \cref{sec:discussion} compares.
+Each recipe was tuned for one search mode, and the main results run each benchmark under its own mode's recipe. \Cref{tab:recipes-proposed,tab:recipes-existing,tab:recipes-sc} run all four recipes on every benchmark with the Nomic embedding, beside the baselines of \cref{tab:retrieval}, and mark every score significantly below the benchmark's own-mode BoundedField.
 
 \input{tables/recipes_proposed}
 \input{tables/recipes_existing}
 \input{tables/recipes_sc}
+
+\FloatBarrier
+\subsection{Transfer Across Embedders}
+\label{app:transfer}
+
+\Cref{tab:transfer} runs the recipes on the other seven embedders twice, once as fit on Nomic and once refit on each embedder, which \cref{sec:discussion} compares.
+
 \input{tables/transfer}
 
 \FloatBarrier
@@ -109,7 +128,12 @@ For magnet weights $w$, starting at $m$, the reach $\rho(v) = \sum_{u : w(u) > 0
 As the lineages look backward, LeyLine also returns \term{successors}: papers outside the search, dated within 240 days before the cap, that \term{extend}, \term{critique}, or \term{compare} against at least one paper of the search with an intent score of at least 0.60, ranked by the number of such papers times their cosine to the question. A successor needs no citations of its own, which reaches the brand new papers that BoundedField's citation terms cannot.
 
 \FloatBarrier
-\section{Test Questions}
+\section{Research System}
+\label{app:system}
+
+This appendix covers the test questions, the runs of GraphIV-MCP on them, one run in detail, and the faults the mechanical check caught.
+
+\subsection{Test Questions}
 \label{app:questions}
 
 The automated research system was tested on 21 questions, one for each of three fields and seven question types, each run once at every effort level for 63 runs in all (\cref{tab:questions}). The types cover how an idea developed, how methods compare, what remains open, and what a field works on now. The questions were frozen before the first counted run, and none was searched in GraphIV beforehand.
@@ -149,7 +173,7 @@ Physics & Frontier-comparison & What are the modern machine-learned interatomic 
 \end{table}
 
 \FloatBarrier
-\section{Research Runs}
+\subsection{Research Runs}
 \label{app:runs}
 
 All 63 runs are public, each with its report, its calls, and the agent's reasoning.\footnote{\furl{https://graphiv.kuroma.dev}} \Cref{tab:runs} lists every run.
@@ -194,7 +218,7 @@ The mode followed the question (\cref{tab:modes}). Frontier questions used the \
 \input{tables/results_modes}
 
 \FloatBarrier
-\section{A Run in Detail}
+\subsection{A Run in Detail}
 \label{app:trace}
 
 \Cref{tab:trace} follows one \term{deep} run from the question to the saved report.\footnote{\furl{https://graphiv.kuroma.dev/\#/run/2026-11-11-104945-what-are-the-modern-methods-for-aligning-language}} The agent restated its budget, searched in the \term{survey} and \term{frontier} modes, and recalled the papers it named. \texttt{recall\_paper} found no match for GRPO, so the agent searched for it in the \term{focused} mode and later read DeepSeekMath, where GRPO was introduced. It read 14 papers over six calls, asked who extended, compared against, or critiqued DPO and SimPO, traced lineages through 12 of the papers, which returned four lines over 73 papers, and searched once more for what is still open.
@@ -204,7 +228,7 @@ Its first save failed with 15 faults over 50 markers. Nine were statements with 
 \input{tables/trace}
 
 \FloatBarrier
-\section{Faults}
+\subsection{Faults}
 \label{app:faults}
 
 61 of the 63 runs failed their first save, with 683 faults between them, and passed after 4.2 saves on average (\cref{tab:faults}). The commonest faults were unlabeled statements and numbers absent from the paragraph their label points to, followed by names the cited papers never mention, each a claim the agent wrote without support and had to fix or remove before saving.

@@ -1,0 +1,4 @@
+retriever = "nomic"
+recipe = "consensus"
+method = "bf"
+seed = 0

@@ -1,0 +1,4 @@
+retriever = "nemotron_1b"
+recipe = "focused"
+method = "bf"
+seed = 0

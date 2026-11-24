@@ -1,0 +1,4 @@
+retriever = "harrier_27b"
+dataset = "surveymatch"
+split = "test"
+method = "none"

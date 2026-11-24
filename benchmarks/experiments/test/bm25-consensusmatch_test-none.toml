@@ -1,0 +1,4 @@
+retriever = "bm25"
+dataset = "consensusmatch"
+split = "test"
+method = "none"

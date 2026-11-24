@@ -1,0 +1,12 @@
+retriever = "nomic"
+dataset = "consensusmatch"
+split = "test"
+method = "bf"
+recipe = "consensus"
+seed = 0
+variant = "zero_cocite"
+
+[override]
+
+[override.weights]
+COCITE = 0.0

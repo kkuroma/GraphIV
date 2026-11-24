@@ -1,0 +1,4 @@
+retriever = "nomic"
+dataset = "frontiermatch"
+split = "test"
+method = "gar_cite"

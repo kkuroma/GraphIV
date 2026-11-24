@@ -1,0 +1,4 @@
+retriever = "nomic"
+recipe = "consensus"
+method = "ppr"
+seed = 0

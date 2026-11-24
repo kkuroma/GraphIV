@@ -1,0 +1,4 @@
+retriever = "nemotron_1b"
+dataset = "pasa"
+split = "test"
+method = "none"

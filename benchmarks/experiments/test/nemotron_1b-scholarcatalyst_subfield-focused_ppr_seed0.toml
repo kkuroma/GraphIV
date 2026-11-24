@@ -1,0 +1,6 @@
+retriever = "nemotron_1b"
+dataset = "scholarcatalyst"
+split = "subfield"
+method = "ppr"
+recipe = "focused"
+seed = 0

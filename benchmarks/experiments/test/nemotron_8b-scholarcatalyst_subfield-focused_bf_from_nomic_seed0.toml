@@ -1,0 +1,10 @@
+retriever = "nemotron_8b"
+dataset = "scholarcatalyst"
+split = "subfield"
+method = "bf"
+recipe = "focused"
+seed = 0
+variant = "from_nomic"
+
+[override]
+tune = "nomic-focused_bf_seed0"

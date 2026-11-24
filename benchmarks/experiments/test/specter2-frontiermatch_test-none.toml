@@ -1,0 +1,4 @@
+retriever = "specter2"
+dataset = "frontiermatch"
+split = "test"
+method = "none"

@@ -1,0 +1,6 @@
+retriever = "harrier_27b"
+dataset = "pasa"
+split = "real"
+method = "ppr"
+recipe = "focused"
+seed = 0

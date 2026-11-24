@@ -1,0 +1,7 @@
+retriever = "nemotron_8b"
+dataset = "frontiermatch"
+split = "test"
+method = "bf"
+recipe = "frontier"
+seed = 0
+tune_variant = "without_fro2"

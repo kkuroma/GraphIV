@@ -1,0 +1,6 @@
+retriever = "nomic"
+dataset = "surveymatch"
+split = "test"
+method = "ppr"
+recipe = "consensus"
+seed = 0

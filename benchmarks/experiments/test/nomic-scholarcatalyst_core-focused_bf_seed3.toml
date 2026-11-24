@@ -1,0 +1,6 @@
+retriever = "nomic"
+dataset = "scholarcatalyst"
+split = "core"
+method = "bf"
+recipe = "focused"
+seed = 3

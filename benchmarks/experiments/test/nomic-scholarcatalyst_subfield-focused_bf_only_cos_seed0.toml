@@ -1,0 +1,22 @@
+retriever = "nomic"
+dataset = "scholarcatalyst"
+split = "subfield"
+method = "bf"
+recipe = "focused"
+seed = 0
+variant = "only_cos"
+
+[override]
+
+[override.weights]
+REC = 0.0
+ANC = 0.0
+FRO = 0.0
+ANC2 = 0.0
+FRO2 = 0.0
+ANC_DECAY = 0.0
+FRO_DECAY = 0.0
+COCITE = 0.0
+COUPLE = 0.0
+BM25 = 0.0
+HUB = 0.0

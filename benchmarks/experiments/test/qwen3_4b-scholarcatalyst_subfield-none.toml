@@ -1,0 +1,4 @@
+retriever = "qwen3_4b"
+dataset = "scholarcatalyst"
+split = "subfield"
+method = "none"

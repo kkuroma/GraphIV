@@ -1,0 +1,12 @@
+retriever = "qwen3_4b"
+dataset = "scholarcatalyst"
+split = "subfield"
+method = "bf"
+recipe = "focused"
+seed = 0
+variant = "zero_anc_decay"
+
+[override]
+
+[override.weights]
+ANC_DECAY = 0.0

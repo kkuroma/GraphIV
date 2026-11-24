@@ -1,0 +1,258 @@
+{
+ "nomic-focused": {
+  "core": 200,
+  "pool": 1000,
+  "alpha": 0.3,
+  "teleport": "core",
+  "direction": "back",
+  "recall": 0.376720695970696
+ },
+ "qwen3_0_6b-focused": {
+  "core": 200,
+  "pool": 5000,
+  "alpha": 0.3,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.4153351648351649
+ },
+ "harrier_0_6b-focused": {
+  "core": 200,
+  "pool": 5000,
+  "alpha": 0.3,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.37403388278388283
+ },
+ "nemotron_1b-focused": {
+  "core": 200,
+  "pool": 1000,
+  "alpha": 0.5,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.37565521978021976
+ },
+ "qwen3_4b-focused": {
+  "core": 200,
+  "pool": 1000,
+  "alpha": 0.3,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.45799816849816855
+ },
+ "qwen3_8b-focused": {
+  "core": 200,
+  "pool": 1000,
+  "alpha": 0.1,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.4611277472527473
+ },
+ "nemotron_8b-focused": {
+  "core": 200,
+  "pool": 1000,
+  "alpha": 0.5,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.46855631868131875
+ },
+ "harrier_27b-focused": {
+  "core": 200,
+  "pool": 1000,
+  "alpha": 0.1,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.5076135531135533
+ },
+ "nomic-survey": {
+  "core": 200,
+  "pool": 1000,
+  "alpha": 0.95,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.2594804821575403
+ },
+ "qwen3_0_6b-survey": {
+  "core": 200,
+  "pool": 1000,
+  "alpha": 0.95,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.27619033635549206
+ },
+ "harrier_0_6b-survey": {
+  "core": 200,
+  "pool": 1000,
+  "alpha": 0.95,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.28332351356962343
+ },
+ "nemotron_1b-survey": {
+  "core": 200,
+  "pool": 1000,
+  "alpha": 0.95,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.266503408647285
+ },
+ "qwen3_4b-survey": {
+  "core": 500,
+  "pool": 5000,
+  "alpha": 0.85,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.3037713612021538
+ },
+ "qwen3_8b-survey": {
+  "core": 500,
+  "pool": 5000,
+  "alpha": 0.85,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.30622972341424665
+ },
+ "nemotron_8b-survey": {
+  "core": 500,
+  "pool": 5000,
+  "alpha": 0.85,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.3178851099386
+ },
+ "harrier_27b-survey": {
+  "core": 500,
+  "pool": 5000,
+  "alpha": 0.85,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.31629191640759874
+ },
+ "nomic-frontier": {
+  "core": 200,
+  "pool": 5000,
+  "alpha": 0.5,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.1396585533476049
+ },
+ "qwen3_0_6b-frontier": {
+  "core": 200,
+  "pool": 1000,
+  "alpha": 0.5,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.14171730361681448
+ },
+ "harrier_0_6b-frontier": {
+  "core": 200,
+  "pool": 5000,
+  "alpha": 0.3,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.1648447437305143
+ },
+ "nemotron_1b-frontier": {
+  "core": 200,
+  "pool": 2000,
+  "alpha": 0.5,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.15225412483391934
+ },
+ "qwen3_4b-frontier": {
+  "core": 200,
+  "pool": 5000,
+  "alpha": 0.5,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.17220945026144346
+ },
+ "qwen3_8b-frontier": {
+  "core": 200,
+  "pool": 5000,
+  "alpha": 0.5,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.17784133741400532
+ },
+ "nemotron_8b-frontier": {
+  "core": 200,
+  "pool": 5000,
+  "alpha": 0.5,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.17838002137592351
+ },
+ "harrier_27b-frontier": {
+  "core": 200,
+  "pool": 5000,
+  "alpha": 0.5,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.1773270124002604
+ },
+ "nomic-consensus": {
+  "core": 500,
+  "pool": 1000,
+  "alpha": 0.5,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.5203823427905807
+ },
+ "qwen3_0_6b-consensus": {
+  "core": 1000,
+  "pool": 5000,
+  "alpha": 0.3,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.5521991390130405
+ },
+ "harrier_0_6b-consensus": {
+  "core": 500,
+  "pool": 1000,
+  "alpha": 0.5,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.5589933514125879
+ },
+ "nemotron_1b-consensus": {
+  "core": 1000,
+  "pool": 5000,
+  "alpha": 0.5,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.5795747006237941
+ },
+ "qwen3_4b-consensus": {
+  "core": 200,
+  "pool": 5000,
+  "alpha": 0.7,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.6225082158955529
+ },
+ "qwen3_8b-consensus": {
+  "core": 200,
+  "pool": 2000,
+  "alpha": 0.7,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.6390623533656533
+ },
+ "nemotron_8b-consensus": {
+  "core": 1000,
+  "pool": 5000,
+  "alpha": 0.3,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.6396710775633443
+ },
+ "harrier_27b-consensus": {
+  "core": 200,
+  "pool": 2000,
+  "alpha": 0.7,
+  "teleport": "core",
+  "direction": "both",
+  "recall": 0.638454799659133
+ }
+}

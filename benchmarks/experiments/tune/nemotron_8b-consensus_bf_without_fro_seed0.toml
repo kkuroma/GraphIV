@@ -1,0 +1,9 @@
+retriever = "nemotron_8b"
+recipe = "consensus"
+method = "bf"
+seed = 0
+variant = "without_fro"
+at_pick = true
+
+[override]
+terms = ["rec", "anc", "anc2", "fro2", "anc_decay", "fro_decay", "cocite", "couple", "bm25", "hub"]

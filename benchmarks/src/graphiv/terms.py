@@ -1,212 +1,136 @@
 """
-Caches every case's pool and score terms at each core size, for tune.py, in GraphIV's own environment
+Caches every train and val case's pool and score terms at each core and pool size of a BoundedField tune, for fit.py
 
-The expanders hop from the core, so each core builds its own pool on top of one shared cosine retrieval
-Cases are written in shards of SHARD, each one memory mapped by fit.py and skipped here once written
+Seeds and cosines stream through the GPU in the main process, then pools and terms run in forked workers
+Each worker writes its shard straight to disk, one .npy per array since fit.py memory maps them
 """
+
+import os
+
+# one BLAS thread per worker, set before numpy loads or the forked workers oversubscribe the cores
+for _k in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS"):
+    os.environ[_k] = "1"
 
 import argparse
 import json
 import multiprocessing as mp
-import os
 import time
-from datetime import date
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 
+import queries as query_cache
+from engine import Store, Stream, day_of
 from src.core.config import load_config
-from src.core.embed import EmbeddingEndpoint, embed
-from src.core.parse_graph_export import load_graph_export
-from src.core.schema import Query
-from src.retrieve.query import PaperQuery
-from src.retrieve.recipe import build_pipeline, get_seed_limit
-from src.retrieve.scorer import GraphScorer, Weights
 
 ROOT = Path(__file__).resolve().parents[3]
-TERMS = list(Weights.__dataclass_fields__)
-SHARD = 250
-WORKERS = 8
-
-# each worker's pipelines, one per core, built once by its initializer
+CASES = ROOT / "benchmarks" / "data" / "cases"
+SHARD = 32
+BATCH = 1024
+# cases held in memory at once, a multiple of SHARD, so a 30k-case split never holds every pool
+BLOCK = 4096
 STATE: dict[str, Any] = {}
 
 
-def start_worker(graph_path: str, cores: list[int], vectors: dict[str, str] | None = None) -> None:
+def recipe_of(spec: tuple[int, int]) -> dict[str, Any]:
+    return {"CORE": spec[0], "POOL": spec[1], "HOPS": STATE["hops"]}
+
+
+def pool_case(j: int) -> dict[tuple[int, int], np.ndarray]:
+    c, blocked = STATE["cases"][j], STATE["blocked"][j]
+    seed, seed_cos = STATE["seeds"][j - STATE["base"]]
+    return {s: STATE["store"].pool_rows(day_of(c["cutoff"]), blocked, seed, seed_cos, recipe_of(s)).astype(np.int32) for s in STATE["specs"]}
+
+
+def write_shard(task: tuple[str, int, int]) -> int:
     """
-    Builds one worker's pipeline per core from config.toml's [retrieve] block
+    Scores one shard of cases at every spec and writes it, so no term array crosses a pipe
 
     Args:
-        graph_path: The frozen graph export.
-        cores: The core sizes every case is pooled and scored at.
-        vectors: Another embedder's npy, corpus arrow and id array, whose exact pool replaces the store's.
-    """
-    config = load_config(str(ROOT / "config.toml"))
-    graph = load_graph_export(graph_path)
-    if vectors is None:
-        dsn = str(config["database"]["PG_DEST"])
-        pipelines = {c: build_pipeline({"CORE": c, "weights": {}}, config["retrieve"], graph, dsn) for c in cores}
-    else:
-        import pyarrow as pa
-        import pyarrow.ipc as ipc
-
-        import embedder
-
-        embedder.STATE.update(
-            corpus=ipc.open_file(pa.memory_map(vectors["arrow"])).read_all(),
-            ids=np.load(vectors["ids"], mmap_mode="r"),
-            vectors=np.load(vectors["vectors"], mmap_mode="r"),
-        )
-        r = config["retrieve"]
-        hops = int(r["EXPANSION_LIMIT"])
-        pipelines = {
-            c: PaperQuery(
-                embedder.PoolRetriever(),
-                [maker(graph, "", top_k=c, hop_limit=hops) for maker in (embedder.Ancestors, embedder.Frontiers)],
-                [hops, hops],
-                [GraphScorer(graph, Weights(), core=c, depth=int(r["DEPTH"]), decay=float(r["DECAY"]))],
-            )
-            for c in cores
-        }
-    STATE.update(config=config, pipelines=pipelines, limit=get_seed_limit(config["retrieve"]))
-
-
-def pool_case(task: dict[str, Any] | tuple[dict[str, Any], np.ndarray, np.ndarray]) -> tuple[dict[int, np.ndarray], dict[int, np.ndarray], int]:
-    """
-    One case pooled and scored at every core, its anchors blocked from every step
-
-    Args:
-        task: The case, with query, cutoff, anchors and key, or the case with its exact pool rows and query vector.
+        task: The split's directory, and the first and one past the last case.
 
     Returns:
-        The terms per core, the answer mask per core over that core's pool and the answer's size.
+        How many cases it wrote.
     """
-    pipelines = STATE["pipelines"]
-    case = task[0] if isinstance(task, tuple) else task
-    for pipeline in pipelines.values():
-        pipeline.block(case["anchors"])
-    cap = date.fromisoformat(case["cutoff"])
-    retriever = next(iter(pipelines.values())).retriever
-    if isinstance(task, tuple):
-        vector = task[2].tolist()
-        retriever.rows = task[1]
-    else:
-        vector = embed(EmbeddingEndpoint.from_config(STATE["config"]), case["query"])
-    query = Query(text=case["query"], emb=vector, max_date=cap)
-    first = retriever.retrieve(query, STATE["limit"])
-    answer = set(case["key"])
-    terms, hits = {}, {}
-    for core, pipeline in pipelines.items():
-        pool = list(first)
-        for expander, limit in zip(pipeline.expanders, pipeline.limits, strict=True):
-            pool = expander.rerank(query, pool, limit)
-        scorer = pipeline.scorers[0]
-        assert isinstance(scorer, GraphScorer)
-        rows = scorer.get_paper_rows(pool)
-        each = scorer.get_individual_score(pool, rows, scorer.graph.get_day_number(cap), case["query"])
-        terms[core] = np.stack([each[t] for t in TERMS], axis=1).astype(np.float32)
-        hits[core] = np.array([p.arxiv_id in answer for p in pool], np.bool_)
-    return terms, hits, len(answer)
-
-
-def write_shard(split: Path, shard: str, cores: list[int], done: list[tuple[dict[int, np.ndarray], dict[int, np.ndarray], int]]) -> None:
-    """
-    Writes one shard per core, one .npy per array since an .npz is never memory mapped
-
-    Args:
-        split: The split's directory, holding core-<c>/shard-<i>/.
-        shard: The shard's directory name.
-        cores: The core sizes.
-        done: The shard's pooled cases.
-    """
-    n_key = np.array([d[2] for d in done], np.int32)
-    for core in cores:
-        target = split / f"core-{core}" / shard
-        if target.exists():
-            continue
-        part = split / "staging" / f"{shard}.part"
+    store: Store = STATE["store"]
+    out, lo, hi = Path(task[0]), task[1], task[2]
+    done: dict[tuple[int, int], list[tuple[np.ndarray, np.ndarray]]] = {s: [] for s in STATE["specs"]}
+    n_key = []
+    for j in range(lo, hi):
+        c, blocked = STATE["cases"][j], STATE["blocked"][j]
+        cap = day_of(c["cutoff"])
+        key = store.rows_of(c["key"])
+        union, ucos = STATE["union"][j - STATE["base"]].astype(np.int64), STATE["cos"][j - STATE["base"]].astype(np.float64)
+        postings = store.bm25_postings(c["query"], union)
+        for s in STATE["specs"]:
+            rows = STATE["pools"][j - STATE["base"]][s].astype(np.int64)
+            cos = ucos[np.searchsorted(union, rows)]
+            terms = store.terms(rows, cos, cap, c["query"], blocked, s[0], STATE["depth"], STATE["decay"], postings)
+            done[s].append((terms.astype(np.float32), np.isin(rows, key)))
+        n_key.append(len(set(c["key"])))
+    for s, items in done.items():
+        target = out / f"core-{s[0]}-pool-{s[1]}" / f"shard-{lo // SHARD:05d}"
+        part = out / "staging" / f"{s[0]}-{s[1]}-{lo}"
         part.mkdir(parents=True, exist_ok=True)
-        np.save(part / "terms.npy", np.concatenate([d[0][core] for d in done]))
-        np.save(part / "hits.npy", np.concatenate([d[1][core] for d in done]))
-        np.save(part / "offsets.npy", np.concatenate([[0], np.cumsum([len(d[1][core]) for d in done])]))
-        np.save(part / "n_key.npy", n_key)
+        np.save(part / "terms.npy", np.concatenate([t for t, _ in items]))
+        np.save(part / "hits.npy", np.concatenate([h for _, h in items]))
+        np.save(part / "offsets.npy", np.concatenate([[0], np.cumsum([len(h) for _, h in items])]))
+        np.save(part / "n_key.npy", np.array(n_key, np.int32))
         target.parent.mkdir(parents=True, exist_ok=True)
         part.rename(target)
-
-
-def pool_exactly(args: argparse.Namespace, todo: list[tuple[str, list[dict[str, Any]]]]) -> tuple[dict[str, str], dict[str, list[Any]]]:
-    """
-    Embeds every uncached case through the router and takes its exact pool from the embedder's npy on the GPU
-
-    Args:
-        args: The parsed arguments, carrying the embedder.
-        todo: The uncached shards.
-
-    Returns:
-        The paths each worker opens, and each shard's cases with their pool rows and query vectors.
-    """
-    import pyarrow.parquet as pq
-
-    import embedder
-
-    index = Path(args.vectors).parent
-    meta = pq.read_table(index / "corpus.parquet", columns=["arxiv_id", "date"])
-    ids = meta["arxiv_id"].to_pylist()
-    row = {a: i for i, a in enumerate(ids)}
-    days = meta["date"].to_numpy().astype("datetime64[D]").astype(np.int64)
-    cases = [c for _, chunk in todo for c in chunk]
-    embedder.load(args.endpoint)
-    queries = embedder.embed_queries(args.endpoint, args.prompt, [c["query"] for c in cases])
-    print(f"terms: embedded {len(queries)} queries", flush=True)
-    if args.unload:
-        embedder.router(args.endpoint, "unload")
-    caps = np.array([np.datetime64(c["cutoff"], "D").astype(np.int64) for c in cases])
-    anchors = [[row[a] for a in c["anchors"] if a in row] for c in cases]
-    limit = get_seed_limit(load_config(str(ROOT / "config.toml"))["retrieve"])
-    pools = embedder.top_rows_batched(np.load(args.vectors, mmap_mode="r"), queries, caps, anchors, days, limit)
-    print(f"terms: pooled {len(pools)} cases", flush=True)
-    tasks: dict[str, list[Any]] = {}
-    i = 0
-    for name, chunk in todo:
-        tasks[name] = [(c, pools[i + j], queries[i + j]) for j, c in enumerate(chunk)]
-        i += len(chunk)
-    paths = {"vectors": args.vectors, "arrow": str(embedder.corpus_arrow(index)), "ids": str(embedder.corpus_ids(index, ids))}
-    return paths, tasks
+    return hi - lo
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    _ = ap.add_argument("--graph", required=True)
-    _ = ap.add_argument("--cases", required=True)
-    _ = ap.add_argument("--cores", required=True, help="json list of core sizes")
-    _ = ap.add_argument("--out", required=True, help="the split's directory")
-    _ = ap.add_argument("--vectors", help="another embedder's npy in index_cache, pooled exactly instead of from the store")
-    _ = ap.add_argument("--endpoint", help="that embedder's router path")
-    _ = ap.add_argument("--prompt", default="", help="that embedder's query prompt")
-    _ = ap.add_argument("--unload", action="store_true", help="unload that embedder from the router once the queries are embedded")
-    _ = ap.add_argument("--workers", type=int, default=WORKERS)
+    _ = ap.add_argument("--retriever", required=True)
+    _ = ap.add_argument("--dataset", required=True)
+    _ = ap.add_argument("--splits", required=True, help="json list of the splits to cache")
+    _ = ap.add_argument("--specs", required=True, help="json list of [core, pool] pairs")
+    _ = ap.add_argument("--out", required=True, help="a directory, one subdirectory per split")
+    _ = ap.add_argument("--workers", type=int, default=12)
     args = ap.parse_args()
-    cores = json.loads(args.cores)
-    with open(args.cases) as f:
-        cases = [json.loads(line) for line in f]
-    out = Path(args.out)
-    shards = [(f"shard-{i:03d}", cases[s : s + SHARD]) for i, s in enumerate(range(0, len(cases), SHARD))]
-    todo = [(name, chunk) for name, chunk in shards if not all((out / f"core-{c}" / name).exists() for c in cores)]
-    print(f"terms {out.name}: {len(cases)} cases, {len(shards) - len(todo)} of {len(shards)} shards cached", flush=True)
-    if not todo:
-        return
-    vectors, tasks = None, {name: chunk for name, chunk in todo}
-    if args.vectors:
-        vectors, tasks = pool_exactly(args, todo)
-    started, seen, total = time.perf_counter(), 0, sum(len(c) for _, c in todo)
-    for k in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS"):
-        os.environ[k] = "1"
-    with mp.get_context("spawn").Pool(args.workers, initializer=start_worker, initargs=(args.graph, cores, vectors)) as workers:
-        for name, chunk in todo:
-            write_shard(out, name, cores, list(workers.imap(pool_case, tasks[name], chunksize=4)))
-            seen += len(chunk)
-            print(f"terms {out.name}: {name}, {seen} of {total} cases, {(time.perf_counter() - started) / seen:.2f}s a case", flush=True)
+    settings = load_config(str(ROOT / "config.toml"))["retrieve"]
+    specs = [tuple(s) for s in json.loads(args.specs)]
+    store = Store()
+    stream = Stream(store, args.retriever)
+    STATE.update(store=store, specs=specs, hops=int(settings["EXPANSION_LIMIT"]), depth=int(settings["DEPTH"]), decay=float(settings["DECAY"]))
+    for split in json.loads(args.splits):
+        started = time.perf_counter()
+        with open(CASES / args.dataset / f"{split}.jsonl") as f:
+            cases = [json.loads(line) for line in f]
+        queries = query_cache.read(args.retriever, args.dataset, split)
+        blocked = [store.rows_of(c["anchors"]) for c in cases]
+        caps = np.array([day_of(c["cutoff"]) for c in cases])
+        depth = max(s[1] for s in specs)
+        STATE.update(cases=cases, blocked=blocked)
+        t_seed = t_pool = 0.0
+        for b0 in range(0, len(cases), BLOCK):
+            b1 = min(b0 + BLOCK, len(cases))
+            t0 = time.perf_counter()
+            seeds: list[tuple[np.ndarray, np.ndarray]] = []
+            for s in range(b0, b1, BATCH):
+                e = min(s + BATCH, b1)
+                seeds += stream.seeds(queries[s:e], caps[s:e], blocked[s:e], depth)
+            STATE.update(seeds=seeds, base=b0)
+            t1 = time.perf_counter()
+            with mp.get_context("fork").Pool(args.workers) as workers:
+                pools = workers.map(pool_case, range(b0, b1), chunksize=8)
+            union = [np.unique(np.concatenate(list(p.values()))) for p in pools]
+            cos: list[np.ndarray] = []
+            for s in range(0, len(union), BATCH):
+                cos += [c.astype(np.float32) for c in stream.cosines(queries[b0 + s : b0 + s + BATCH], union[s : s + BATCH])]
+            STATE.update(pools=pools, union=union, cos=cos)
+            t2 = time.perf_counter()
+            tasks = [(str(Path(args.out) / split), lo, min(lo + SHARD, b1)) for lo in range(b0, b1, SHARD)]
+            with mp.get_context("fork").Pool(args.workers) as workers:
+                _ = sum(workers.imap_unordered(write_shard, tasks))
+            t_seed += t1 - t0
+            t_pool += t2 - t1
+        n = len(cases)
+        total = time.perf_counter() - started
+        print(f"terms {args.retriever} {args.dataset}_{split}: {n} cases x {len(specs)} specs, seeds {t_seed:.0f}s, pools {t_pool:.0f}s, all {total:.0f}s", flush=True)
 
 
 if __name__ == "__main__":

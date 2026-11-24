@@ -45,6 +45,7 @@
 }
 \email{contact@kuroma.dev}
 
+\addtocontents{toc}{\protect\setcounter{tocdepth}{-1}}
 \input{sections/00_abstract}
 
 \begin{teaserfigure}
@@ -70,8 +71,14 @@
 \onecolumn
 \appendix
 \setcounter{table}{0}
-\renewcommand{\thetable}{\Alph{table}}
-\renewcommand{\theHtable}{appendix.\Alph{table}}
+\setcounter{figure}{0}
+\renewcommand{\thetable}{A\arabic{table}}
+\renewcommand{\thefigure}{A\arabic{figure}}
+\renewcommand{\theHtable}{appendix.\arabic{table}}
+\renewcommand{\theHfigure}{appendix.\arabic{figure}}
+\addtocontents{toc}{\protect\setcounter{tocdepth}{2}}
+\renewcommand{\contentsname}{Appendix Contents}
+\tableofcontents
 \input{sections/08_appendix}
 
 \end{document}

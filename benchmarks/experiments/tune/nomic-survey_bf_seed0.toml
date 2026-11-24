@@ -1,0 +1,4 @@
+retriever = "nomic"
+recipe = "survey"
+method = "bf"
+seed = 0

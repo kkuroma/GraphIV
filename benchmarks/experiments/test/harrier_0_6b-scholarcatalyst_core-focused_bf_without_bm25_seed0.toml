@@ -1,0 +1,7 @@
+retriever = "harrier_0_6b"
+dataset = "scholarcatalyst"
+split = "core"
+method = "bf"
+recipe = "focused"
+seed = 0
+tune_variant = "without_bm25"

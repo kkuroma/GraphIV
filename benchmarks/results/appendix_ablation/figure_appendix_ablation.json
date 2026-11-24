@@ -1,0 +1,2818 @@
+{
+ "zero focused nomic rec": {
+  "delta": -0.015436463795752031,
+  "holm": 1.0
+ },
+ "zero focused nomic bm25": {
+  "delta": -0.052004900920362584,
+  "holm": 0.0015414020595355012
+ },
+ "zero focused nomic anc": {
+  "delta": -0.06318929186003719,
+  "holm": 7.144248246024536e-10
+ },
+ "zero focused nomic fro": {
+  "delta": -0.0007150802478946838,
+  "holm": 1.0
+ },
+ "zero focused nomic anc2": {
+  "delta": -0.0047666244273586456,
+  "holm": 1.0
+ },
+ "zero focused nomic fro2": {
+  "delta": -0.0012977382276605498,
+  "holm": 1.0
+ },
+ "zero focused nomic cocite": {
+  "delta": -0.054000510674592994,
+  "holm": 4.633529510400906e-09
+ },
+ "zero focused nomic couple": {
+  "delta": 0.0006091424333914963,
+  "holm": 1.0
+ },
+ "zero focused nomic anc_decay": {
+  "delta": -0.001050549993820371,
+  "holm": 1.0
+ },
+ "zero focused nomic fro_decay": {
+  "delta": -0.0009269558769003927,
+  "holm": 1.0
+ },
+ "zero focused nomic hub": {
+  "delta": 0.0,
+  "holm": 1.0
+ },
+ "zero focused qwen3_0_6b rec": {
+  "delta": -0.008411835970234205,
+  "holm": 1.0
+ },
+ "zero focused qwen3_0_6b bm25": {
+  "delta": -0.038470903710058235,
+  "holm": 0.02519808029756864
+ },
+ "zero focused qwen3_0_6b anc": {
+  "delta": -0.043392604182370564,
+  "holm": 4.08145099523996e-07
+ },
+ "zero focused qwen3_0_6b fro": {
+  "delta": 0.0,
+  "holm": 1.0
+ },
+ "zero focused qwen3_0_6b anc2": {
+  "delta": -0.007640187645749363,
+  "holm": 1.0
+ },
+ "zero focused qwen3_0_6b fro2": {
+  "delta": -0.0001191800413156141,
+  "holm": 1.0
+ },
+ "zero focused qwen3_0_6b cocite": {
+  "delta": -0.03795534585300986,
+  "holm": 3.1918959473742375e-06
+ },
+ "zero focused qwen3_0_6b couple": {
+  "delta": -0.004275405721456904,
+  "holm": 1.0
+ },
+ "zero focused qwen3_0_6b anc_decay": {
+  "delta": -0.0006488691138301084,
+  "holm": 1.0
+ },
+ "zero focused qwen3_0_6b fro_decay": {
+  "delta": -0.001205042639970233,
+  "holm": 1.0
+ },
+ "zero focused qwen3_0_6b hub": {
+  "delta": 0.0,
+  "holm": 1.0
+ },
+ "zero focused harrier_0_6b rec": {
+  "delta": -0.024342302734961296,
+  "holm": 0.01692583756445129
+ },
+ "zero focused harrier_0_6b bm25": {
+  "delta": -0.04955546245868825,
+  "holm": 7.800583783530685e-05
+ },
+ "zero focused harrier_0_6b anc": {
+  "delta": -0.04729390001915035,
+  "holm": 1.3622817575357215e-05
+ },
+ "zero focused harrier_0_6b fro": {
+  "delta": -0.002428624397478596,
+  "holm": 1.0
+ },
+ "zero focused harrier_0_6b anc2": {
+  "delta": -0.005984909294141749,
+  "holm": 1.0
+ },
+ "zero focused harrier_0_6b fro2": {
+  "delta": -0.002641824249165814,
+  "holm": 1.0
+ },
+ "zero focused harrier_0_6b cocite": {
+  "delta": -0.016237550609074503,
+  "holm": 0.49349017558492825
+ },
+ "zero focused harrier_0_6b couple": {
+  "delta": -0.005904708935854597,
+  "holm": 0.689297260012692
+ },
+ "zero focused harrier_0_6b anc_decay": {
+  "delta": -0.00157582499073039,
+  "holm": 1.0
+ },
+ "zero focused harrier_0_6b fro_decay": {
+  "delta": -0.00157582499073039,
+  "holm": 1.0
+ },
+ "zero focused harrier_0_6b hub": {
+  "delta": -0.0011123470522803602,
+  "holm": 1.0
+ },
+ "zero focused nemotron_1b rec": {
+  "delta": -0.010128537881596955,
+  "holm": 1.0
+ },
+ "zero focused nemotron_1b bm25": {
+  "delta": -0.023133049745952983,
+  "holm": 1.0
+ },
+ "zero focused nemotron_1b anc": {
+  "delta": -0.050887908285016215,
+  "holm": 3.975725312027505e-07
+ },
+ "zero focused nemotron_1b fro": {
+  "delta": -0.0010752688172044333,
+  "holm": 1.0
+ },
+ "zero focused nemotron_1b anc2": {
+  "delta": -0.004321380016597098,
+  "holm": 1.0
+ },
+ "zero focused nemotron_1b fro2": {
+  "delta": -0.0008898776418243548,
+  "holm": 1.0
+ },
+ "zero focused nemotron_1b cocite": {
+  "delta": -0.024735596871303334,
+  "holm": 0.0010205171821944027
+ },
+ "zero focused nemotron_1b couple": {
+  "delta": -0.0021845260165617164,
+  "holm": 1.0
+ },
+ "zero focused nemotron_1b anc_decay": {
+  "delta": -0.0008898776418243548,
+  "holm": 1.0
+ },
+ "zero focused nemotron_1b fro_decay": {
+  "delta": -0.0008898776418243548,
+  "holm": 1.0
+ },
+ "zero focused nemotron_1b hub": {
+  "delta": -0.0003337041156842302,
+  "holm": 1.0
+ },
+ "zero focused qwen3_4b rec": {
+  "delta": -0.007033388067870794,
+  "holm": 1.0
+ },
+ "zero focused qwen3_4b bm25": {
+  "delta": -0.011264375224330658,
+  "holm": 1.0
+ },
+ "zero focused qwen3_4b anc": {
+  "delta": -0.0606422683730804,
+  "holm": 1.9860481203778015e-11
+ },
+ "zero focused qwen3_4b fro": {
+  "delta": -0.0003151649981459892,
+  "holm": 1.0
+ },
+ "zero focused qwen3_4b anc2": {
+  "delta": -0.008039797305648189,
+  "holm": 1.0
+ },
+ "zero focused qwen3_4b fro2": {
+  "delta": -0.0003151649981459892,
+  "holm": 1.0
+ },
+ "zero focused qwen3_4b cocite": {
+  "delta": -0.03141894874375406,
+  "holm": 3.904520075663636e-05
+ },
+ "zero focused qwen3_4b couple": {
+  "delta": -0.005042639970337381,
+  "holm": 1.0
+ },
+ "zero focused qwen3_4b anc_decay": {
+  "delta": 0.0,
+  "holm": 1.0
+ },
+ "zero focused qwen3_4b fro_decay": {
+  "delta": 0.0,
+  "holm": 1.0
+ },
+ "zero focused qwen3_4b hub": {
+  "delta": 0.0005561735261401246,
+  "holm": 1.0
+ },
+ "zero focused qwen3_8b rec": {
+  "delta": -0.003317551315326739,
+  "holm": 1.0
+ },
+ "zero focused qwen3_8b bm25": {
+  "delta": -0.011095729755351669,
+  "holm": 1.0
+ },
+ "zero focused qwen3_8b anc": {
+  "delta": -0.03820498497917868,
+  "holm": 5.325629719466362e-06
+ },
+ "zero focused qwen3_8b fro": {
+  "delta": -0.0012112223458164983,
+  "holm": 1.0
+ },
+ "zero focused qwen3_8b anc2": {
+  "delta": -0.001654877072007288,
+  "holm": 1.0
+ },
+ "zero focused qwen3_8b fro2": {
+  "delta": -0.0006550488196762627,
+  "holm": 1.0
+ },
+ "zero focused qwen3_8b cocite": {
+  "delta": -0.01954278264066922,
+  "holm": 0.09453374000357392
+ },
+ "zero focused qwen3_8b couple": {
+  "delta": -0.001767395871956623,
+  "holm": 1.0
+ },
+ "zero focused qwen3_8b anc_decay": {
+  "delta": 0.0,
+  "holm": 1.0
+ },
+ "zero focused qwen3_8b fro_decay": {
+  "delta": 0.0,
+  "holm": 1.0
+ },
+ "zero focused qwen3_8b hub": {
+  "delta": 0.0005561735261401246,
+  "holm": 1.0
+ },
+ "zero focused nemotron_8b rec": {
+  "delta": -0.010728852163779945,
+  "holm": 1.0
+ },
+ "zero focused nemotron_8b bm25": {
+  "delta": -0.0035520745476251836,
+  "holm": 1.0
+ },
+ "zero focused nemotron_8b anc": {
+  "delta": -0.04328164111256427,
+  "holm": 4.2614592839918785e-10
+ },
+ "zero focused nemotron_8b fro": {
+  "delta": -0.0008713385242862248,
+  "holm": 1.0
+ },
+ "zero focused nemotron_8b anc2": {
+  "delta": -0.006900965799742198,
+  "holm": 1.0
+ },
+ "zero focused nemotron_8b fro2": {
+  "delta": -0.0007786429365962411,
+  "holm": 1.0
+ },
+ "zero focused nemotron_8b cocite": {
+  "delta": -0.050834124471499376,
+  "holm": 5.2353349596491546e-11
+ },
+ "zero focused nemotron_8b couple": {
+  "delta": -0.0012884686688913183,
+  "holm": 1.0
+ },
+ "zero focused nemotron_8b anc_decay": {
+  "delta": 0.0,
+  "holm": 1.0
+ },
+ "zero focused nemotron_8b fro_decay": {
+  "delta": 0.0,
+  "holm": 1.0
+ },
+ "zero focused nemotron_8b hub": {
+  "delta": 0.0003707823507601571,
+  "holm": 1.0
+ },
+ "zero focused harrier_27b rec": {
+  "delta": -0.0028137694711666272,
+  "holm": 1.0
+ },
+ "zero focused harrier_27b bm25": {
+  "delta": 0.004950759288912865,
+  "holm": 1.0
+ },
+ "zero focused harrier_27b anc": {
+  "delta": -0.018244494968632785,
+  "holm": 0.2925939625184979
+ },
+ "zero focused harrier_27b fro": {
+  "delta": 0.0007150802478944618,
+  "holm": 1.0
+ },
+ "zero focused harrier_27b anc2": {
+  "delta": 0.0018989353249642127,
+  "holm": 1.0
+ },
+ "zero focused harrier_27b fro2": {
+  "delta": 0.00015890672175433718,
+  "holm": 1.0
+ },
+ "zero focused harrier_27b cocite": {
+  "delta": -0.0437714676869293,
+  "holm": 3.3943973459879145e-08
+ },
+ "zero focused harrier_27b couple": {
+  "delta": -0.0004449388209121219,
+  "holm": 1.0
+ },
+ "zero focused harrier_27b anc_decay": {
+  "delta": 0.0021055140632448843,
+  "holm": 1.0
+ },
+ "zero focused harrier_27b fro_decay": {
+  "delta": 0.0012712537740345864,
+  "holm": 1.0
+ },
+ "zero focused harrier_27b hub": {
+  "delta": 0.00015890672175433718,
+  "holm": 1.0
+ },
+ "zero survey nomic rec": {
+  "delta": -0.006004984939230462,
+  "holm": 2.4082935579084946e-13
+ },
+ "zero survey nomic bm25": {
+  "delta": -0.002166020721650619,
+  "holm": 0.0002386241083570442
+ },
+ "zero survey nomic anc": {
+  "delta": -0.02377569474657848,
+  "holm": 2.4909016890377816e-79
+ },
+ "zero survey nomic fro": {
+  "delta": -0.0012922499697798906,
+  "holm": 0.21172148560595222
+ },
+ "zero survey nomic anc2": {
+  "delta": -0.0005080408393198232,
+  "holm": 1.0
+ },
+ "zero survey nomic fro2": {
+  "delta": 4.563755227615651e-06,
+  "holm": 1.0
+ },
+ "zero survey nomic cocite": {
+  "delta": -0.02675046591415653,
+  "holm": 4.893623793331187e-86
+ },
+ "zero survey nomic couple": {
+  "delta": 9.94870588074126e-05,
+  "holm": 1.0
+ },
+ "zero survey nomic anc_decay": {
+  "delta": 1.2466477907313589e-05,
+  "holm": 1.0
+ },
+ "zero survey nomic fro_decay": {
+  "delta": 0.00010080459150269006,
+  "holm": 1.0
+ },
+ "zero survey nomic hub": {
+  "delta": -0.0006913780802730307,
+  "holm": 0.20622893927625963
+ },
+ "zero survey qwen3_0_6b rec": {
+  "delta": -0.00600557426472248,
+  "holm": 3.0925255206657755e-15
+ },
+ "zero survey qwen3_0_6b bm25": {
+  "delta": -0.0017823209119110506,
+  "holm": 0.11442787301620896
+ },
+ "zero survey qwen3_0_6b anc": {
+  "delta": -0.021059327159946573,
+  "holm": 1.2495311781852722e-70
+ },
+ "zero survey qwen3_0_6b fro": {
+  "delta": -0.0007567977773349499,
+  "holm": 1.0
+ },
+ "zero survey qwen3_0_6b anc2": {
+  "delta": -0.00036375896498702653,
+  "holm": 1.0
+ },
+ "zero survey qwen3_0_6b fro2": {
+  "delta": 0.00015774151084552157,
+  "holm": 1.0
+ },
+ "zero survey qwen3_0_6b cocite": {
+  "delta": -0.027142708877966493,
+  "holm": 3.4811784547118414e-92
+ },
+ "zero survey qwen3_0_6b couple": {
+  "delta": 0.00010565589208844095,
+  "holm": 1.0
+ },
+ "zero survey qwen3_0_6b anc_decay": {
+  "delta": 3.0752430366653982e-06,
+  "holm": 1.0
+ },
+ "zero survey qwen3_0_6b fro_decay": {
+  "delta": 0.00020420690517597428,
+  "holm": 1.0
+ },
+ "zero survey qwen3_0_6b hub": {
+  "delta": 2.6483777771091344e-05,
+  "holm": 1.0
+ },
+ "zero survey harrier_0_6b rec": {
+  "delta": -0.006891398792450265,
+  "holm": 7.3285175376837355e-19
+ },
+ "zero survey harrier_0_6b bm25": {
+  "delta": -0.0013561030742497704,
+  "holm": 0.2672964032753103
+ },
+ "zero survey harrier_0_6b anc": {
+  "delta": -0.023677440325671206,
+  "holm": 4.639824224802514e-81
+ },
+ "zero survey harrier_0_6b fro": {
+  "delta": -0.0009461520382132993,
+  "holm": 0.4332765528296996
+ },
+ "zero survey harrier_0_6b anc2": {
+  "delta": 0.00019406934552312904,
+  "holm": 1.0
+ },
+ "zero survey harrier_0_6b fro2": {
+  "delta": -0.00011904679730245782,
+  "holm": 1.0
+ },
+ "zero survey harrier_0_6b cocite": {
+  "delta": -0.021121388379447104,
+  "holm": 2.08447882943364e-70
+ },
+ "zero survey harrier_0_6b couple": {
+  "delta": -0.00016862804098499717,
+  "holm": 1.0
+ },
+ "zero survey harrier_0_6b anc_decay": {
+  "delta": -0.00020258777244297477,
+  "holm": 1.0
+ },
+ "zero survey harrier_0_6b fro_decay": {
+  "delta": 2.172508955500252e-05,
+  "holm": 1.0
+ },
+ "zero survey harrier_0_6b hub": {
+  "delta": -0.00011786916049694174,
+  "holm": 1.0
+ },
+ "zero survey nemotron_1b rec": {
+  "delta": -0.0063094617764423155,
+  "holm": 7.230287158501073e-15
+ },
+ "zero survey nemotron_1b bm25": {
+  "delta": -0.0005378128524183845,
+  "holm": 1.0
+ },
+ "zero survey nemotron_1b anc": {
+  "delta": -0.029927017405294853,
+  "holm": 2.844658175298943e-93
+ },
+ "zero survey nemotron_1b fro": {
+  "delta": -0.0009961463433533768,
+  "holm": 1.0
+ },
+ "zero survey nemotron_1b anc2": {
+  "delta": -0.0003988126744342013,
+  "holm": 1.0
+ },
+ "zero survey nemotron_1b fro2": {
+  "delta": 5.829124971951094e-05,
+  "holm": 1.0
+ },
+ "zero survey nemotron_1b cocite": {
+  "delta": -0.024542719020963444,
+  "holm": 5.3433085010763045e-84
+ },
+ "zero survey nemotron_1b couple": {
+  "delta": 0.00011293315777283208,
+  "holm": 1.0
+ },
+ "zero survey nemotron_1b anc_decay": {
+  "delta": 1.0648406699120816e-05,
+  "holm": 1.0
+ },
+ "zero survey nemotron_1b fro_decay": {
+  "delta": 0.0001341527110039209,
+  "holm": 1.0
+ },
+ "zero survey nemotron_1b hub": {
+  "delta": -7.931900437924133e-05,
+  "holm": 1.0
+ },
+ "zero survey qwen3_4b rec": {
+  "delta": -0.0070652083093946105,
+  "holm": 6.063759941685744e-24
+ },
+ "zero survey qwen3_4b bm25": {
+  "delta": -0.000665872898147235,
+  "holm": 1.0
+ },
+ "zero survey qwen3_4b anc": {
+  "delta": -0.019038059031297516,
+  "holm": 1.4384158046261848e-68
+ },
+ "zero survey qwen3_4b fro": {
+  "delta": -0.0008797910647121432,
+  "holm": 0.08693933352625001
+ },
+ "zero survey qwen3_4b anc2": {
+  "delta": -0.00016291866232803764,
+  "holm": 1.0
+ },
+ "zero survey qwen3_4b fro2": {
+  "delta": -2.0465047644746548e-05,
+  "holm": 1.0
+ },
+ "zero survey qwen3_4b cocite": {
+  "delta": -0.02251320980759941,
+  "holm": 2.6766720767914642e-74
+ },
+ "zero survey qwen3_4b couple": {
+  "delta": 2.197764271733016e-05,
+  "holm": 1.0
+ },
+ "zero survey qwen3_4b anc_decay": {
+  "delta": 7.026548683619627e-06,
+  "holm": 1.0
+ },
+ "zero survey qwen3_4b fro_decay": {
+  "delta": 0.00011563639769890388,
+  "holm": 1.0
+ },
+ "zero survey qwen3_4b hub": {
+  "delta": 1.4241571470174907e-05,
+  "holm": 1.0
+ },
+ "zero survey qwen3_8b rec": {
+  "delta": -0.00742643811279442,
+  "holm": 6.336398674818803e-22
+ },
+ "zero survey qwen3_8b bm25": {
+  "delta": -0.00026400450986896473,
+  "holm": 1.0
+ },
+ "zero survey qwen3_8b anc": {
+  "delta": -0.024027208034961722,
+  "holm": 2.8537325924315525e-73
+ },
+ "zero survey qwen3_8b fro": {
+  "delta": -0.00042346676087023916,
+  "holm": 1.0
+ },
+ "zero survey qwen3_8b anc2": {
+  "delta": 0.00032894879948525135,
+  "holm": 1.0
+ },
+ "zero survey qwen3_8b fro2": {
+  "delta": 0.0001403918530714643,
+  "holm": 1.0
+ },
+ "zero survey qwen3_8b cocite": {
+  "delta": -0.017145406172545674,
+  "holm": 7.680178570339608e-58
+ },
+ "zero survey qwen3_8b couple": {
+  "delta": 0.00010088011129277819,
+  "holm": 1.0
+ },
+ "zero survey qwen3_8b anc_decay": {
+  "delta": -0.0005284437208411541,
+  "holm": 1.0
+ },
+ "zero survey qwen3_8b fro_decay": {
+  "delta": -3.836035081200562e-05,
+  "holm": 1.0
+ },
+ "zero survey qwen3_8b hub": {
+  "delta": 6.0603821489313425e-05,
+  "holm": 1.0
+ },
+ "zero survey nemotron_8b rec": {
+  "delta": -0.00745022063494305,
+  "holm": 2.562283576546703e-24
+ },
+ "zero survey nemotron_8b bm25": {
+  "delta": -3.838698871050372e-06,
+  "holm": 1.0
+ },
+ "zero survey nemotron_8b anc": {
+  "delta": -0.0264883021740433,
+  "holm": 6.713406258090314e-78
+ },
+ "zero survey nemotron_8b fro": {
+  "delta": -0.000865266506194784,
+  "holm": 1.0
+ },
+ "zero survey nemotron_8b anc2": {
+  "delta": -7.1306674885252e-05,
+  "holm": 1.0
+ },
+ "zero survey nemotron_8b fro2": {
+  "delta": -0.0001211677230910091,
+  "holm": 1.0
+ },
+ "zero survey nemotron_8b cocite": {
+  "delta": -0.014068732111167215,
+  "holm": 1.6316474610982518e-51
+ },
+ "zero survey nemotron_8b couple": {
+  "delta": -3.90909209075363e-05,
+  "holm": 1.0
+ },
+ "zero survey nemotron_8b anc_decay": {
+  "delta": -0.0008301237562791108,
+  "holm": 1.0
+ },
+ "zero survey nemotron_8b fro_decay": {
+  "delta": -1.599575496691319e-05,
+  "holm": 1.0
+ },
+ "zero survey nemotron_8b hub": {
+  "delta": -3.455481610631361e-05,
+  "holm": 1.0
+ },
+ "zero survey harrier_27b rec": {
+  "delta": -0.006823574978124636,
+  "holm": 2.6670076078357714e-17
+ },
+ "zero survey harrier_27b bm25": {
+  "delta": 0.0001927298024826385,
+  "holm": 1.0
+ },
+ "zero survey harrier_27b anc": {
+  "delta": -0.0258911970470585,
+  "holm": 1.5068856387936303e-93
+ },
+ "zero survey harrier_27b fro": {
+  "delta": -0.00027939105631813455,
+  "holm": 1.0
+ },
+ "zero survey harrier_27b anc2": {
+  "delta": -0.0004729252377470572,
+  "holm": 1.0
+ },
+ "zero survey harrier_27b fro2": {
+  "delta": 9.456710929767187e-05,
+  "holm": 1.0
+ },
+ "zero survey harrier_27b cocite": {
+  "delta": -0.024820570183133606,
+  "holm": 1.260768896670565e-88
+ },
+ "zero survey harrier_27b couple": {
+  "delta": 6.332971196504333e-05,
+  "holm": 1.0
+ },
+ "zero survey harrier_27b anc_decay": {
+  "delta": -0.0004144441246074493,
+  "holm": 1.0
+ },
+ "zero survey harrier_27b fro_decay": {
+  "delta": 7.668299344515406e-05,
+  "holm": 1.0
+ },
+ "zero survey harrier_27b hub": {
+  "delta": 0.00011108112999314024,
+  "holm": 1.0
+ },
+ "zero frontier nomic rec": {
+  "delta": -0.024901855458360947,
+  "holm": 3.5058787936616304e-06
+ },
+ "zero frontier nomic bm25": {
+  "delta": -0.002908850574243227,
+  "holm": 1.0
+ },
+ "zero frontier nomic anc": {
+  "delta": -0.007961614840759607,
+  "holm": 0.7439155773009181
+ },
+ "zero frontier nomic fro": {
+  "delta": -0.005194417113139893,
+  "holm": 1.0
+ },
+ "zero frontier nomic anc2": {
+  "delta": -0.0001027854866892941,
+  "holm": 1.0
+ },
+ "zero frontier nomic fro2": {
+  "delta": -0.0002436530230623679,
+  "holm": 1.0
+ },
+ "zero frontier nomic cocite": {
+  "delta": -0.06451120605736561,
+  "holm": 1.2044148460644408e-13
+ },
+ "zero frontier nomic couple": {
+  "delta": 1.5416896005843173e-05,
+  "holm": 1.0
+ },
+ "zero frontier nomic anc_decay": {
+  "delta": -0.0008464844734533683,
+  "holm": 1.0
+ },
+ "zero frontier nomic fro_decay": {
+  "delta": -0.00012433077805620862,
+  "holm": 1.0
+ },
+ "zero frontier nomic hub": {
+  "delta": -0.016688598788857298,
+  "holm": 0.10766365960687306
+ },
+ "zero frontier qwen3_0_6b rec": {
+  "delta": -0.025037459982130292,
+  "holm": 0.00474984997932555
+ },
+ "zero frontier qwen3_0_6b bm25": {
+  "delta": -0.0012623243729881217,
+  "holm": 1.0
+ },
+ "zero frontier qwen3_0_6b anc": {
+  "delta": 0.0004803397371120899,
+  "holm": 1.0
+ },
+ "zero frontier qwen3_0_6b fro": {
+  "delta": 0.0033396233479544846,
+  "holm": 1.0
+ },
+ "zero frontier qwen3_0_6b anc2": {
+  "delta": -5.820382981200356e-05,
+  "holm": 1.0
+ },
+ "zero frontier qwen3_0_6b fro2": {
+  "delta": 0.006391353091591834,
+  "holm": 1.0
+ },
+ "zero frontier qwen3_0_6b cocite": {
+  "delta": -0.06578299149707807,
+  "holm": 2.3480650131037885e-14
+ },
+ "zero frontier qwen3_0_6b couple": {
+  "delta": 0.0003267986759446784,
+  "holm": 1.0
+ },
+ "zero frontier qwen3_0_6b anc_decay": {
+  "delta": 0.0012426636325777451,
+  "holm": 1.0
+ },
+ "zero frontier qwen3_0_6b fro_decay": {
+  "delta": 0.0,
+  "holm": 1.0
+ },
+ "zero frontier qwen3_0_6b hub": {
+  "delta": 0.0008862318407582559,
+  "holm": 1.0
+ },
+ "zero frontier harrier_0_6b rec": {
+  "delta": -0.019172621981991378,
+  "holm": 0.0017804490014291135
+ },
+ "zero frontier harrier_0_6b bm25": {
+  "delta": 0.0011613878912124787,
+  "holm": 1.0
+ },
+ "zero frontier harrier_0_6b anc": {
+  "delta": 0.0010515199044627277,
+  "holm": 1.0
+ },
+ "zero frontier harrier_0_6b fro": {
+  "delta": 0.0007506545862350777,
+  "holm": 1.0
+ },
+ "zero frontier harrier_0_6b anc2": {
+  "delta": 3.905963918660049e-05,
+  "holm": 1.0
+ },
+ "zero frontier harrier_0_6b fro2": {
+  "delta": 0.0009415574940788429,
+  "holm": 1.0
+ },
+ "zero frontier harrier_0_6b cocite": {
+  "delta": -0.056269283969468176,
+  "holm": 8.413492199996882e-11
+ },
+ "zero frontier harrier_0_6b couple": {
+  "delta": 0.00047127173741484674,
+  "holm": 1.0
+ },
+ "zero frontier harrier_0_6b anc_decay": {
+  "delta": 0.0036718488432317398,
+  "holm": 1.0
+ },
+ "zero frontier harrier_0_6b fro_decay": {
+  "delta": 0.0009364984688785827,
+  "holm": 1.0
+ },
+ "zero frontier harrier_0_6b hub": {
+  "delta": 0.0014819871478857216,
+  "holm": 1.0
+ },
+ "zero frontier nemotron_1b rec": {
+  "delta": -0.026166414943954178,
+  "holm": 1.2891284905664655e-05
+ },
+ "zero frontier nemotron_1b bm25": {
+  "delta": -0.0022551838108947897,
+  "holm": 1.0
+ },
+ "zero frontier nemotron_1b anc": {
+  "delta": -0.0035188230201230464,
+  "holm": 1.0
+ },
+ "zero frontier nemotron_1b fro": {
+  "delta": -0.006649767452090033,
+  "holm": 1.0
+ },
+ "zero frontier nemotron_1b anc2": {
+  "delta": 0.0002576489533011317,
+  "holm": 1.0
+ },
+ "zero frontier nemotron_1b fro2": {
+  "delta": -0.0008930340206138865,
+  "holm": 1.0
+ },
+ "zero frontier nemotron_1b cocite": {
+  "delta": -0.06383542518474379,
+  "holm": 7.861365186768809e-14
+ },
+ "zero frontier nemotron_1b couple": {
+  "delta": 0.000518563279814227,
+  "holm": 1.0
+ },
+ "zero frontier nemotron_1b anc_decay": {
+  "delta": -0.000228079755238475,
+  "holm": 1.0
+ },
+ "zero frontier nemotron_1b fro_decay": {
+  "delta": 1.3248285026384865e-05,
+  "holm": 1.0
+ },
+ "zero frontier nemotron_1b hub": {
+  "delta": -0.006830572955942388,
+  "holm": 1.0
+ },
+ "zero frontier qwen3_4b rec": {
+  "delta": -0.02110764592831918,
+  "holm": 0.04940689094873802
+ },
+ "zero frontier qwen3_4b bm25": {
+  "delta": 0.0007549071811588093,
+  "holm": 1.0
+ },
+ "zero frontier qwen3_4b anc": {
+  "delta": 0.0005284235229523759,
+  "holm": 1.0
+ },
+ "zero frontier qwen3_4b fro": {
+  "delta": 0.002118422240197926,
+  "holm": 1.0
+ },
+ "zero frontier qwen3_4b anc2": {
+  "delta": 0.0005954336711180563,
+  "holm": 1.0
+ },
+ "zero frontier qwen3_4b fro2": {
+  "delta": 0.0007162055693658576,
+  "holm": 1.0
+ },
+ "zero frontier qwen3_4b cocite": {
+  "delta": -0.058990993545603373,
+  "holm": 2.9686247910166074e-11
+ },
+ "zero frontier qwen3_4b couple": {
+  "delta": 0.00020851906106211793,
+  "holm": 1.0
+ },
+ "zero frontier qwen3_4b anc_decay": {
+  "delta": 0.0031930596474847583,
+  "holm": 1.0
+ },
+ "zero frontier qwen3_4b fro_decay": {
+  "delta": 0.0006267527573376452,
+  "holm": 1.0
+ },
+ "zero frontier qwen3_4b hub": {
+  "delta": 0.0008674974534525759,
+  "holm": 1.0
+ },
+ "zero frontier qwen3_8b rec": {
+  "delta": -0.021321288172967634,
+  "holm": 0.00025963944357203613
+ },
+ "zero frontier qwen3_8b bm25": {
+  "delta": 0.0001792446830802541,
+  "holm": 1.0
+ },
+ "zero frontier qwen3_8b anc": {
+  "delta": -0.001321116935838279,
+  "holm": 1.0
+ },
+ "zero frontier qwen3_8b fro": {
+  "delta": -0.003212220634931179,
+  "holm": 1.0
+ },
+ "zero frontier qwen3_8b anc2": {
+  "delta": -0.0001042752867570218,
+  "holm": 1.0
+ },
+ "zero frontier qwen3_8b fro2": {
+  "delta": -0.0002176167748849378,
+  "holm": 1.0
+ },
+ "zero frontier qwen3_8b cocite": {
+  "delta": -0.05638353979927205,
+  "holm": 2.662070387586941e-11
+ },
+ "zero frontier qwen3_8b couple": {
+  "delta": 0.00045641264539963977,
+  "holm": 1.0
+ },
+ "zero frontier qwen3_8b anc_decay": {
+  "delta": 0.0007955776860554542,
+  "holm": 1.0
+ },
+ "zero frontier qwen3_8b fro_decay": {
+  "delta": 0.0012062616201640175,
+  "holm": 1.0
+ },
+ "zero frontier qwen3_8b hub": {
+  "delta": -0.005103068066629579,
+  "holm": 1.0
+ },
+ "zero frontier nemotron_8b rec": {
+  "delta": -0.032926582075725686,
+  "holm": 1.757305740362325e-07
+ },
+ "zero frontier nemotron_8b bm25": {
+  "delta": -3.2301804702150605e-06,
+  "holm": 1.0
+ },
+ "zero frontier nemotron_8b anc": {
+  "delta": 0.0016361965711066406,
+  "holm": 1.0
+ },
+ "zero frontier nemotron_8b fro": {
+  "delta": -0.0016641018717184763,
+  "holm": 1.0
+ },
+ "zero frontier nemotron_8b anc2": {
+  "delta": 0.00022347103092443255,
+  "holm": 1.0
+ },
+ "zero frontier nemotron_8b fro2": {
+  "delta": -0.002634973845992372,
+  "holm": 1.0
+ },
+ "zero frontier nemotron_8b cocite": {
+  "delta": -0.06812690678533562,
+  "holm": 1.763937816799099e-14
+ },
+ "zero frontier nemotron_8b couple": {
+  "delta": -0.00030927733592112094,
+  "holm": 1.0
+ },
+ "zero frontier nemotron_8b anc_decay": {
+  "delta": -6.605541467138987e-05,
+  "holm": 1.0
+ },
+ "zero frontier nemotron_8b fro_decay": {
+  "delta": -6.80599847566743e-05,
+  "holm": 1.0
+ },
+ "zero frontier nemotron_8b hub": {
+  "delta": -0.0020039386457828268,
+  "holm": 1.0
+ },
+ "zero frontier harrier_27b rec": {
+  "delta": -0.022271512160699336,
+  "holm": 0.00030516007173022567
+ },
+ "zero frontier harrier_27b bm25": {
+  "delta": -0.0018495522442953105,
+  "holm": 1.0
+ },
+ "zero frontier harrier_27b anc": {
+  "delta": 0.0012052604774317743,
+  "holm": 1.0
+ },
+ "zero frontier harrier_27b fro": {
+  "delta": -0.005432727364493739,
+  "holm": 0.6931944235994739
+ },
+ "zero frontier harrier_27b anc2": {
+  "delta": 0.00010510155437692958,
+  "holm": 1.0
+ },
+ "zero frontier harrier_27b fro2": {
+  "delta": -0.0013848615218795546,
+  "holm": 1.0
+ },
+ "zero frontier harrier_27b cocite": {
+  "delta": -0.05571859174895026,
+  "holm": 2.355909356529216e-10
+ },
+ "zero frontier harrier_27b couple": {
+  "delta": -0.0004991006672429299,
+  "holm": 1.0
+ },
+ "zero frontier harrier_27b anc_decay": {
+  "delta": -0.0006452797672887589,
+  "holm": 1.0
+ },
+ "zero frontier harrier_27b fro_decay": {
+  "delta": -0.00032387469260841684,
+  "holm": 1.0
+ },
+ "zero frontier harrier_27b hub": {
+  "delta": 0.0009544625880960611,
+  "holm": 1.0
+ },
+ "zero consensus nomic rec": {
+  "delta": -0.08395623345552083,
+  "holm": 0.008956785599866094
+ },
+ "zero consensus nomic bm25": {
+  "delta": -0.03468151461700386,
+  "holm": 0.0902080807768648
+ },
+ "zero consensus nomic anc": {
+  "delta": -0.5256992914906649,
+  "holm": 1.6058306602349653e-10
+ },
+ "zero consensus nomic fro": {
+  "delta": -0.000806409925045215,
+  "holm": 1.0
+ },
+ "zero consensus nomic anc2": {
+  "delta": 0.007219837851910493,
+  "holm": 1.0
+ },
+ "zero consensus nomic fro2": {
+  "delta": -0.000806409925045215,
+  "holm": 1.0
+ },
+ "zero consensus nomic cocite": {
+  "delta": 0.005699608610567508,
+  "holm": 1.0
+ },
+ "zero consensus nomic couple": {
+  "delta": -0.0005479452054794054,
+  "holm": 1.0
+ },
+ "zero consensus nomic anc_decay": {
+  "delta": -0.0010648746446110247,
+  "holm": 1.0
+ },
+ "zero consensus nomic fro_decay": {
+  "delta": -0.000806409925045215,
+  "holm": 1.0
+ },
+ "zero consensus nomic hub": {
+  "delta": -0.0028000344619625306,
+  "holm": 1.0
+ },
+ "zero consensus qwen3_0_6b rec": {
+  "delta": -0.07291097485848275,
+  "holm": 0.016516813327213258
+ },
+ "zero consensus qwen3_0_6b bm25": {
+  "delta": -0.012513491984453506,
+  "holm": 1.0
+ },
+ "zero consensus qwen3_0_6b anc": {
+  "delta": -0.2255297531785838,
+  "holm": 2.189559724995714e-05
+ },
+ "zero consensus qwen3_0_6b fro": {
+  "delta": -0.003275373480265187,
+  "holm": 1.0
+ },
+ "zero consensus qwen3_0_6b anc2": {
+  "delta": 0.017004798504781538,
+  "holm": 1.0
+ },
+ "zero consensus qwen3_0_6b fro2": {
+  "delta": 0.0006563926940639231,
+  "holm": 1.0
+ },
+ "zero consensus qwen3_0_6b cocite": {
+  "delta": 0.004697422199740342,
+  "holm": 1.0
+ },
+ "zero consensus qwen3_0_6b couple": {
+  "delta": 0.0019406392694063523,
+  "holm": 1.0
+ },
+ "zero consensus qwen3_0_6b anc_decay": {
+  "delta": -0.001619327139594784,
+  "holm": 1.0
+ },
+ "zero consensus qwen3_0_6b fro_decay": {
+  "delta": 0.0005707762557077833,
+  "holm": 1.0
+ },
+ "zero consensus qwen3_0_6b hub": {
+  "delta": 0.00042808219178080975,
+  "holm": 1.0
+ },
+ "zero consensus harrier_0_6b rec": {
+  "delta": -0.07650758412406766,
+  "holm": 0.04739818430050958
+ },
+ "zero consensus harrier_0_6b bm25": {
+  "delta": -0.013573069042954966,
+  "holm": 1.0
+ },
+ "zero consensus harrier_0_6b anc": {
+  "delta": -0.4252719709660518,
+  "holm": 5.025070611435869e-10
+ },
+ "zero consensus harrier_0_6b fro": {
+  "delta": -0.0014868019248315267,
+  "holm": 1.0
+ },
+ "zero consensus harrier_0_6b anc2": {
+  "delta": 0.008519089504389732,
+  "holm": 1.0
+ },
+ "zero consensus harrier_0_6b fro2": {
+  "delta": -0.0007658213913058765,
+  "holm": 1.0
+ },
+ "zero consensus harrier_0_6b cocite": {
+  "delta": 0.006692993517353751,
+  "holm": 1.0
+ },
+ "zero consensus harrier_0_6b couple": {
+  "delta": 0.0009784735812133905,
+  "holm": 1.0
+ },
+ "zero consensus harrier_0_6b anc_decay": {
+  "delta": 0.0,
+  "holm": 1.0
+ },
+ "zero consensus harrier_0_6b fro_decay": {
+  "delta": 0.0,
+  "holm": 1.0
+ },
+ "zero consensus harrier_0_6b hub": {
+  "delta": -0.0011415525114154557,
+  "holm": 1.0
+ },
+ "zero consensus nemotron_1b rec": {
+  "delta": -0.030628000937006572,
+  "holm": 1.0
+ },
+ "zero consensus nemotron_1b bm25": {
+  "delta": -0.0065552779003882344,
+  "holm": 1.0
+ },
+ "zero consensus nemotron_1b anc": {
+  "delta": -0.1858576904906759,
+  "holm": 6.357941935153775e-06
+ },
+ "zero consensus nemotron_1b fro": {
+  "delta": 0.0008612284134995596,
+  "holm": 1.0
+ },
+ "zero consensus nemotron_1b anc2": {
+  "delta": 0.011426368107221974,
+  "holm": 1.0
+ },
+ "zero consensus nemotron_1b fro2": {
+  "delta": -0.0028526224236390396,
+  "holm": 1.0
+ },
+ "zero consensus nemotron_1b cocite": {
+  "delta": 0.002403381559989426,
+  "holm": 1.0
+ },
+ "zero consensus nemotron_1b couple": {
+  "delta": -0.00043052837573387404,
+  "holm": 1.0
+ },
+ "zero consensus nemotron_1b anc_decay": {
+  "delta": 0.0,
+  "holm": 1.0
+ },
+ "zero consensus nemotron_1b fro_decay": {
+  "delta": 0.0008612284134995596,
+  "holm": 1.0
+ },
+ "zero consensus nemotron_1b hub": {
+  "delta": -0.003147423352902745,
+  "holm": 1.0
+ },
+ "zero consensus qwen3_4b rec": {
+  "delta": -0.07070391041793089,
+  "holm": 0.004575833135633644
+ },
+ "zero consensus qwen3_4b bm25": {
+  "delta": -0.006063914456127861,
+  "holm": 1.0
+ },
+ "zero consensus qwen3_4b anc": {
+  "delta": -0.3922884307675242,
+  "holm": 3.984583267915501e-10
+ },
+ "zero consensus qwen3_4b fro": {
+  "delta": -0.004885844748858448,
+  "holm": 1.0
+ },
+ "zero consensus qwen3_4b anc2": {
+  "delta": 0.004573682733708395,
+  "holm": 1.0
+ },
+ "zero consensus qwen3_4b fro2": {
+  "delta": -0.005606825282383987,
+  "holm": 1.0
+ },
+ "zero consensus qwen3_4b cocite": {
+  "delta": 0.008619288287584292,
+  "holm": 1.0
+ },
+ "zero consensus qwen3_4b couple": {
+  "delta": -0.0005479452054794054,
+  "holm": 1.0
+ },
+ "zero consensus qwen3_4b anc_decay": {
+  "delta": -0.0076350034490326735,
+  "holm": 1.0
+ },
+ "zero consensus qwen3_4b fro_decay": {
+  "delta": -0.0027272727272726893,
+  "holm": 1.0
+ },
+ "zero consensus qwen3_4b hub": {
+  "delta": -0.0012328767123286344,
+  "holm": 1.0
+ },
+ "zero consensus qwen3_8b rec": {
+  "delta": -0.06740485031837573,
+  "holm": 0.03814922413045052
+ },
+ "zero consensus qwen3_8b bm25": {
+  "delta": -0.004031674674195518,
+  "holm": 1.0
+ },
+ "zero consensus qwen3_8b anc": {
+  "delta": -0.5265229500963409,
+  "holm": 2.16919134593678e-10
+ },
+ "zero consensus qwen3_8b fro": {
+  "delta": -0.001989906272530595,
+  "holm": 1.0
+ },
+ "zero consensus qwen3_8b anc2": {
+  "delta": -0.003797537406978968,
+  "holm": 1.0
+ },
+ "zero consensus qwen3_8b fro2": {
+  "delta": -0.001989906272530595,
+  "holm": 1.0
+ },
+ "zero consensus qwen3_8b cocite": {
+  "delta": -0.0018954290440039712,
+  "holm": 1.0
+ },
+ "zero consensus qwen3_8b couple": {
+  "delta": -0.0014419610670510785,
+  "holm": 1.0
+ },
+ "zero consensus qwen3_8b anc_decay": {
+  "delta": -0.0013452771175744838,
+  "holm": 1.0
+ },
+ "zero consensus qwen3_8b fro_decay": {
+  "delta": 0.0,
+  "holm": 1.0
+ },
+ "zero consensus qwen3_8b hub": {
+  "delta": -0.0007209805335255393,
+  "holm": 1.0
+ },
+ "zero consensus nemotron_8b rec": {
+  "delta": -0.08962035003061875,
+  "holm": 0.004919571835364121
+ },
+ "zero consensus nemotron_8b bm25": {
+  "delta": 0.0018216208726832273,
+  "holm": 1.0
+ },
+ "zero consensus nemotron_8b anc": {
+  "delta": -0.5606353956322891,
+  "holm": 3.8194470738877565e-11
+ },
+ "zero consensus nemotron_8b fro": {
+  "delta": 0.005755961440892854,
+  "holm": 1.0
+ },
+ "zero consensus nemotron_8b anc2": {
+  "delta": 0.004263864352286428,
+  "holm": 1.0
+ },
+ "zero consensus nemotron_8b fro2": {
+  "delta": 0.0061164517076557345,
+  "holm": 1.0
+ },
+ "zero consensus nemotron_8b cocite": {
+  "delta": 0.002016674066095292,
+  "holm": 1.0
+ },
+ "zero consensus nemotron_8b couple": {
+  "delta": 0.0018797564687975665,
+  "holm": 1.0
+ },
+ "zero consensus nemotron_8b anc_decay": {
+  "delta": 0.00483699736403409,
+  "holm": 1.0
+ },
+ "zero consensus nemotron_8b fro_decay": {
+  "delta": 0.00011415525114155667,
+  "holm": 1.0
+ },
+ "zero consensus nemotron_8b hub": {
+  "delta": 0.0005707762557076723,
+  "holm": 1.0
+ },
+ "zero consensus harrier_27b rec": {
+  "delta": -0.10558906269528368,
+  "holm": 4.608259729241754e-05
+ },
+ "zero consensus harrier_27b bm25": {
+  "delta": -0.004743060085525941,
+  "holm": 1.0
+ },
+ "zero consensus harrier_27b anc": {
+  "delta": -0.5482071178148559,
+  "holm": 9.799743840496787e-11
+ },
+ "zero consensus harrier_27b fro": {
+  "delta": 0.0011439159741720717,
+  "holm": 1.0
+ },
+ "zero consensus harrier_27b anc2": {
+  "delta": 0.004863907375137533,
+  "holm": 1.0
+ },
+ "zero consensus harrier_27b fro2": {
+  "delta": -0.002625019301612519,
+  "holm": 1.0
+ },
+ "zero consensus harrier_27b cocite": {
+  "delta": 0.003194344308259267,
+  "holm": 1.0
+ },
+ "zero consensus harrier_27b couple": {
+  "delta": -0.002625019301612519,
+  "holm": 1.0
+ },
+ "zero consensus harrier_27b anc_decay": {
+  "delta": -0.00927971254156168,
+  "holm": 1.0
+ },
+ "zero consensus harrier_27b fro_decay": {
+  "delta": -0.0028533298038955213,
+  "holm": 1.0
+ },
+ "zero consensus harrier_27b hub": {
+  "delta": 0.0011147334287674449,
+  "holm": 1.0
+ },
+ "without focused nomic rec": {
+  "delta": -0.0122687194155493,
+  "holm": 1.0
+ },
+ "without focused nomic bm25": {
+  "delta": -0.0379455608042929,
+  "holm": 0.009237363429771142
+ },
+ "without focused nomic anc": {
+  "delta": -0.009694124933279702,
+  "holm": 1.0
+ },
+ "without focused nomic fro": {
+  "delta": 0.00204385282249564,
+  "holm": 1.0
+ },
+ "without focused nomic anc2": {
+  "delta": -0.0005534571719222336,
+  "holm": 1.0
+ },
+ "without focused nomic fro2": {
+  "delta": -0.002033938129600066,
+  "holm": 1.0
+ },
+ "without focused nomic cocite": {
+  "delta": -0.012595496827977448,
+  "holm": 1.0
+ },
+ "without focused nomic couple": {
+  "delta": -0.0027119401424184897,
+  "holm": 1.0
+ },
+ "without focused nomic anc_decay": {
+  "delta": -0.0013740338267591579,
+  "holm": 1.0
+ },
+ "without focused nomic fro_decay": {
+  "delta": 0.002448487737697791,
+  "holm": 1.0
+ },
+ "without focused nomic hub": {
+  "delta": -0.0011514965074477246,
+  "holm": 1.0
+ },
+ "without focused qwen3_0_6b rec": {
+  "delta": -0.00792842678270922,
+  "holm": 1.0
+ },
+ "without focused qwen3_0_6b bm25": {
+  "delta": -0.04093558770978112,
+  "holm": 0.00025094873605627807
+ },
+ "without focused qwen3_0_6b anc": {
+  "delta": -0.0038211973417756617,
+  "holm": 1.0
+ },
+ "without focused qwen3_0_6b fro": {
+  "delta": -0.000797182054134149,
+  "holm": 1.0
+ },
+ "without focused qwen3_0_6b anc2": {
+  "delta": -0.0018141850733618403,
+  "holm": 1.0
+ },
+ "without focused qwen3_0_6b fro2": {
+  "delta": -0.001865320441516105,
+  "holm": 1.0
+ },
+ "without focused qwen3_0_6b cocite": {
+  "delta": -0.013627881202964542,
+  "holm": 0.3762731802722109
+ },
+ "without focused qwen3_0_6b couple": {
+  "delta": -0.00394883203559504,
+  "holm": 1.0
+ },
+ "without focused qwen3_0_6b anc_decay": {
+  "delta": 0.0002780867630700623,
+  "holm": 1.0
+ },
+ "without focused qwen3_0_6b fro_decay": {
+  "delta": -0.0019466073414905471,
+  "holm": 1.0
+ },
+ "without focused qwen3_0_6b hub": {
+  "delta": -0.0010752688172042113,
+  "holm": 1.0
+ },
+ "without focused harrier_0_6b rec": {
+  "delta": -0.00232292426396985,
+  "holm": 1.0
+ },
+ "without focused harrier_0_6b bm25": {
+  "delta": -0.03908701297466588,
+  "holm": 1.858467473752136e-05
+ },
+ "without focused harrier_0_6b anc": {
+  "delta": -0.009644313787806502,
+  "holm": 1.0
+ },
+ "without focused harrier_0_6b fro": {
+  "delta": -0.0014659145081836744,
+  "holm": 1.0
+ },
+ "without focused harrier_0_6b anc2": {
+  "delta": -0.009761592381169693,
+  "holm": 1.0
+ },
+ "without focused harrier_0_6b fro2": {
+  "delta": -0.0016600659259169426,
+  "holm": 1.0
+ },
+ "without focused harrier_0_6b cocite": {
+  "delta": -0.007646061761745759,
+  "holm": 1.0
+ },
+ "without focused harrier_0_6b couple": {
+  "delta": -0.00808305524657027,
+  "holm": 1.0
+ },
+ "without focused harrier_0_6b anc_decay": {
+  "delta": 0.0027178142584148857,
+  "holm": 1.0
+ },
+ "without focused harrier_0_6b fro_decay": {
+  "delta": -0.0036437515024834166,
+  "holm": 1.0
+ },
+ "without focused harrier_0_6b hub": {
+  "delta": 0.0005686008466876391,
+  "holm": 1.0
+ },
+ "without focused nemotron_1b rec": {
+  "delta": -0.0053895184039789434,
+  "holm": 1.0
+ },
+ "without focused nemotron_1b bm25": {
+  "delta": -0.012845401416035518,
+  "holm": 1.0
+ },
+ "without focused nemotron_1b anc": {
+  "delta": -0.00615631124529914,
+  "holm": 1.0
+ },
+ "without focused nemotron_1b fro": {
+  "delta": 0.000622384660204367,
+  "holm": 1.0
+ },
+ "without focused nemotron_1b anc2": {
+  "delta": -0.0022834013100977435,
+  "holm": 1.0
+ },
+ "without focused nemotron_1b fro2": {
+  "delta": 0.001595688330949585,
+  "holm": 1.0
+ },
+ "without focused nemotron_1b cocite": {
+  "delta": -0.00042639970337421396,
+  "holm": 1.0
+ },
+ "without focused nemotron_1b couple": {
+  "delta": 0.0038234722884332717,
+  "holm": 1.0
+ },
+ "without focused nemotron_1b anc_decay": {
+  "delta": 0.0008342602892101869,
+  "holm": 1.0
+ },
+ "without focused nemotron_1b fro_decay": {
+  "delta": 0.000817045394353455,
+  "holm": 1.0
+ },
+ "without focused nemotron_1b hub": {
+  "delta": -0.0007402404788389161,
+  "holm": 1.0
+ },
+ "without focused qwen3_4b rec": {
+  "delta": -0.001400144781679824,
+  "holm": 1.0
+ },
+ "without focused qwen3_4b bm25": {
+  "delta": -0.020561674760784854,
+  "holm": 0.048076092251962646
+ },
+ "without focused qwen3_4b anc": {
+  "delta": -0.010715609936966963,
+  "holm": 1.0
+ },
+ "without focused qwen3_4b fro": {
+  "delta": -0.006136447905079723,
+  "holm": 1.0
+ },
+ "without focused qwen3_4b anc2": {
+  "delta": -0.001242120875046382,
+  "holm": 1.0
+ },
+ "without focused qwen3_4b fro2": {
+  "delta": -0.005672969966629582,
+  "holm": 1.0
+ },
+ "without focused qwen3_4b cocite": {
+  "delta": -0.003553330861451043,
+  "holm": 1.0
+ },
+ "without focused qwen3_4b couple": {
+  "delta": -0.0017982944011865065,
+  "holm": 1.0
+ },
+ "without focused qwen3_4b anc_decay": {
+  "delta": -0.010502410085279967,
+  "holm": 0.1939139212803992
+ },
+ "without focused qwen3_4b fro_decay": {
+  "delta": -0.004393770856507273,
+  "holm": 1.0
+ },
+ "without focused qwen3_4b hub": {
+  "delta": -0.0009269558769002817,
+  "holm": 1.0
+ },
+ "without focused qwen3_8b rec": {
+  "delta": 9.150718271955238e-05,
+  "holm": 1.0
+ },
+ "without focused qwen3_8b bm25": {
+  "delta": -0.016016914737715715,
+  "holm": 1.0
+ },
+ "without focused qwen3_8b anc": {
+  "delta": -0.006732416020513998,
+  "holm": 1.0
+ },
+ "without focused qwen3_8b fro": {
+  "delta": -9.887529353613811e-05,
+  "holm": 1.0
+ },
+ "without focused qwen3_8b anc2": {
+  "delta": -0.00031516499814621124,
+  "holm": 1.0
+ },
+ "without focused qwen3_8b fro2": {
+  "delta": 0.0006170877694792187,
+  "holm": 1.0
+ },
+ "without focused qwen3_8b cocite": {
+  "delta": -0.002230805901551225,
+  "holm": 1.0
+ },
+ "without focused qwen3_8b couple": {
+  "delta": 0.0018675552602137602,
+  "holm": 1.0
+ },
+ "without focused qwen3_8b anc_decay": {
+  "delta": 0.00033546974592568723,
+  "holm": 1.0
+ },
+ "without focused qwen3_8b fro_decay": {
+  "delta": -0.0002971074161286502,
+  "holm": 1.0
+ },
+ "without focused qwen3_8b hub": {
+  "delta": -0.001710494424621345,
+  "holm": 1.0
+ },
+ "without focused nemotron_8b rec": {
+  "delta": -0.00610599078341012,
+  "holm": 1.0
+ },
+ "without focused nemotron_8b bm25": {
+  "delta": -0.010307375852425915,
+  "holm": 1.0
+ },
+ "without focused nemotron_8b anc": {
+  "delta": -0.003563992551756656,
+  "holm": 1.0
+ },
+ "without focused nemotron_8b fro": {
+  "delta": -3.707823507592689e-05,
+  "holm": 1.0
+ },
+ "without focused nemotron_8b anc2": {
+  "delta": 0.0049075692568463225,
+  "holm": 1.0
+ },
+ "without focused nemotron_8b fro2": {
+  "delta": -0.002877026570018759,
+  "holm": 1.0
+ },
+ "without focused nemotron_8b cocite": {
+  "delta": 0.0011992364328293759,
+  "holm": 1.0
+ },
+ "without focused nemotron_8b couple": {
+  "delta": -0.0010443702879742167,
+  "holm": 1.0
+ },
+ "without focused nemotron_8b anc_decay": {
+  "delta": 0.0060114616566230294,
+  "holm": 1.0
+ },
+ "without focused nemotron_8b fro_decay": {
+  "delta": -0.0007044864664441652,
+  "holm": 1.0
+ },
+ "without focused nemotron_8b hub": {
+  "delta": 0.004017182298606037,
+  "holm": 1.0
+ },
+ "without focused harrier_27b rec": {
+  "delta": -0.006156548926293137,
+  "holm": 1.0
+ },
+ "without focused harrier_27b bm25": {
+  "delta": -0.0030747771570908133,
+  "holm": 1.0
+ },
+ "without focused harrier_27b anc": {
+  "delta": -0.0003379823735775167,
+  "holm": 1.0
+ },
+ "without focused harrier_27b fro": {
+  "delta": -0.000133237174393952,
+  "holm": 1.0
+ },
+ "without focused harrier_27b anc2": {
+  "delta": -0.000622384660204478,
+  "holm": 1.0
+ },
+ "without focused harrier_27b fro2": {
+  "delta": 0.002435754827300962,
+  "holm": 1.0
+ },
+ "without focused harrier_27b cocite": {
+  "delta": -0.004773313449620398,
+  "holm": 1.0
+ },
+ "without focused harrier_27b couple": {
+  "delta": 0.0007415647015202032,
+  "holm": 1.0
+ },
+ "without focused harrier_27b anc_decay": {
+  "delta": -0.0008456689769258396,
+  "holm": 1.0
+ },
+ "without focused harrier_27b fro_decay": {
+  "delta": -0.0010011123470522465,
+  "holm": 1.0
+ },
+ "without focused harrier_27b hub": {
+  "delta": 0.00229172014489043,
+  "holm": 1.0
+ },
+ "without survey nomic rec": {
+  "delta": -0.003473857416321169,
+  "holm": 1.7013628436648295e-09
+ },
+ "without survey nomic bm25": {
+  "delta": -0.001060710452459479,
+  "holm": 0.5909141051693797
+ },
+ "without survey nomic anc": {
+  "delta": -0.009320617684551058,
+  "holm": 2.9937334109424127e-48
+ },
+ "without survey nomic fro": {
+  "delta": -0.0011060199943320193,
+  "holm": 0.2156700133289094
+ },
+ "without survey nomic anc2": {
+  "delta": -0.0005315440391566728,
+  "holm": 1.0
+ },
+ "without survey nomic fro2": {
+  "delta": -0.0005392595259222643,
+  "holm": 1.0
+ },
+ "without survey nomic cocite": {
+  "delta": -0.009230991134478783,
+  "holm": 2.0525336726719388e-19
+ },
+ "without survey nomic couple": {
+  "delta": -0.00012384322416997273,
+  "holm": 1.0
+ },
+ "without survey nomic anc_decay": {
+  "delta": -0.0005143233693502558,
+  "holm": 1.0
+ },
+ "without survey nomic fro_decay": {
+  "delta": -0.0005985778481168991,
+  "holm": 1.0
+ },
+ "without survey nomic hub": {
+  "delta": -0.0005513973698250685,
+  "holm": 1.0
+ },
+ "without survey qwen3_0_6b rec": {
+  "delta": -0.0042231088003180095,
+  "holm": 1.1448505428869886e-14
+ },
+ "without survey qwen3_0_6b bm25": {
+  "delta": -0.0014446814895978655,
+  "holm": 0.08267919038825278
+ },
+ "without survey qwen3_0_6b anc": {
+  "delta": -0.008334674275283394,
+  "holm": 5.361620518217175e-39
+ },
+ "without survey qwen3_0_6b fro": {
+  "delta": -0.000687723442470034,
+  "holm": 1.0
+ },
+ "without survey qwen3_0_6b anc2": {
+  "delta": -0.00043214128156693343,
+  "holm": 1.0
+ },
+ "without survey qwen3_0_6b fro2": {
+  "delta": -0.00047665004181685067,
+  "holm": 1.0
+ },
+ "without survey qwen3_0_6b cocite": {
+  "delta": -0.009253577366586274,
+  "holm": 6.950142656476346e-21
+ },
+ "without survey qwen3_0_6b couple": {
+  "delta": -0.000334867255783855,
+  "holm": 1.0
+ },
+ "without survey qwen3_0_6b anc_decay": {
+  "delta": -0.0004101098485581045,
+  "holm": 1.0
+ },
+ "without survey qwen3_0_6b fro_decay": {
+  "delta": -0.0003435984636943612,
+  "holm": 1.0
+ },
+ "without survey qwen3_0_6b hub": {
+  "delta": -8.425825427582634e-05,
+  "holm": 1.0
+ },
+ "without survey harrier_0_6b rec": {
+  "delta": -0.004651423264523169,
+  "holm": 1.424383740934066e-14
+ },
+ "without survey harrier_0_6b bm25": {
+  "delta": -0.00040564703494117005,
+  "holm": 1.0
+ },
+ "without survey harrier_0_6b anc": {
+  "delta": -0.00917047816419514,
+  "holm": 1.421442310762193e-47
+ },
+ "without survey harrier_0_6b fro": {
+  "delta": -0.0012386516852739837,
+  "holm": 0.7809801035995332
+ },
+ "without survey harrier_0_6b anc2": {
+  "delta": 0.00017076375515345799,
+  "holm": 1.0
+ },
+ "without survey harrier_0_6b fro2": {
+  "delta": 0.00013627360363160923,
+  "holm": 1.0
+ },
+ "without survey harrier_0_6b cocite": {
+  "delta": -0.007904508428884738,
+  "holm": 2.6738505609435026e-19
+ },
+ "without survey harrier_0_6b couple": {
+  "delta": -8.749250322936941e-05,
+  "holm": 1.0
+ },
+ "without survey harrier_0_6b anc_decay": {
+  "delta": -0.00089167438664145,
+  "holm": 1.0
+ },
+ "without survey harrier_0_6b fro_decay": {
+  "delta": 0.00032200660868325626,
+  "holm": 1.0
+ },
+ "without survey harrier_0_6b hub": {
+  "delta": 0.00024769633277277325,
+  "holm": 1.0
+ },
+ "without survey nemotron_1b rec": {
+  "delta": -0.003739976778855514,
+  "holm": 9.287635302785653e-12
+ },
+ "without survey nemotron_1b bm25": {
+  "delta": -0.001031687804988024,
+  "holm": 0.014707414258637232
+ },
+ "without survey nemotron_1b anc": {
+  "delta": -0.010293853714144208,
+  "holm": 1.4407691383474557e-45
+ },
+ "without survey nemotron_1b fro": {
+  "delta": -0.0012443302871367745,
+  "holm": 0.0020271184309089596
+ },
+ "without survey nemotron_1b anc2": {
+  "delta": -0.00027740006766246994,
+  "holm": 1.0
+ },
+ "without survey nemotron_1b fro2": {
+  "delta": -0.00034603875974864584,
+  "holm": 1.0
+ },
+ "without survey nemotron_1b cocite": {
+  "delta": -0.007571111449692358,
+  "holm": 4.3515239529973396e-15
+ },
+ "without survey nemotron_1b couple": {
+  "delta": -0.0007269259223440794,
+  "holm": 1.0
+ },
+ "without survey nemotron_1b anc_decay": {
+  "delta": -0.000327510063157177,
+  "holm": 1.0
+ },
+ "without survey nemotron_1b fro_decay": {
+  "delta": -0.0001387995818441512,
+  "holm": 1.0
+ },
+ "without survey nemotron_1b hub": {
+  "delta": -0.0007572495826748127,
+  "holm": 0.3231495141268585
+ },
+ "without survey qwen3_4b rec": {
+  "delta": -0.003943654041295597,
+  "holm": 4.451501378378614e-16
+ },
+ "without survey qwen3_4b bm25": {
+  "delta": -0.000572842565398135,
+  "holm": 1.0
+ },
+ "without survey qwen3_4b anc": {
+  "delta": -0.008692060793818512,
+  "holm": 1.5798072897287704e-43
+ },
+ "without survey qwen3_4b fro": {
+  "delta": -0.000815869021810911,
+  "holm": 0.6438128416582344
+ },
+ "without survey qwen3_4b anc2": {
+  "delta": 0.00043412001956893986,
+  "holm": 1.0
+ },
+ "without survey qwen3_4b fro2": {
+  "delta": -0.00024115229499410695,
+  "holm": 1.0
+ },
+ "without survey qwen3_4b cocite": {
+  "delta": -0.008482512397051556,
+  "holm": 1.1604690880799853e-19
+ },
+ "without survey qwen3_4b couple": {
+  "delta": -0.00013308542558809755,
+  "holm": 1.0
+ },
+ "without survey qwen3_4b anc_decay": {
+  "delta": -5.819241713606038e-05,
+  "holm": 1.0
+ },
+ "without survey qwen3_4b fro_decay": {
+  "delta": 0.00037711401925821786,
+  "holm": 1.0
+ },
+ "without survey qwen3_4b hub": {
+  "delta": 0.00011659557758736394,
+  "holm": 1.0
+ },
+ "without survey qwen3_8b rec": {
+  "delta": -0.004660540409292813,
+  "holm": 1.605158095951259e-17
+ },
+ "without survey qwen3_8b bm25": {
+  "delta": 9.808458825244504e-05,
+  "holm": 1.0
+ },
+ "without survey qwen3_8b anc": {
+  "delta": -0.009029339278033233,
+  "holm": 1.3604655537723227e-44
+ },
+ "without survey qwen3_8b fro": {
+  "delta": -0.00040094945570190443,
+  "holm": 1.0
+ },
+ "without survey qwen3_8b anc2": {
+  "delta": 2.0892307742936822e-05,
+  "holm": 1.0
+ },
+ "without survey qwen3_8b fro2": {
+  "delta": 0.00037077101257287914,
+  "holm": 1.0
+ },
+ "without survey qwen3_8b cocite": {
+  "delta": -0.007099749137064237,
+  "holm": 2.432403360993803e-19
+ },
+ "without survey qwen3_8b couple": {
+  "delta": 4.9780357448681034e-05,
+  "holm": 1.0
+ },
+ "without survey qwen3_8b anc_decay": {
+  "delta": -0.0004984807180731798,
+  "holm": 1.0
+ },
+ "without survey qwen3_8b fro_decay": {
+  "delta": 0.0002001057252476457,
+  "holm": 1.0
+ },
+ "without survey qwen3_8b hub": {
+  "delta": 0.00033293410347373653,
+  "holm": 1.0
+ },
+ "without survey nemotron_8b rec": {
+  "delta": -0.0037767530268247307,
+  "holm": 5.4830712920756e-14
+ },
+ "without survey nemotron_8b bm25": {
+  "delta": -0.0004907377304281257,
+  "holm": 1.0
+ },
+ "without survey nemotron_8b anc": {
+  "delta": -0.009349271160567163,
+  "holm": 1.3317169805850494e-40
+ },
+ "without survey nemotron_8b fro": {
+  "delta": -0.000944681915492851,
+  "holm": 0.020387615793144444
+ },
+ "without survey nemotron_8b anc2": {
+  "delta": -0.00038245192142549733,
+  "holm": 1.0
+ },
+ "without survey nemotron_8b fro2": {
+  "delta": -0.00014660075312517007,
+  "holm": 1.0
+ },
+ "without survey nemotron_8b cocite": {
+  "delta": -0.006374823428297038,
+  "holm": 6.796624773082262e-19
+ },
+ "without survey nemotron_8b couple": {
+  "delta": -5.6017839256183866e-05,
+  "holm": 1.0
+ },
+ "without survey nemotron_8b anc_decay": {
+  "delta": -0.0006619699071193641,
+  "holm": 1.0
+ },
+ "without survey nemotron_8b fro_decay": {
+  "delta": 2.7259233547849426e-05,
+  "holm": 1.0
+ },
+ "without survey nemotron_8b hub": {
+  "delta": -0.00011411495129226568,
+  "holm": 1.0
+ },
+ "without survey harrier_27b rec": {
+  "delta": -0.0037048726663302944,
+  "holm": 1.2766587480543483e-07
+ },
+ "without survey harrier_27b bm25": {
+  "delta": -0.00038309660333502027,
+  "holm": 1.0
+ },
+ "without survey harrier_27b anc": {
+  "delta": -0.00827597088573745,
+  "holm": 5.0135489898554644e-42
+ },
+ "without survey harrier_27b fro": {
+  "delta": -0.00028950120366727505,
+  "holm": 1.0
+ },
+ "without survey harrier_27b anc2": {
+  "delta": 0.0001759185232638183,
+  "holm": 1.0
+ },
+ "without survey harrier_27b fro2": {
+  "delta": 0.000478926138443303,
+  "holm": 1.0
+ },
+ "without survey harrier_27b cocite": {
+  "delta": -0.006742012505370432,
+  "holm": 8.513010635064547e-17
+ },
+ "without survey harrier_27b couple": {
+  "delta": 9.9032632944418e-05,
+  "holm": 1.0
+ },
+ "without survey harrier_27b anc_decay": {
+  "delta": -0.0008468056966436932,
+  "holm": 1.0
+ },
+ "without survey harrier_27b fro_decay": {
+  "delta": 0.0003345161132833341,
+  "holm": 1.0
+ },
+ "without survey harrier_27b hub": {
+  "delta": -0.00035414397199534653,
+  "holm": 1.0
+ },
+ "without frontier nomic rec": {
+  "delta": -0.01690920407251957,
+  "holm": 0.00514602864772575
+ },
+ "without frontier nomic bm25": {
+  "delta": -0.004733703058590555,
+  "holm": 1.0
+ },
+ "without frontier nomic anc": {
+  "delta": -0.003505473294710987,
+  "holm": 1.0
+ },
+ "without frontier nomic fro": {
+  "delta": -0.0040684544035431425,
+  "holm": 1.0
+ },
+ "without frontier nomic anc2": {
+  "delta": -0.0032583422150746777,
+  "holm": 1.0
+ },
+ "without frontier nomic fro2": {
+  "delta": -0.006090924664670566,
+  "holm": 1.0
+ },
+ "without frontier nomic cocite": {
+  "delta": -0.02170960292337816,
+  "holm": 0.0015780498119968445
+ },
+ "without frontier nomic couple": {
+  "delta": -0.001541322059221556,
+  "holm": 1.0
+ },
+ "without frontier nomic anc_decay": {
+  "delta": -0.0016448025467824534,
+  "holm": 1.0
+ },
+ "without frontier nomic fro_decay": {
+  "delta": -0.0030209499669422712,
+  "holm": 1.0
+ },
+ "without frontier nomic hub": {
+  "delta": -0.004195544993048417,
+  "holm": 1.0
+ },
+ "without frontier qwen3_0_6b rec": {
+  "delta": -0.00986415011133665,
+  "holm": 1.0
+ },
+ "without frontier qwen3_0_6b bm25": {
+  "delta": 0.0031026534899813996,
+  "holm": 1.0
+ },
+ "without frontier qwen3_0_6b anc": {
+  "delta": 0.001092659913224464,
+  "holm": 1.0
+ },
+ "without frontier qwen3_0_6b fro": {
+  "delta": -0.0014158263121565318,
+  "holm": 1.0
+ },
+ "without frontier qwen3_0_6b anc2": {
+  "delta": 0.0023215982379135858,
+  "holm": 1.0
+ },
+ "without frontier qwen3_0_6b fro2": {
+  "delta": 0.0016488125692190603,
+  "holm": 1.0
+ },
+ "without frontier qwen3_0_6b cocite": {
+  "delta": -0.017890215858924016,
+  "holm": 0.06661760661234228
+ },
+ "without frontier qwen3_0_6b couple": {
+  "delta": 0.0007892274823338152,
+  "holm": 1.0
+ },
+ "without frontier qwen3_0_6b anc_decay": {
+  "delta": -4.234829836707865e-05,
+  "holm": 1.0
+ },
+ "without frontier qwen3_0_6b fro_decay": {
+  "delta": 0.0041452933108462875,
+  "holm": 1.0
+ },
+ "without frontier qwen3_0_6b hub": {
+  "delta": 0.001278260925976854,
+  "holm": 1.0
+ },
+ "without frontier harrier_0_6b rec": {
+  "delta": -0.015732490639135677,
+  "holm": 0.013245396793942425
+ },
+ "without frontier harrier_0_6b bm25": {
+  "delta": 0.0009398148673761264,
+  "holm": 1.0
+ },
+ "without frontier harrier_0_6b anc": {
+  "delta": 0.0031580732519289334,
+  "holm": 1.0
+ },
+ "without frontier harrier_0_6b fro": {
+  "delta": 0.005080809681279191,
+  "holm": 1.0
+ },
+ "without frontier harrier_0_6b anc2": {
+  "delta": 0.005790286340636164,
+  "holm": 1.0
+ },
+ "without frontier harrier_0_6b fro2": {
+  "delta": 0.0038600562753773326,
+  "holm": 1.0
+ },
+ "without frontier harrier_0_6b cocite": {
+  "delta": -0.017134563743273462,
+  "holm": 0.026408675442773838
+ },
+ "without frontier harrier_0_6b couple": {
+  "delta": 0.0034069920133208975,
+  "holm": 1.0
+ },
+ "without frontier harrier_0_6b anc_decay": {
+  "delta": 0.003714368984546468,
+  "holm": 1.0
+ },
+ "without frontier harrier_0_6b fro_decay": {
+  "delta": 0.003516525274293303,
+  "holm": 1.0
+ },
+ "without frontier harrier_0_6b hub": {
+  "delta": 0.008895812093232452,
+  "holm": 1.0
+ },
+ "without frontier nemotron_1b rec": {
+  "delta": -0.011690249927116703,
+  "holm": 1.0
+ },
+ "without frontier nemotron_1b bm25": {
+  "delta": -4.349222440636069e-05,
+  "holm": 1.0
+ },
+ "without frontier nemotron_1b anc": {
+  "delta": -7.775035732293656e-06,
+  "holm": 1.0
+ },
+ "without frontier nemotron_1b fro": {
+  "delta": -0.002912497119738705,
+  "holm": 1.0
+ },
+ "without frontier nemotron_1b anc2": {
+  "delta": -0.0013266209406700702,
+  "holm": 1.0
+ },
+ "without frontier nemotron_1b fro2": {
+  "delta": -0.00013454129892859212,
+  "holm": 1.0
+ },
+ "without frontier nemotron_1b cocite": {
+  "delta": -0.024587325728795156,
+  "holm": 0.0005054295021932964
+ },
+ "without frontier nemotron_1b couple": {
+  "delta": 0.001350726143998865,
+  "holm": 1.0
+ },
+ "without frontier nemotron_1b anc_decay": {
+  "delta": -0.000157170066974327,
+  "holm": 1.0
+ },
+ "without frontier nemotron_1b fro_decay": {
+  "delta": 0.001501386704710922,
+  "holm": 1.0
+ },
+ "without frontier nemotron_1b hub": {
+  "delta": 0.00035224338012379564,
+  "holm": 1.0
+ },
+ "without frontier qwen3_4b rec": {
+  "delta": -0.009377591276919062,
+  "holm": 1.0
+ },
+ "without frontier qwen3_4b bm25": {
+  "delta": 0.0007836147668273119,
+  "holm": 1.0
+ },
+ "without frontier qwen3_4b anc": {
+  "delta": 0.0011788352028094251,
+  "holm": 1.0
+ },
+ "without frontier qwen3_4b fro": {
+  "delta": -4.493285313100781e-05,
+  "holm": 1.0
+ },
+ "without frontier qwen3_4b anc2": {
+  "delta": 0.0009700737022249051,
+  "holm": 1.0
+ },
+ "without frontier qwen3_4b fro2": {
+  "delta": 0.0005402586648415308,
+  "holm": 1.0
+ },
+ "without frontier qwen3_4b cocite": {
+  "delta": -0.01679283362651185,
+  "holm": 0.12700007371624694
+ },
+ "without frontier qwen3_4b couple": {
+  "delta": 0.0022610435211096735,
+  "holm": 1.0
+ },
+ "without frontier qwen3_4b anc_decay": {
+  "delta": -0.0006478285086808366,
+  "holm": 1.0
+ },
+ "without frontier qwen3_4b fro_decay": {
+  "delta": 0.003447110452143992,
+  "holm": 1.0
+ },
+ "without frontier qwen3_4b hub": {
+  "delta": 0.005030565120147795,
+  "holm": 1.0
+ },
+ "without frontier qwen3_8b rec": {
+  "delta": -0.014584871510967656,
+  "holm": 0.13507533725314688
+ },
+ "without frontier qwen3_8b bm25": {
+  "delta": 0.000796658036335246,
+  "holm": 1.0
+ },
+ "without frontier qwen3_8b anc": {
+  "delta": 0.0009156719667997582,
+  "holm": 1.0
+ },
+ "without frontier qwen3_8b fro": {
+  "delta": -0.0010489997725399713,
+  "holm": 1.0
+ },
+ "without frontier qwen3_8b anc2": {
+  "delta": 0.0003517387661055027,
+  "holm": 1.0
+ },
+ "without frontier qwen3_8b fro2": {
+  "delta": -0.00015744148304433492,
+  "holm": 1.0
+ },
+ "without frontier qwen3_8b cocite": {
+  "delta": -0.018197543024015078,
+  "holm": 0.008927366939348539
+ },
+ "without frontier qwen3_8b couple": {
+  "delta": 0.0006225053477469378,
+  "holm": 1.0
+ },
+ "without frontier qwen3_8b anc_decay": {
+  "delta": 0.0002007676096482669,
+  "holm": 1.0
+ },
+ "without frontier qwen3_8b fro_decay": {
+  "delta": -0.0007626011263843491,
+  "holm": 1.0
+ },
+ "without frontier qwen3_8b hub": {
+  "delta": 0.0019364877098179967,
+  "holm": 1.0
+ },
+ "without frontier nemotron_8b rec": {
+  "delta": -0.015604998946205928,
+  "holm": 1.0
+ },
+ "without frontier nemotron_8b bm25": {
+  "delta": 0.00013011176646340883,
+  "holm": 1.0
+ },
+ "without frontier nemotron_8b anc": {
+  "delta": 0.0021140475071513842,
+  "holm": 1.0
+ },
+ "without frontier nemotron_8b fro": {
+  "delta": -0.0012808103424095385,
+  "holm": 1.0
+ },
+ "without frontier nemotron_8b anc2": {
+  "delta": 0.00010962153001756181,
+  "holm": 1.0
+ },
+ "without frontier nemotron_8b fro2": {
+  "delta": 0.00020965747193305018,
+  "holm": 1.0
+ },
+ "without frontier nemotron_8b cocite": {
+  "delta": -0.02028492627876763,
+  "holm": 0.004726507153760788
+ },
+ "without frontier nemotron_8b couple": {
+  "delta": 0.0005400850419840231,
+  "holm": 1.0
+ },
+ "without frontier nemotron_8b anc_decay": {
+  "delta": -0.0028173282715156234,
+  "holm": 1.0
+ },
+ "without frontier nemotron_8b fro_decay": {
+  "delta": 0.0019507929794427836,
+  "holm": 1.0
+ },
+ "without frontier nemotron_8b hub": {
+  "delta": 0.0025910125048457244,
+  "holm": 1.0
+ },
+ "without frontier harrier_27b rec": {
+  "delta": -0.01789715813732423,
+  "holm": 0.00598808083096499
+ },
+ "without frontier harrier_27b bm25": {
+  "delta": -0.0012661170375848907,
+  "holm": 1.0
+ },
+ "without frontier harrier_27b anc": {
+  "delta": 0.0013811683930529117,
+  "holm": 1.0
+ },
+ "without frontier harrier_27b fro": {
+  "delta": -0.00295630876146849,
+  "holm": 1.0
+ },
+ "without frontier harrier_27b anc2": {
+  "delta": -0.0028595606666552975,
+  "holm": 1.0
+ },
+ "without frontier harrier_27b fro2": {
+  "delta": -0.0019442380984529273,
+  "holm": 1.0
+ },
+ "without frontier harrier_27b cocite": {
+  "delta": -0.011808139262434597,
+  "holm": 0.4067258055075028
+ },
+ "without frontier harrier_27b couple": {
+  "delta": -0.0011545371344492128,
+  "holm": 1.0
+ },
+ "without frontier harrier_27b anc_decay": {
+  "delta": -0.002655370452885053,
+  "holm": 1.0
+ },
+ "without frontier harrier_27b fro_decay": {
+  "delta": -0.002448638532408537,
+  "holm": 1.0
+ },
+ "without frontier harrier_27b hub": {
+  "delta": 0.005275285681866387,
+  "holm": 1.0
+ },
+ "without consensus nomic rec": {
+  "delta": -0.06457583507881237,
+  "holm": 0.008512997277378814
+ },
+ "without consensus nomic bm25": {
+  "delta": -0.016423494293898,
+  "holm": 1.0
+ },
+ "without consensus nomic anc": {
+  "delta": -0.07295456162217262,
+  "holm": 0.0006283210410590336
+ },
+ "without consensus nomic fro": {
+  "delta": 0.012433034513410823,
+  "holm": 1.0
+ },
+ "without consensus nomic anc2": {
+  "delta": 0.005576289418493974,
+  "holm": 1.0
+ },
+ "without consensus nomic fro2": {
+  "delta": 0.00013698630136993462,
+  "holm": 1.0
+ },
+ "without consensus nomic cocite": {
+  "delta": 0.002645875701879019,
+  "holm": 1.0
+ },
+ "without consensus nomic couple": {
+  "delta": 0.014869433730631987,
+  "holm": 1.0
+ },
+ "without consensus nomic anc_decay": {
+  "delta": -0.0016725201323744,
+  "holm": 1.0
+ },
+ "without consensus nomic fro_decay": {
+  "delta": -0.000806409925045215,
+  "holm": 1.0
+ },
+ "without consensus nomic hub": {
+  "delta": 0.014015376396414703,
+  "holm": 1.0
+ },
+ "without consensus qwen3_0_6b rec": {
+  "delta": -0.03541367203421175,
+  "holm": 1.0
+ },
+ "without consensus qwen3_0_6b bm25": {
+  "delta": -0.025779577634330142,
+  "holm": 1.0
+ },
+ "without consensus qwen3_0_6b anc": {
+  "delta": -0.053619982446376335,
+  "holm": 0.009775499967775474
+ },
+ "without consensus qwen3_0_6b fro": {
+  "delta": -0.03342938194634204,
+  "holm": 1.0
+ },
+ "without consensus qwen3_0_6b anc2": {
+  "delta": -0.009369637412175225,
+  "holm": 1.0
+ },
+ "without consensus qwen3_0_6b fro2": {
+  "delta": -0.0015905090219968665,
+  "holm": 1.0
+ },
+ "without consensus qwen3_0_6b cocite": {
+  "delta": -0.009566273123652325,
+  "holm": 1.0
+ },
+ "without consensus qwen3_0_6b couple": {
+  "delta": 0.0011441933798167492,
+  "holm": 1.0
+ },
+ "without consensus qwen3_0_6b anc_decay": {
+  "delta": 0.0008172209019551291,
+  "holm": 1.0
+ },
+ "without consensus qwen3_0_6b fro_decay": {
+  "delta": 0.004250239826153024,
+  "holm": 1.0
+ },
+ "without consensus qwen3_0_6b hub": {
+  "delta": 0.004698113207413868,
+  "holm": 1.0
+ },
+ "without consensus harrier_0_6b rec": {
+  "delta": -0.028702021964764235,
+  "holm": 1.0
+ },
+ "without consensus harrier_0_6b bm25": {
+  "delta": -0.0016973900511831896,
+  "holm": 1.0
+ },
+ "without consensus harrier_0_6b anc": {
+  "delta": -0.0341412561756359,
+  "holm": 1.0
+ },
+ "without consensus harrier_0_6b fro": {
+  "delta": 0.003339867149295128,
+  "holm": 1.0
+ },
+ "without consensus harrier_0_6b anc2": {
+  "delta": 0.009556726782682268,
+  "holm": 1.0
+ },
+ "without consensus harrier_0_6b fro2": {
+  "delta": 0.0009861593585458461,
+  "holm": 1.0
+ },
+ "without consensus harrier_0_6b cocite": {
+  "delta": 0.006141857068196033,
+  "holm": 1.0
+ },
+ "without consensus harrier_0_6b couple": {
+  "delta": 0.002217518931336815,
+  "holm": 1.0
+ },
+ "without consensus harrier_0_6b anc_decay": {
+  "delta": 0.0005836913694391432,
+  "holm": 1.0
+ },
+ "without consensus harrier_0_6b fro_decay": {
+  "delta": -0.002576706060011258,
+  "holm": 1.0
+ },
+ "without consensus harrier_0_6b hub": {
+  "delta": -0.0036522877027432843,
+  "holm": 1.0
+ },
+ "without consensus nemotron_1b rec": {
+  "delta": -0.02634613645699757,
+  "holm": 1.0
+ },
+ "without consensus nemotron_1b bm25": {
+  "delta": 9.683030265728032e-05,
+  "holm": 1.0
+ },
+ "without consensus nemotron_1b anc": {
+  "delta": -0.05962570252062771,
+  "holm": 0.002941956098739313
+ },
+ "without consensus nemotron_1b fro": {
+  "delta": 0.002183959625394971,
+  "holm": 1.0
+ },
+ "without consensus nemotron_1b anc2": {
+  "delta": 0.01185242398323505,
+  "holm": 1.0
+ },
+ "without consensus nemotron_1b fro2": {
+  "delta": 0.0027342871710022143,
+  "holm": 1.0
+ },
+ "without consensus nemotron_1b cocite": {
+  "delta": -0.006575880658273858,
+  "holm": 1.0
+ },
+ "without consensus nemotron_1b couple": {
+  "delta": 0.0015357821702450813,
+  "holm": 1.0
+ },
+ "without consensus nemotron_1b anc_decay": {
+  "delta": 0.005346403406079614,
+  "holm": 1.0
+ },
+ "without consensus nemotron_1b fro_decay": {
+  "delta": -0.00018655371304965307,
+  "holm": 1.0
+ },
+ "without consensus nemotron_1b hub": {
+  "delta": 0.007646501236098113,
+  "holm": 1.0
+ },
+ "without consensus qwen3_4b rec": {
+  "delta": -0.04092473281904929,
+  "holm": 0.638882045710846
+ },
+ "without consensus qwen3_4b bm25": {
+  "delta": -0.002342749776059083,
+  "holm": 1.0
+ },
+ "without consensus qwen3_4b anc": {
+  "delta": -0.05915892868707817,
+  "holm": 0.012611884762610463
+ },
+ "without consensus qwen3_4b fro": {
+  "delta": -0.003982559137569841,
+  "holm": 1.0
+ },
+ "without consensus qwen3_4b anc2": {
+  "delta": -0.011536333108066565,
+  "holm": 1.0
+ },
+ "without consensus qwen3_4b fro2": {
+  "delta": -0.0032419512997569067,
+  "holm": 1.0
+ },
+ "without consensus qwen3_4b cocite": {
+  "delta": -0.009132836803318889,
+  "holm": 1.0
+ },
+ "without consensus qwen3_4b couple": {
+  "delta": -0.006289955247218093,
+  "holm": 1.0
+ },
+ "without consensus qwen3_4b anc_decay": {
+  "delta": -0.008228196371599439,
+  "holm": 1.0
+ },
+ "without consensus qwen3_4b fro_decay": {
+  "delta": -0.003982559137569841,
+  "holm": 1.0
+ },
+ "without consensus qwen3_4b hub": {
+  "delta": -0.002182167748137398,
+  "holm": 1.0
+ },
+ "without consensus qwen3_8b rec": {
+  "delta": -0.04261048782051435,
+  "holm": 0.732904875494702
+ },
+ "without consensus qwen3_8b bm25": {
+  "delta": -0.010173186836883397,
+  "holm": 1.0
+ },
+ "without consensus qwen3_8b anc": {
+  "delta": -0.048913219473811775,
+  "holm": 0.03739267583985484
+ },
+ "without consensus qwen3_8b fro": {
+  "delta": -0.007180069698976332,
+  "holm": 1.0
+ },
+ "without consensus qwen3_8b anc2": {
+  "delta": -0.005422090956532788,
+  "holm": 1.0
+ },
+ "without consensus qwen3_8b fro2": {
+  "delta": -0.007072075207420259,
+  "holm": 1.0
+ },
+ "without consensus qwen3_8b cocite": {
+  "delta": -0.00441407938071503,
+  "holm": 1.0
+ },
+ "without consensus qwen3_8b couple": {
+  "delta": -0.0015456068294739111,
+  "holm": 1.0
+ },
+ "without consensus qwen3_8b anc_decay": {
+  "delta": -0.009703958131300316,
+  "holm": 1.0
+ },
+ "without consensus qwen3_8b fro_decay": {
+  "delta": -0.004205318154522963,
+  "holm": 1.0
+ },
+ "without consensus qwen3_8b hub": {
+  "delta": 0.0012366728182369169,
+  "holm": 1.0
+ },
+ "without consensus nemotron_8b rec": {
+  "delta": -0.04885724159895166,
+  "holm": 0.18393455012062138
+ },
+ "without consensus nemotron_8b bm25": {
+  "delta": -0.002129357557764222,
+  "holm": 1.0
+ },
+ "without consensus nemotron_8b anc": {
+  "delta": -0.031218872548195442,
+  "holm": 1.0
+ },
+ "without consensus nemotron_8b fro": {
+  "delta": 0.005420042586589124,
+  "holm": 1.0
+ },
+ "without consensus nemotron_8b anc2": {
+  "delta": -0.011814042686426385,
+  "holm": 1.0
+ },
+ "without consensus nemotron_8b fro2": {
+  "delta": 0.007701743959579566,
+  "holm": 1.0
+ },
+ "without consensus nemotron_8b cocite": {
+  "delta": -0.0047044952770111115,
+  "holm": 1.0
+ },
+ "without consensus nemotron_8b couple": {
+  "delta": 0.006642599339138577,
+  "holm": 1.0
+ },
+ "without consensus nemotron_8b anc_decay": {
+  "delta": 0.005828786059571822,
+  "holm": 1.0
+ },
+ "without consensus nemotron_8b fro_decay": {
+  "delta": -0.009976734924079578,
+  "holm": 1.0
+ },
+ "without consensus nemotron_8b hub": {
+  "delta": -0.0003521210615551329,
+  "holm": 1.0
+ },
+ "without consensus harrier_27b rec": {
+  "delta": -0.04838873133789623,
+  "holm": 0.12226738343718868
+ },
+ "without consensus harrier_27b bm25": {
+  "delta": -0.001095585855287129,
+  "holm": 1.0
+ },
+ "without consensus harrier_27b anc": {
+  "delta": -0.054127314461039466,
+  "holm": 0.026948021513761047
+ },
+ "without consensus harrier_27b fro": {
+  "delta": 0.0010505154935239736,
+  "holm": 1.0
+ },
+ "without consensus harrier_27b anc2": {
+  "delta": -0.001178000391211298,
+  "holm": 1.0
+ },
+ "without consensus harrier_27b fro2": {
+  "delta": -0.0003076677034390407,
+  "holm": 1.0
+ },
+ "without consensus harrier_27b cocite": {
+  "delta": -0.004181997365058421,
+  "holm": 1.0
+ },
+ "without consensus harrier_27b couple": {
+  "delta": -0.004231523236864598,
+  "holm": 1.0
+ },
+ "without consensus harrier_27b anc_decay": {
+  "delta": -0.006247588241359847,
+  "holm": 1.0
+ },
+ "without consensus harrier_27b fro_decay": {
+  "delta": -0.00519668123917405,
+  "holm": 1.0
+ },
+ "without consensus harrier_27b hub": {
+  "delta": 0.004123063430956031,
+  "holm": 1.0
+ }
+}

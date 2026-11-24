@@ -1,0 +1,4 @@
+retriever = "qwen3_4b"
+recipe = "survey"
+method = "bf"
+seed = 0

@@ -1,0 +1,6 @@
+retriever = "qwen3_0_6b"
+dataset = "surveymatch"
+split = "test"
+method = "bf"
+recipe = "survey"
+seed = 3

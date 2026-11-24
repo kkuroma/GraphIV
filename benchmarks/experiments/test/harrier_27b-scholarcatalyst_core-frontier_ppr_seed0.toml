@@ -1,0 +1,6 @@
+retriever = "harrier_27b"
+dataset = "scholarcatalyst"
+split = "core"
+method = "ppr"
+recipe = "frontier"
+seed = 0

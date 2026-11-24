@@ -1,0 +1,4 @@
+retriever = "nomic"
+dataset = "pasa"
+split = "real"
+method = "gar_sim"

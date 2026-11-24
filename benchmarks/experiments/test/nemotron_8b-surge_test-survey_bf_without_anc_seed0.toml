@@ -1,0 +1,7 @@
+retriever = "nemotron_8b"
+dataset = "surge"
+split = "test"
+method = "bf"
+recipe = "survey"
+seed = 0
+tune_variant = "without_anc"

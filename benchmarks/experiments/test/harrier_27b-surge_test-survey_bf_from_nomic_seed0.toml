@@ -1,0 +1,10 @@
+retriever = "harrier_27b"
+dataset = "surge"
+split = "test"
+method = "bf"
+recipe = "survey"
+seed = 0
+variant = "from_nomic"
+
+[override]
+tune = "nomic-survey_bf_seed0"

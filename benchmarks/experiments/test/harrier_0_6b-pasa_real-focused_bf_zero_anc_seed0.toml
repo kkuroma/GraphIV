@@ -1,0 +1,12 @@
+retriever = "harrier_0_6b"
+dataset = "pasa"
+split = "real"
+method = "bf"
+recipe = "focused"
+seed = 0
+variant = "zero_anc"
+
+[override]
+
+[override.weights]
+ANC = 0.0

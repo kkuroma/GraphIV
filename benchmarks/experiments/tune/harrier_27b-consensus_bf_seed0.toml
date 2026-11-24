@@ -1,0 +1,4 @@
+retriever = "harrier_27b"
+recipe = "consensus"
+method = "bf"
+seed = 0

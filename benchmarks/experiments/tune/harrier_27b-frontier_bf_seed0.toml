@@ -1,0 +1,4 @@
+retriever = "harrier_27b"
+recipe = "frontier"
+method = "bf"
+seed = 0

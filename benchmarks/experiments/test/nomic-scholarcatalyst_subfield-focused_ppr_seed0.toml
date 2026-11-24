@@ -1,0 +1,6 @@
+retriever = "nomic"
+dataset = "scholarcatalyst"
+split = "subfield"
+method = "ppr"
+recipe = "focused"
+seed = 0

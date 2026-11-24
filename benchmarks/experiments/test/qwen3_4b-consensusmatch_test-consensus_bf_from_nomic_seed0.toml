@@ -1,0 +1,10 @@
+retriever = "qwen3_4b"
+dataset = "consensusmatch"
+split = "test"
+method = "bf"
+recipe = "consensus"
+seed = 0
+variant = "from_nomic"
+
+[override]
+tune = "nomic-consensus_bf_seed0"

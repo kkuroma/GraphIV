@@ -1,0 +1,4 @@
+retriever = "scincl"
+dataset = "pasa"
+split = "real"
+method = "none"

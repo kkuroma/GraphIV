@@ -1,0 +1,4 @@
+retriever = "nomic"
+dataset = "scholarcatalyst"
+split = "core"
+method = "gar_sim"

@@ -1,0 +1,4 @@
+retriever = "bm25"
+dataset = "pasa"
+split = "real"
+method = "none"

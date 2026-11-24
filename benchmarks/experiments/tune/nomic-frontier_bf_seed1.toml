@@ -1,0 +1,5 @@
+retriever = "nomic"
+recipe = "frontier"
+method = "bf"
+seed = 1
+at_pick = true

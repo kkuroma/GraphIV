@@ -1,0 +1,7 @@
+retriever = "nomic"
+dataset = "consensusmatch"
+split = "test"
+method = "bf"
+recipe = "consensus"
+seed = 0
+tune_variant = "without_cocite"

@@ -1,0 +1,6 @@
+retriever = "qwen3_4b"
+dataset = "surge"
+split = "test"
+method = "bf"
+recipe = "survey"
+seed = 4

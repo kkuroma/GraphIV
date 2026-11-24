@@ -1,0 +1,6 @@
+retriever = "qwen3_8b"
+dataset = "pasa"
+split = "real"
+method = "bf"
+recipe = "frontier"
+seed = 0

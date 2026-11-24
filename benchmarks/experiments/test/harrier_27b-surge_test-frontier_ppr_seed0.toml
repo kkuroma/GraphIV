@@ -1,0 +1,6 @@
+retriever = "harrier_27b"
+dataset = "surge"
+split = "test"
+method = "ppr"
+recipe = "frontier"
+seed = 0

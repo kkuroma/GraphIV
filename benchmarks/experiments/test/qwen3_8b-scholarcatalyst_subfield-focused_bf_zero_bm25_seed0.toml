@@ -1,0 +1,12 @@
+retriever = "qwen3_8b"
+dataset = "scholarcatalyst"
+split = "subfield"
+method = "bf"
+recipe = "focused"
+seed = 0
+variant = "zero_bm25"
+
+[override]
+
+[override.weights]
+BM25 = 0.0

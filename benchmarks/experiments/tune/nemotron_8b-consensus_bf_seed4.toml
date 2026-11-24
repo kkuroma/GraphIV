@@ -1,0 +1,5 @@
+retriever = "nemotron_8b"
+recipe = "consensus"
+method = "bf"
+seed = 4
+at_pick = true

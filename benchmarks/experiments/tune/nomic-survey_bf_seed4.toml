@@ -1,0 +1,5 @@
+retriever = "nomic"
+recipe = "survey"
+method = "bf"
+seed = 4
+at_pick = true

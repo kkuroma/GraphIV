@@ -1,0 +1,12 @@
+retriever = "nomic"
+dataset = "scholarcatalyst"
+split = "subfield"
+method = "bf"
+recipe = "focused"
+seed = 0
+variant = "zero_cocite"
+
+[override]
+
+[override.weights]
+COCITE = 0.0

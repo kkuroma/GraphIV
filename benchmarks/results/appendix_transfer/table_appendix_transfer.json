@@ -1,0 +1,674 @@
+{
+ "qwen3_0_6b cosine surveymatch_test": {
+  "mean": 0.14922557553631385,
+  "holm": null
+ },
+ "qwen3_0_6b cosine frontiermatch_test": {
+  "mean": 0.06774162652114839,
+  "holm": null
+ },
+ "qwen3_0_6b cosine consensusmatch_test": {
+  "mean": 0.24324263289014594,
+  "holm": null
+ },
+ "qwen3_0_6b cosine pasa_test": {
+  "mean": 0.42251504520692507,
+  "holm": null
+ },
+ "qwen3_0_6b cosine pasa_real": {
+  "mean": 0.411052810107225,
+  "holm": null
+ },
+ "qwen3_0_6b cosine surge_test": {
+  "mean": 0.29498983661527256,
+  "holm": null
+ },
+ "qwen3_0_6b cosine scholarcatalyst_core": {
+  "mean": 0.30139368146614526,
+  "holm": null
+ },
+ "qwen3_0_6b cosine scholarcatalyst_subfield": {
+  "mean": 0.3352941737221213,
+  "holm": null
+ },
+ "qwen3_0_6b unchanged surveymatch_test": {
+  "mean": 0.33117212318098255,
+  "holm": 1.0
+ },
+ "qwen3_0_6b unchanged frontiermatch_test": {
+  "mean": 0.13684483449886467,
+  "holm": 1.0
+ },
+ "qwen3_0_6b unchanged consensusmatch_test": {
+  "mean": 0.6221346017682186,
+  "holm": 1.0
+ },
+ "qwen3_0_6b unchanged pasa_test": {
+  "mean": 0.6411592856531677,
+  "holm": 1.0
+ },
+ "qwen3_0_6b unchanged pasa_real": {
+  "mean": 0.3597266301859174,
+  "holm": 0.012983539730314351
+ },
+ "qwen3_0_6b unchanged surge_test": {
+  "mean": 0.4552595657589621,
+  "holm": 0.6414683805437469
+ },
+ "qwen3_0_6b unchanged scholarcatalyst_core": {
+  "mean": 0.3134115481941569,
+  "holm": 1.0
+ },
+ "qwen3_0_6b unchanged scholarcatalyst_subfield": {
+  "mean": 0.3681011047823275,
+  "holm": 6.630601429758829e-07
+ },
+ "qwen3_0_6b refit surveymatch_test": {
+  "mean": 0.33085582671565666,
+  "holm": null
+ },
+ "qwen3_0_6b refit frontiermatch_test": {
+  "mean": 0.13943695764966876,
+  "holm": null
+ },
+ "qwen3_0_6b refit consensusmatch_test": {
+  "mean": 0.6276232652970637,
+  "holm": null
+ },
+ "qwen3_0_6b refit pasa_test": {
+  "mean": 0.6461903811180785,
+  "holm": null
+ },
+ "qwen3_0_6b refit pasa_real": {
+  "mean": 0.40363026047879297,
+  "holm": null
+ },
+ "qwen3_0_6b refit surge_test": {
+  "mean": 0.4580958525218632,
+  "holm": null
+ },
+ "qwen3_0_6b refit scholarcatalyst_core": {
+  "mean": 0.32121386396748713,
+  "holm": null
+ },
+ "qwen3_0_6b refit scholarcatalyst_subfield": {
+  "mean": 0.38746061879249655,
+  "holm": null
+ },
+ "harrier_0_6b cosine surveymatch_test": {
+  "mean": 0.16001455900271308,
+  "holm": null
+ },
+ "harrier_0_6b cosine frontiermatch_test": {
+  "mean": 0.07778766583907325,
+  "holm": null
+ },
+ "harrier_0_6b cosine consensusmatch_test": {
+  "mean": 0.23202620598460072,
+  "holm": null
+ },
+ "harrier_0_6b cosine pasa_test": {
+  "mean": 0.42303950529756984,
+  "holm": null
+ },
+ "harrier_0_6b cosine pasa_real": {
+  "mean": 0.4340765927451981,
+  "holm": null
+ },
+ "harrier_0_6b cosine surge_test": {
+  "mean": 0.3258749026311897,
+  "holm": null
+ },
+ "harrier_0_6b cosine scholarcatalyst_core": {
+  "mean": 0.32586458093704473,
+  "holm": null
+ },
+ "harrier_0_6b cosine scholarcatalyst_subfield": {
+  "mean": 0.37269784638780273,
+  "holm": null
+ },
+ "harrier_0_6b unchanged surveymatch_test": {
+  "mean": 0.3367470484743884,
+  "holm": 0.40092807958689736
+ },
+ "harrier_0_6b unchanged frontiermatch_test": {
+  "mean": 0.14142469014725223,
+  "holm": 1.0
+ },
+ "harrier_0_6b unchanged consensusmatch_test": {
+  "mean": 0.620517694240857,
+  "holm": 1.0
+ },
+ "harrier_0_6b unchanged pasa_test": {
+  "mean": 0.6348052238207966,
+  "holm": 1.0
+ },
+ "harrier_0_6b unchanged pasa_real": {
+  "mean": 0.35467444518713304,
+  "holm": 0.5016170276896527
+ },
+ "harrier_0_6b unchanged surge_test": {
+  "mean": 0.4688615719138886,
+  "holm": 0.0016779157456163682
+ },
+ "harrier_0_6b unchanged scholarcatalyst_core": {
+  "mean": 0.3058699486235718,
+  "holm": 1.0
+ },
+ "harrier_0_6b unchanged scholarcatalyst_subfield": {
+  "mean": 0.36654699820638686,
+  "holm": 0.04549136263096118
+ },
+ "harrier_0_6b refit surveymatch_test": {
+  "mean": 0.3374312369330459,
+  "holm": null
+ },
+ "harrier_0_6b refit frontiermatch_test": {
+  "mean": 0.14536513315149804,
+  "holm": null
+ },
+ "harrier_0_6b refit consensusmatch_test": {
+  "mean": 0.635254061560934,
+  "holm": null
+ },
+ "harrier_0_6b refit pasa_test": {
+  "mean": 0.6407932908767169,
+  "holm": null
+ },
+ "harrier_0_6b refit pasa_real": {
+  "mean": 0.38147430237518,
+  "holm": null
+ },
+ "harrier_0_6b refit surge_test": {
+  "mean": 0.4792010745263087,
+  "holm": null
+ },
+ "harrier_0_6b refit scholarcatalyst_core": {
+  "mean": 0.3154915267234108,
+  "holm": null
+ },
+ "harrier_0_6b refit scholarcatalyst_subfield": {
+  "mean": 0.3769543976967558,
+  "holm": null
+ },
+ "nemotron_1b cosine surveymatch_test": {
+  "mean": 0.1407404449212566,
+  "holm": null
+ },
+ "nemotron_1b cosine frontiermatch_test": {
+  "mean": 0.06904767363729113,
+  "holm": null
+ },
+ "nemotron_1b cosine consensusmatch_test": {
+  "mean": 0.18542528245290252,
+  "holm": null
+ },
+ "nemotron_1b cosine pasa_test": {
+  "mean": 0.45536232090737094,
+  "holm": null
+ },
+ "nemotron_1b cosine pasa_real": {
+  "mean": 0.45262406685151646,
+  "holm": null
+ },
+ "nemotron_1b cosine surge_test": {
+  "mean": 0.271033902517457,
+  "holm": null
+ },
+ "nemotron_1b cosine scholarcatalyst_core": {
+  "mean": 0.3136780154896097,
+  "holm": null
+ },
+ "nemotron_1b cosine scholarcatalyst_subfield": {
+  "mean": 0.3649951011304723,
+  "holm": null
+ },
+ "nemotron_1b unchanged surveymatch_test": {
+  "mean": 0.3292199097850208,
+  "holm": 0.03409030091567226
+ },
+ "nemotron_1b unchanged frontiermatch_test": {
+  "mean": 0.13983466357420754,
+  "holm": 0.5107796502979989
+ },
+ "nemotron_1b unchanged consensusmatch_test": {
+  "mean": 0.607869167859375,
+  "holm": 0.7512425653426119
+ },
+ "nemotron_1b unchanged pasa_test": {
+  "mean": 0.6347920495028393,
+  "holm": 1.0
+ },
+ "nemotron_1b unchanged pasa_real": {
+  "mean": 0.4126712830777905,
+  "holm": 1.0
+ },
+ "nemotron_1b unchanged surge_test": {
+  "mean": 0.45201722848145326,
+  "holm": 1.0
+ },
+ "nemotron_1b unchanged scholarcatalyst_core": {
+  "mean": 0.31814278046162103,
+  "holm": 1.0
+ },
+ "nemotron_1b unchanged scholarcatalyst_subfield": {
+  "mean": 0.3951155305958799,
+  "holm": 1.0
+ },
+ "nemotron_1b refit surveymatch_test": {
+  "mean": 0.33010700054678516,
+  "holm": null
+ },
+ "nemotron_1b refit frontiermatch_test": {
+  "mean": 0.14559795123920363,
+  "holm": null
+ },
+ "nemotron_1b refit consensusmatch_test": {
+  "mean": 0.6270041767410477,
+  "holm": null
+ },
+ "nemotron_1b refit pasa_test": {
+  "mean": 0.6393019105477393,
+  "holm": null
+ },
+ "nemotron_1b refit pasa_real": {
+  "mean": 0.4251804160285139,
+  "holm": null
+ },
+ "nemotron_1b refit surge_test": {
+  "mean": 0.45295472917250357,
+  "holm": null
+ },
+ "nemotron_1b refit scholarcatalyst_core": {
+  "mean": 0.326481864887662,
+  "holm": null
+ },
+ "nemotron_1b refit scholarcatalyst_subfield": {
+  "mean": 0.39285142724007355,
+  "holm": null
+ },
+ "qwen3_4b cosine surveymatch_test": {
+  "mean": 0.18281953096562928,
+  "holm": null
+ },
+ "qwen3_4b cosine frontiermatch_test": {
+  "mean": 0.08503703184420192,
+  "holm": null
+ },
+ "qwen3_4b cosine consensusmatch_test": {
+  "mean": 0.28318038910748994,
+  "holm": null
+ },
+ "qwen3_4b cosine pasa_test": {
+  "mean": 0.5477095022145078,
+  "holm": null
+ },
+ "qwen3_4b cosine pasa_real": {
+  "mean": 0.5333141669885678,
+  "holm": null
+ },
+ "qwen3_4b cosine surge_test": {
+  "mean": 0.3739159661542843,
+  "holm": null
+ },
+ "qwen3_4b cosine scholarcatalyst_core": {
+  "mean": 0.37820719269994635,
+  "holm": null
+ },
+ "qwen3_4b cosine scholarcatalyst_subfield": {
+  "mean": 0.4230951201475219,
+  "holm": null
+ },
+ "qwen3_4b unchanged surveymatch_test": {
+  "mean": 0.34962100524177797,
+  "holm": 0.15760404634343975
+ },
+ "qwen3_4b unchanged frontiermatch_test": {
+  "mean": 0.1460314559788186,
+  "holm": 1.0
+ },
+ "qwen3_4b unchanged consensusmatch_test": {
+  "mean": 0.634593658597484,
+  "holm": 0.799119792542958
+ },
+ "qwen3_4b unchanged pasa_test": {
+  "mean": 0.6696605304224881,
+  "holm": 0.04402153791246161
+ },
+ "qwen3_4b unchanged pasa_real": {
+  "mean": 0.4074886612314687,
+  "holm": 0.005080425748720493
+ },
+ "qwen3_4b unchanged surge_test": {
+  "mean": 0.48091850348811427,
+  "holm": 0.05383522284236923
+ },
+ "qwen3_4b unchanged scholarcatalyst_core": {
+  "mean": 0.34730082048922634,
+  "holm": 0.04402153791246161
+ },
+ "qwen3_4b unchanged scholarcatalyst_subfield": {
+  "mean": 0.39441086165976996,
+  "holm": 8.241705922298039e-13
+ },
+ "qwen3_4b refit surveymatch_test": {
+  "mean": 0.35029486860477893,
+  "holm": null
+ },
+ "qwen3_4b refit frontiermatch_test": {
+  "mean": 0.1522267305925408,
+  "holm": null
+ },
+ "qwen3_4b refit consensusmatch_test": {
+  "mean": 0.6506949865099966,
+  "holm": null
+ },
+ "qwen3_4b refit pasa_test": {
+  "mean": 0.6897243375830695,
+  "holm": null
+ },
+ "qwen3_4b refit pasa_real": {
+  "mean": 0.46951380756602845,
+  "holm": null
+ },
+ "qwen3_4b refit surge_test": {
+  "mean": 0.48747981359246195,
+  "holm": null
+ },
+ "qwen3_4b refit scholarcatalyst_core": {
+  "mean": 0.3855379188712522,
+  "holm": null
+ },
+ "qwen3_4b refit scholarcatalyst_subfield": {
+  "mean": 0.43183874592171534,
+  "holm": null
+ },
+ "qwen3_8b cosine surveymatch_test": {
+  "mean": 0.19367880574215027,
+  "holm": null
+ },
+ "qwen3_8b cosine frontiermatch_test": {
+  "mean": 0.09385291707978516,
+  "holm": null
+ },
+ "qwen3_8b cosine consensusmatch_test": {
+  "mean": 0.3077985097392682,
+  "holm": null
+ },
+ "qwen3_8b cosine pasa_test": {
+  "mean": 0.5694722870751792,
+  "holm": null
+ },
+ "qwen3_8b cosine pasa_real": {
+  "mean": 0.5092914387244187,
+  "holm": null
+ },
+ "qwen3_8b cosine surge_test": {
+  "mean": 0.3988079722388289,
+  "holm": null
+ },
+ "qwen3_8b cosine scholarcatalyst_core": {
+  "mean": 0.35623418449505406,
+  "holm": null
+ },
+ "qwen3_8b cosine scholarcatalyst_subfield": {
+  "mean": 0.4639349046554287,
+  "holm": null
+ },
+ "qwen3_8b unchanged surveymatch_test": {
+  "mean": 0.35180199032268406,
+  "holm": 0.0006447582409035807
+ },
+ "qwen3_8b unchanged frontiermatch_test": {
+  "mean": 0.14907725757062323,
+  "holm": 0.9681732531355033
+ },
+ "qwen3_8b unchanged consensusmatch_test": {
+  "mean": 0.6346373965600165,
+  "holm": 0.04549136263096118
+ },
+ "qwen3_8b unchanged pasa_test": {
+  "mean": 0.6786939361466614,
+  "holm": 0.9681732531355033
+ },
+ "qwen3_8b unchanged pasa_real": {
+  "mean": 0.40577539514948957,
+  "holm": 0.0006447582409035807
+ },
+ "qwen3_8b unchanged surge_test": {
+  "mean": 0.4878710527864687,
+  "holm": 1.7623134293005855e-06
+ },
+ "qwen3_8b unchanged scholarcatalyst_core": {
+  "mean": 0.31046507169695575,
+  "holm": 0.0003955922771822705
+ },
+ "qwen3_8b unchanged scholarcatalyst_subfield": {
+  "mean": 0.38735199379304186,
+  "holm": 1.3867753892499081e-24
+ },
+ "qwen3_8b refit surveymatch_test": {
+  "mean": 0.35318500771549516,
+  "holm": null
+ },
+ "qwen3_8b refit frontiermatch_test": {
+  "mean": 0.1550402821031744,
+  "holm": null
+ },
+ "qwen3_8b refit consensusmatch_test": {
+  "mean": 0.6623877380993861,
+  "holm": null
+ },
+ "qwen3_8b refit pasa_test": {
+  "mean": 0.6914942862106378,
+  "holm": null
+ },
+ "qwen3_8b refit pasa_real": {
+  "mean": 0.4925502759930669,
+  "holm": null
+ },
+ "qwen3_8b refit surge_test": {
+  "mean": 0.5021805211756136,
+  "holm": null
+ },
+ "qwen3_8b refit scholarcatalyst_core": {
+  "mean": 0.37532589525343146,
+  "holm": null
+ },
+ "qwen3_8b refit scholarcatalyst_subfield": {
+  "mean": 0.4522025847353358,
+  "holm": null
+ },
+ "nemotron_8b cosine surveymatch_test": {
+  "mean": 0.19845558640109892,
+  "holm": null
+ },
+ "nemotron_8b cosine frontiermatch_test": {
+  "mean": 0.09025922757592099,
+  "holm": null
+ },
+ "nemotron_8b cosine consensusmatch_test": {
+  "mean": 0.2784215141976096,
+  "holm": null
+ },
+ "nemotron_8b cosine pasa_test": {
+  "mean": 0.5822929696678306,
+  "holm": null
+ },
+ "nemotron_8b cosine pasa_real": {
+  "mean": 0.5525108666359649,
+  "holm": null
+ },
+ "nemotron_8b cosine surge_test": {
+  "mean": 0.3739197654027597,
+  "holm": null
+ },
+ "nemotron_8b cosine scholarcatalyst_core": {
+  "mean": 0.4012939958592132,
+  "holm": null
+ },
+ "nemotron_8b cosine scholarcatalyst_subfield": {
+  "mean": 0.4321606624008371,
+  "holm": null
+ },
+ "nemotron_8b unchanged surveymatch_test": {
+  "mean": 0.3598117472073259,
+  "holm": 2.969083966799714e-11
+ },
+ "nemotron_8b unchanged frontiermatch_test": {
+  "mean": 0.15091456259284558,
+  "holm": 1.0
+ },
+ "nemotron_8b unchanged consensusmatch_test": {
+  "mean": 0.6558116986995837,
+  "holm": 1.0
+ },
+ "nemotron_8b unchanged pasa_test": {
+  "mean": 0.6908339682811319,
+  "holm": 0.9681732531355033
+ },
+ "nemotron_8b unchanged pasa_real": {
+  "mean": 0.444478583673227,
+  "holm": 0.00021890258835278182
+ },
+ "nemotron_8b unchanged surge_test": {
+  "mean": 0.49165441129296,
+  "holm": 5.577742412374522e-06
+ },
+ "nemotron_8b unchanged scholarcatalyst_core": {
+  "mean": 0.3581761367993252,
+  "holm": 0.00015405017912044908
+ },
+ "nemotron_8b unchanged scholarcatalyst_subfield": {
+  "mean": 0.4159846905480093,
+  "holm": 5.91631479447923e-16
+ },
+ "nemotron_8b refit surveymatch_test": {
+  "mean": 0.3627082792869084,
+  "holm": null
+ },
+ "nemotron_8b refit frontiermatch_test": {
+  "mean": 0.1587106787320322,
+  "holm": null
+ },
+ "nemotron_8b refit consensusmatch_test": {
+  "mean": 0.6634644880927955,
+  "holm": null
+ },
+ "nemotron_8b refit pasa_test": {
+  "mean": 0.7022999031619721,
+  "holm": null
+ },
+ "nemotron_8b refit pasa_real": {
+  "mean": 0.5742195132463999,
+  "holm": null
+ },
+ "nemotron_8b refit surge_test": {
+  "mean": 0.5081940710851559,
+  "holm": null
+ },
+ "nemotron_8b refit scholarcatalyst_core": {
+  "mean": 0.43597883597883597,
+  "holm": null
+ },
+ "nemotron_8b refit scholarcatalyst_subfield": {
+  "mean": 0.46568136699141066,
+  "holm": null
+ },
+ "harrier_27b cosine surveymatch_test": {
+  "mean": 0.20467393377423226,
+  "holm": null
+ },
+ "harrier_27b cosine frontiermatch_test": {
+  "mean": 0.09638690502803603,
+  "holm": null
+ },
+ "harrier_27b cosine consensusmatch_test": {
+  "mean": 0.3205062899068753,
+  "holm": null
+ },
+ "harrier_27b cosine pasa_test": {
+  "mean": 0.5777341802925785,
+  "holm": null
+ },
+ "harrier_27b cosine pasa_real": {
+  "mean": 0.5473220172118007,
+  "holm": null
+ },
+ "harrier_27b cosine surge_test": {
+  "mean": 0.3867290401588323,
+  "holm": null
+ },
+ "harrier_27b cosine scholarcatalyst_core": {
+  "mean": 0.38012614063338707,
+  "holm": null
+ },
+ "harrier_27b cosine scholarcatalyst_subfield": {
+  "mean": 0.47264348945571655,
+  "holm": null
+ },
+ "harrier_27b unchanged surveymatch_test": {
+  "mean": 0.35805539662214164,
+  "holm": 1.2399141355793745e-06
+ },
+ "harrier_27b unchanged frontiermatch_test": {
+  "mean": 0.14938995157886772,
+  "holm": 1.0
+ },
+ "harrier_27b unchanged consensusmatch_test": {
+  "mean": 0.6456533105852094,
+  "holm": 0.2937679578700737
+ },
+ "harrier_27b unchanged pasa_test": {
+  "mean": 0.6742874323797572,
+  "holm": 0.12941997005929523
+ },
+ "harrier_27b unchanged pasa_real": {
+  "mean": 0.3743334138189667,
+  "holm": 0.001061013277557981
+ },
+ "harrier_27b unchanged surge_test": {
+  "mean": 0.49339280869463364,
+  "holm": 5.817202469033151e-05
+ },
+ "harrier_27b unchanged scholarcatalyst_core": {
+  "mean": 0.31690629552948396,
+  "holm": 0.0014532281366389497
+ },
+ "harrier_27b unchanged scholarcatalyst_subfield": {
+  "mean": 0.3884817713420333,
+  "holm": 1.4349387312301076e-25
+ },
+ "harrier_27b refit surveymatch_test": {
+  "mean": 0.36111174028465154,
+  "holm": null
+ },
+ "harrier_27b refit frontiermatch_test": {
+  "mean": 0.15294386285312098,
+  "holm": null
+ },
+ "harrier_27b refit consensusmatch_test": {
+  "mean": 0.672920128799179,
+  "holm": null
+ },
+ "harrier_27b refit pasa_test": {
+  "mean": 0.6939998112133818,
+  "holm": null
+ },
+ "harrier_27b refit pasa_real": {
+  "mean": 0.47046924062095646,
+  "holm": null
+ },
+ "harrier_27b refit surge_test": {
+  "mean": 0.5071189084320634,
+  "holm": null
+ },
+ "harrier_27b refit scholarcatalyst_core": {
+  "mean": 0.38459665669810594,
+  "holm": null
+ },
+ "harrier_27b refit scholarcatalyst_subfield": {
+  "mean": 0.4633244202021495,
+  "holm": null
+ }
+}

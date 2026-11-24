@@ -1,0 +1,4 @@
+retriever = "nemotron_8b"
+dataset = "scholarcatalyst"
+split = "subfield"
+method = "none"

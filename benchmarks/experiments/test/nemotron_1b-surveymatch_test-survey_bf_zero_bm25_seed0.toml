@@ -1,0 +1,12 @@
+retriever = "nemotron_1b"
+dataset = "surveymatch"
+split = "test"
+method = "bf"
+recipe = "survey"
+seed = 0
+variant = "zero_bm25"
+
+[override]
+
+[override.weights]
+BM25 = 0.0

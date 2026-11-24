@@ -1,0 +1,4 @@
+retriever = "scincl"
+dataset = "scholarcatalyst"
+split = "subfield"
+method = "none"

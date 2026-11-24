@@ -1,0 +1,6 @@
+retriever = "harrier_27b"
+dataset = "frontiermatch"
+split = "test"
+method = "bf"
+recipe = "frontier"
+seed = 3

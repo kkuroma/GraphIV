@@ -1,0 +1,12 @@
+retriever = "nomic"
+dataset = "scholarcatalyst"
+split = "subfield"
+method = "bf"
+recipe = "focused"
+seed = 0
+variant = "zero_fro2"
+
+[override]
+
+[override.weights]
+FRO2 = 0.0

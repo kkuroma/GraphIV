@@ -1,0 +1,6 @@
+retriever = "qwen3_8b"
+dataset = "surveymatch"
+split = "test"
+method = "ppr"
+recipe = "focused"
+seed = 0

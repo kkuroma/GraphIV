@@ -1,0 +1,4 @@
+retriever = "nemotron_1b"
+recipe = "frontier"
+method = "ppr"
+seed = 0

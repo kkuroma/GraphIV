@@ -1,0 +1,9 @@
+retriever = "qwen3_8b"
+recipe = "focused"
+method = "bf"
+seed = 0
+variant = "without_anc2"
+at_pick = true
+
+[override]
+terms = ["rec", "anc", "fro", "fro2", "anc_decay", "fro_decay", "cocite", "couple", "bm25", "hub"]

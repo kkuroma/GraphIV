@@ -1,0 +1,722 @@
+{
+ "bm25-none scholarcatalyst_core ndcg@20": {
+  "run": "bm25-scholarcatalyst_core-none",
+  "mean": 0.1701217044425437,
+  "holm": 0.035164126486345156,
+  "arxiv": 0.18007204976656108
+ },
+ "bm25-none scholarcatalyst_core recall@5": {
+  "run": "bm25-scholarcatalyst_core-none",
+  "mean": 0.13939498504715897,
+  "holm": 0.07563034714460719,
+  "arxiv": 0.14986969912343046
+ },
+ "bm25-none scholarcatalyst_core recall@20": {
+  "run": "bm25-scholarcatalyst_core-none",
+  "mean": 0.23397170462387853,
+  "holm": 0.03489376869308704,
+  "arxiv": 0.2509239516702203
+ },
+ "bm25-none scholarcatalyst_core recall@100": {
+  "run": "bm25-scholarcatalyst_core-none",
+  "mean": 0.39609309102062723,
+  "holm": 2.7607987037497497e-08,
+  "arxiv": 0.42841743662639187
+ },
+ "bm25-none scholarcatalyst_subfield ndcg@20": {
+  "run": "bm25-scholarcatalyst_subfield-none",
+  "mean": 0.21319383968879954,
+  "holm": 2.4492601969444812e-15,
+  "arxiv": 0.22476256438983588
+ },
+ "bm25-none scholarcatalyst_subfield recall@5": {
+  "run": "bm25-scholarcatalyst_subfield-none",
+  "mean": 0.12638433053280212,
+  "holm": 1.201103878822048e-08,
+  "arxiv": 0.1386180941899417
+ },
+ "bm25-none scholarcatalyst_subfield recall@20": {
+  "run": "bm25-scholarcatalyst_subfield-none",
+  "mean": 0.2677805253132764,
+  "holm": 8.898930079982995e-14,
+  "arxiv": 0.29099874953980526
+ },
+ "bm25-none scholarcatalyst_subfield recall@100": {
+  "run": "bm25-scholarcatalyst_subfield-none",
+  "mean": 0.4734231359777211,
+  "holm": 6.913465052423676e-28,
+  "arxiv": 0.5138029492501633
+ },
+ "specter2-none scholarcatalyst_core ndcg@20": {
+  "run": "specter2-scholarcatalyst_core-none",
+  "mean": 0.09542932177305746,
+  "holm": 1.5196424257134408e-07,
+  "arxiv": 0.10343509534277044
+ },
+ "specter2-none scholarcatalyst_core recall@5": {
+  "run": "specter2-scholarcatalyst_core-none",
+  "mean": 0.07040871098842114,
+  "holm": 1.2974911134394133e-06,
+  "arxiv": 0.08094053541814736
+ },
+ "specter2-none scholarcatalyst_core recall@20": {
+  "run": "specter2-scholarcatalyst_core-none",
+  "mean": 0.14682347979449428,
+  "holm": 1.392478674489108e-06,
+  "arxiv": 0.1638711205875385
+ },
+ "specter2-none scholarcatalyst_core recall@100": {
+  "run": "specter2-scholarcatalyst_core-none",
+  "mean": 0.28978605935127677,
+  "holm": 2.949009569686654e-16,
+  "arxiv": 0.3170398009950249
+ },
+ "specter2-none scholarcatalyst_subfield ndcg@20": {
+  "run": "specter2-scholarcatalyst_subfield-none",
+  "mean": 0.1393623628615992,
+  "holm": 1.444368315760704e-41,
+  "arxiv": 0.14986167932758104
+ },
+ "specter2-none scholarcatalyst_subfield recall@5": {
+  "run": "specter2-scholarcatalyst_subfield-none",
+  "mean": 0.08202635549797122,
+  "holm": 9.843993054045287e-27,
+  "arxiv": 0.09295568800700765
+ },
+ "specter2-none scholarcatalyst_subfield recall@20": {
+  "run": "specter2-scholarcatalyst_subfield-none",
+  "mean": 0.17531366821759836,
+  "holm": 1.2092860005038362e-43,
+  "arxiv": 0.19706448650730174
+ },
+ "specter2-none scholarcatalyst_subfield recall@100": {
+  "run": "specter2-scholarcatalyst_subfield-none",
+  "mean": 0.3466845179727276,
+  "holm": 4.978487171875151e-57,
+  "arxiv": 0.3830906752094435
+ },
+ "scincl-none scholarcatalyst_core ndcg@20": {
+  "run": "scincl-scholarcatalyst_core-none",
+  "mean": 0.1349144629430665,
+  "holm": 0.00046031466596565087,
+  "arxiv": 0.14467322441375047
+ },
+ "scincl-none scholarcatalyst_core recall@5": {
+  "run": "scincl-scholarcatalyst_core-none",
+  "mean": 0.11035196687370599,
+  "holm": 0.0018456100425338648,
+  "arxiv": 0.11899431414356787
+ },
+ "scincl-none scholarcatalyst_core recall@20": {
+  "run": "scincl-scholarcatalyst_core-none",
+  "mean": 0.19703243616287094,
+  "holm": 0.0005962579267049198,
+  "arxiv": 0.21829542762378584
+ },
+ "scincl-none scholarcatalyst_core recall@100": {
+  "run": "scincl-scholarcatalyst_core-none",
+  "mean": 0.3585787132888582,
+  "holm": 3.5967048404978423e-10,
+  "arxiv": 0.3897239990523572
+ },
+ "scincl-none scholarcatalyst_subfield ndcg@20": {
+  "run": "scincl-scholarcatalyst_subfield-none",
+  "mean": 0.16156902253994387,
+  "holm": 4.948942179492001e-32,
+  "arxiv": 0.17355223977490158
+ },
+ "scincl-none scholarcatalyst_subfield recall@5": {
+  "run": "scincl-scholarcatalyst_subfield-none",
+  "mean": 0.09794623943095558,
+  "holm": 1.0082710642003939e-17,
+  "arxiv": 0.112547496491778
+ },
+ "scincl-none scholarcatalyst_subfield recall@20": {
+  "run": "scincl-scholarcatalyst_subfield-none",
+  "mean": 0.19522867961732593,
+  "holm": 3.061121467332063e-36,
+  "arxiv": 0.2170146040014075
+ },
+ "scincl-none scholarcatalyst_subfield recall@100": {
+  "run": "scincl-scholarcatalyst_subfield-none",
+  "mean": 0.38717863488605847,
+  "holm": 3.9923247074985035e-47,
+  "arxiv": 0.42383696866834697
+ },
+ "nomic-none scholarcatalyst_core ndcg@20": {
+  "run": "nomic-scholarcatalyst_core-none",
+  "mean": 0.20300453541690822,
+  "holm": 0.8818517880171166,
+  "arxiv": 0.217883108023799
+ },
+ "nomic-none scholarcatalyst_core recall@5": {
+  "run": "nomic-scholarcatalyst_core-none",
+  "mean": 0.1678034659918718,
+  "holm": 0.832337933076607,
+  "arxiv": 0.1833747927031509
+ },
+ "nomic-none scholarcatalyst_core recall@20": {
+  "run": "nomic-scholarcatalyst_core-none",
+  "mean": 0.2928743961352657,
+  "holm": 0.8818517880171166,
+  "arxiv": 0.3185915659796257
+ },
+ "nomic-none scholarcatalyst_core recall@100": {
+  "run": "nomic-scholarcatalyst_core-none",
+  "mean": 0.40774672187715666,
+  "holm": 6.333696029469195e-08,
+  "arxiv": 0.446002132196162
+ },
+ "nomic-none scholarcatalyst_subfield ndcg@20": {
+  "run": "nomic-scholarcatalyst_subfield-none",
+  "mean": 0.2464693573521658,
+  "holm": 0.00016056311142954044,
+  "arxiv": 0.2627574746187698
+ },
+ "nomic-none scholarcatalyst_subfield recall@5": {
+  "run": "nomic-scholarcatalyst_subfield-none",
+  "mean": 0.14794628790261977,
+  "holm": 0.0009744910236830102,
+  "arxiv": 0.16713424649641656
+ },
+ "nomic-none scholarcatalyst_subfield recall@20": {
+  "run": "nomic-scholarcatalyst_subfield-none",
+  "mean": 0.2983417318570157,
+  "holm": 7.732434133377073e-06,
+  "arxiv": 0.3289070899774712
+ },
+ "nomic-none scholarcatalyst_subfield recall@100": {
+  "run": "nomic-scholarcatalyst_subfield-none",
+  "mean": 0.515173585915944,
+  "holm": 6.444427561074118e-11,
+  "arxiv": 0.5599361293642819
+ },
+ "nomic-rerank scholarcatalyst_core ndcg@20": {
+  "run": "nomic-scholarcatalyst_core-rerank",
+  "mean": 0.11662039345401644,
+  "holm": 3.938159791370066e-06,
+  "arxiv": 0.12416445837519133
+ },
+ "nomic-rerank scholarcatalyst_core recall@5": {
+  "run": "nomic-scholarcatalyst_core-rerank",
+  "mean": 0.07115251897860593,
+  "holm": 1.0660918301474054e-06,
+  "arxiv": 0.07741648898365316
+ },
+ "nomic-rerank scholarcatalyst_core recall@20": {
+  "run": "nomic-scholarcatalyst_core-rerank",
+  "mean": 0.1676213480561307,
+  "holm": 2.5559306230529482e-06,
+  "arxiv": 0.17975005922767118
+ },
+ "nomic-rerank scholarcatalyst_core recall@100": {
+  "run": "nomic-scholarcatalyst_core-rerank",
+  "mean": 0.31657848324514987,
+  "holm": 7.572327236961388e-15,
+  "arxiv": 0.338563136697465
+ },
+ "nomic-rerank scholarcatalyst_subfield ndcg@20": {
+  "run": "nomic-scholarcatalyst_subfield-rerank",
+  "mean": 0.21663274240555197,
+  "holm": 4.508517580330234e-12,
+  "arxiv": 0.22946291026221804
+ },
+ "nomic-rerank scholarcatalyst_subfield recall@5": {
+  "run": "nomic-scholarcatalyst_subfield-rerank",
+  "mean": 0.12910105824952986,
+  "holm": 3.944704868240553e-09,
+  "arxiv": 0.14174227125106892
+ },
+ "nomic-rerank scholarcatalyst_subfield recall@20": {
+  "run": "nomic-scholarcatalyst_subfield-rerank",
+  "mean": 0.2693678107433566,
+  "holm": 3.1891322959485456e-13,
+  "arxiv": 0.2955134308506743
+ },
+ "nomic-rerank scholarcatalyst_subfield recall@100": {
+  "run": "nomic-scholarcatalyst_subfield-rerank",
+  "mean": 0.49999367040851755,
+  "holm": 7.376295959897146e-16,
+  "arxiv": 0.545045151166852
+ },
+ "nomic-gar_sim scholarcatalyst_core ndcg@20": {
+  "run": "nomic-scholarcatalyst_core-gar_sim",
+  "mean": 0.11188342833891965,
+  "holm": 1.4282624992018644e-06,
+  "arxiv": 0.11919327579815156
+ },
+ "nomic-gar_sim scholarcatalyst_core recall@5": {
+  "run": "nomic-scholarcatalyst_core-gar_sim",
+  "mean": 0.0722260562840273,
+  "holm": 1.4282624992018644e-06,
+  "arxiv": 0.07845297322909263
+ },
+ "nomic-gar_sim scholarcatalyst_core recall@20": {
+  "run": "nomic-scholarcatalyst_core-gar_sim",
+  "mean": 0.15876466528640443,
+  "holm": 3.965131681838185e-07,
+  "arxiv": 0.17062899786780383
+ },
+ "nomic-gar_sim scholarcatalyst_core recall@100": {
+  "run": "nomic-scholarcatalyst_core-gar_sim",
+  "mean": 0.30026838432635533,
+  "holm": 1.7385704889059194e-15,
+  "arxiv": 0.3213515754560531
+ },
+ "nomic-gar_sim scholarcatalyst_subfield ndcg@20": {
+  "run": "nomic-scholarcatalyst_subfield-gar_sim",
+  "mean": 0.2162841483868904,
+  "holm": 3.6441859358266965e-12,
+  "arxiv": 0.22887199302502947
+ },
+ "nomic-gar_sim scholarcatalyst_subfield recall@5": {
+  "run": "nomic-scholarcatalyst_subfield-gar_sim",
+  "mean": 0.12852296498584706,
+  "holm": 5.147394856541706e-09,
+  "arxiv": 0.14143975932832237
+ },
+ "nomic-gar_sim scholarcatalyst_subfield recall@20": {
+  "run": "nomic-scholarcatalyst_subfield-gar_sim",
+  "mean": 0.27056740364600623,
+  "holm": 8.840880688422929e-13,
+  "arxiv": 0.2959840623696929
+ },
+ "nomic-gar_sim scholarcatalyst_subfield recall@100": {
+  "run": "nomic-scholarcatalyst_subfield-gar_sim",
+  "mean": 0.5005958985216628,
+  "holm": 2.9185000577861735e-15,
+  "arxiv": 0.5443812175117161
+ },
+ "nomic-gar_cite scholarcatalyst_core ndcg@20": {
+  "run": "nomic-scholarcatalyst_core-gar_cite",
+  "mean": 0.11750966668352063,
+  "holm": 3.938159791370066e-06,
+  "arxiv": 0.12512706206810437
+ },
+ "nomic-gar_cite scholarcatalyst_core recall@5": {
+  "run": "nomic-scholarcatalyst_core-gar_cite",
+  "mean": 0.07558086036346906,
+  "holm": 2.5933461298054925e-06,
+  "arxiv": 0.08197701966358682
+ },
+ "nomic-gar_cite scholarcatalyst_core recall@20": {
+  "run": "nomic-scholarcatalyst_core-gar_cite",
+  "mean": 0.16697722567287787,
+  "holm": 1.6550685339820188e-06,
+  "arxiv": 0.17933546552949536
+ },
+ "nomic-gar_cite scholarcatalyst_core recall@100": {
+  "run": "nomic-scholarcatalyst_core-gar_cite",
+  "mean": 0.3158538455639905,
+  "holm": 9.62637014855384e-15,
+  "arxiv": 0.33798270552001897
+ },
+ "nomic-gar_cite scholarcatalyst_subfield ndcg@20": {
+  "run": "nomic-scholarcatalyst_subfield-gar_cite",
+  "mean": 0.22006530994916246,
+  "holm": 6.444427561074118e-11,
+  "arxiv": 0.23299304374894214
+ },
+ "nomic-gar_cite scholarcatalyst_subfield recall@5": {
+  "run": "nomic-scholarcatalyst_subfield-gar_cite",
+  "mean": 0.13121880949391868,
+  "holm": 3.131640250955393e-08,
+  "arxiv": 0.14421471734521588
+ },
+ "nomic-gar_cite scholarcatalyst_subfield recall@20": {
+  "run": "nomic-scholarcatalyst_subfield-gar_cite",
+  "mean": 0.27299066371118774,
+  "holm": 6.433701413827446e-12,
+  "arxiv": 0.29886551620422586
+ },
+ "nomic-gar_cite scholarcatalyst_subfield recall@100": {
+  "run": "nomic-scholarcatalyst_subfield-gar_cite",
+  "mean": 0.5198496877536178,
+  "holm": 8.273680277437762e-11,
+  "arxiv": 0.5653438773673377
+ },
+ "focused-ppr scholarcatalyst_core ndcg@20": {
+  "run": "nomic-scholarcatalyst_core-focused_ppr_seed0",
+  "mean": 0.1882306234088805,
+  "holm": 0.15399289635067226,
+  "arxiv": 0.20028464451713496
+ },
+ "focused-ppr scholarcatalyst_core recall@5": {
+  "run": "nomic-scholarcatalyst_core-focused_ppr_seed0",
+  "mean": 0.15534659918717889,
+  "holm": 0.14644891637884777,
+  "arxiv": 0.16922530206112293
+ },
+ "focused-ppr scholarcatalyst_core recall@20": {
+  "run": "nomic-scholarcatalyst_core-focused_ppr_seed0",
+  "mean": 0.3038589832068093,
+  "holm": 0.8818517880171166,
+  "arxiv": 0.32767116796967544
+ },
+ "focused-ppr scholarcatalyst_core recall@100": {
+  "run": "nomic-scholarcatalyst_core-focused_ppr_seed0",
+  "mean": 0.4386377578406564,
+  "holm": 1.6550685339820188e-06,
+  "arxiv": 0.4822435441838427
+ },
+ "focused-ppr scholarcatalyst_subfield ndcg@20": {
+  "run": "nomic-scholarcatalyst_subfield-focused_ppr_seed0",
+  "mean": 0.25022739045324993,
+  "holm": 7.859834722403075e-07,
+  "arxiv": 0.2662920808534167
+ },
+ "focused-ppr scholarcatalyst_subfield recall@5": {
+  "run": "nomic-scholarcatalyst_subfield-focused_ppr_seed0",
+  "mean": 0.1507373469163862,
+  "holm": 3.6024318918052253e-06,
+  "arxiv": 0.16875670354409356
+ },
+ "focused-ppr scholarcatalyst_subfield recall@20": {
+  "run": "nomic-scholarcatalyst_subfield-focused_ppr_seed0",
+  "mean": 0.32988923174512697,
+  "holm": 0.035164126486345156,
+  "arxiv": 0.36292029085284216
+ },
+ "focused-ppr scholarcatalyst_subfield recall@100": {
+  "run": "nomic-scholarcatalyst_subfield-focused_ppr_seed0",
+  "mean": 0.5298671690593088,
+  "holm": 4.081482266052691e-10,
+  "arxiv": 0.575212336539316
+ },
+ "focused-bf scholarcatalyst_core ndcg@20": {
+  "run": "nomic-scholarcatalyst_core-focused_bf_seed0",
+  "mean": 0.2097138714898455,
+  "holm": null,
+  "arxiv": 0.22715762304639187
+ },
+ "focused-bf scholarcatalyst_core recall@5": {
+  "run": "nomic-scholarcatalyst_core-focused_bf_seed0",
+  "mean": 0.182035503412315,
+  "holm": null,
+  "arxiv": 0.20040274816394218
+ },
+ "focused-bf scholarcatalyst_core recall@20": {
+  "run": "nomic-scholarcatalyst_core-focused_bf_seed0",
+  "mean": 0.2891227666589985,
+  "holm": null,
+  "arxiv": 0.316015162283819
+ },
+ "focused-bf scholarcatalyst_core recall@100": {
+  "run": "nomic-scholarcatalyst_core-focused_bf_seed0",
+  "mean": 0.5436028678782302,
+  "holm": null,
+  "arxiv": 0.589729921819474
+ },
+ "focused-bf scholarcatalyst_subfield ndcg@20": {
+  "run": "nomic-scholarcatalyst_subfield-focused_bf_seed0",
+  "mean": 0.2926108416025387,
+  "holm": null,
+  "arxiv": 0.3092877669626577
+ },
+ "focused-bf scholarcatalyst_subfield recall@5": {
+  "run": "nomic-scholarcatalyst_subfield-focused_bf_seed0",
+  "mean": 0.18450748669089279,
+  "holm": null,
+  "arxiv": 0.20196729793503987
+ },
+ "focused-bf scholarcatalyst_subfield recall@20": {
+  "run": "nomic-scholarcatalyst_subfield-focused_bf_seed0",
+  "mean": 0.358188972599453,
+  "holm": null,
+  "arxiv": 0.3892202819988744
+ },
+ "focused-bf scholarcatalyst_subfield recall@100": {
+  "run": "nomic-scholarcatalyst_subfield-focused_bf_seed0",
+  "mean": 0.6034541352226942,
+  "holm": null,
+  "arxiv": 0.6510640955655619
+ },
+ "survey-ppr scholarcatalyst_core ndcg@20": {
+  "run": "nomic-scholarcatalyst_core-survey_ppr_seed0",
+  "mean": 0.03581909433273992,
+  "holm": 2.7253292717335488e-17,
+  "arxiv": 0.03923577954720597
+ },
+ "survey-ppr scholarcatalyst_core recall@5": {
+  "run": "nomic-scholarcatalyst_core-survey_ppr_seed0",
+  "mean": 0.01904186795491143,
+  "holm": 2.4541160136254663e-13,
+  "arxiv": 0.023756218905472637
+ },
+ "survey-ppr scholarcatalyst_core recall@20": {
+  "run": "nomic-scholarcatalyst_core-survey_ppr_seed0",
+  "mean": 0.05810520665593129,
+  "holm": 1.6398711624585215e-16,
+  "arxiv": 0.06551764984600805
+ },
+ "survey-ppr scholarcatalyst_core recall@100": {
+  "run": "nomic-scholarcatalyst_core-survey_ppr_seed0",
+  "mean": 0.2141093474426808,
+  "holm": 5.9137365309887386e-21,
+  "arxiv": 0.23509831793413885
+ },
+ "survey-ppr scholarcatalyst_subfield ndcg@20": {
+  "run": "nomic-scholarcatalyst_subfield-survey_ppr_seed0",
+  "mean": 0.06202164748280018,
+  "holm": 3.157024852336681e-82,
+  "arxiv": 0.06530025532182249
+ },
+ "survey-ppr scholarcatalyst_subfield recall@5": {
+  "run": "nomic-scholarcatalyst_subfield-survey_ppr_seed0",
+  "mean": 0.035349294082918536,
+  "holm": 3.569882195820804e-55,
+  "arxiv": 0.03927481365164649
+ },
+ "survey-ppr scholarcatalyst_subfield recall@20": {
+  "run": "nomic-scholarcatalyst_subfield-survey_ppr_seed0",
+  "mean": 0.0924795324358643,
+  "holm": 1.8984565641364468e-73,
+  "arxiv": 0.10046388118235625
+ },
+ "survey-ppr scholarcatalyst_subfield recall@100": {
+  "run": "nomic-scholarcatalyst_subfield-survey_ppr_seed0",
+  "mean": 0.257562997410159,
+  "holm": 4.474744328056812e-84,
+  "arxiv": 0.28222714073153954
+ },
+ "survey-bf scholarcatalyst_core ndcg@20": {
+  "run": "nomic-scholarcatalyst_core-survey_bf_seed0",
+  "mean": 0.13979564898720984,
+  "holm": 9.839320371485207e-09,
+  "arxiv": 0.15323206128743821
+ },
+ "survey-bf scholarcatalyst_core recall@5": {
+  "run": "nomic-scholarcatalyst_core-survey_bf_seed0",
+  "mean": 0.10187102216087722,
+  "holm": 1.7773604515057872e-06,
+  "arxiv": 0.11416133617626154
+ },
+ "survey-bf scholarcatalyst_core recall@20": {
+  "run": "nomic-scholarcatalyst_core-survey_bf_seed0",
+  "mean": 0.19740434015796335,
+  "holm": 1.1075334280235188e-07,
+  "arxiv": 0.21857379767827528
+ },
+ "survey-bf scholarcatalyst_core recall@100": {
+  "run": "nomic-scholarcatalyst_core-survey_bf_seed0",
+  "mean": 0.41010466988727856,
+  "holm": 8.846362911916771e-09,
+  "arxiv": 0.44664179104477614
+ },
+ "survey-bf scholarcatalyst_subfield ndcg@20": {
+  "run": "nomic-scholarcatalyst_subfield-survey_bf_seed0",
+  "mean": 0.19811601971854595,
+  "holm": 9.51767213530217e-43,
+  "arxiv": 0.20794233856184194
+ },
+ "survey-bf scholarcatalyst_subfield recall@5": {
+  "run": "nomic-scholarcatalyst_subfield-survey_bf_seed0",
+  "mean": 0.1297486477617482,
+  "holm": 1.1808522590433093e-17,
+  "arxiv": 0.14158875093625828
+ },
+ "survey-bf scholarcatalyst_subfield recall@20": {
+  "run": "nomic-scholarcatalyst_subfield-survey_bf_seed0",
+  "mean": 0.23866309979847097,
+  "holm": 5.249418964471312e-38,
+  "arxiv": 0.2582728773344609
+ },
+ "survey-bf scholarcatalyst_subfield recall@100": {
+  "run": "nomic-scholarcatalyst_subfield-survey_bf_seed0",
+  "mean": 0.4465811077164789,
+  "holm": 2.4841367732754656e-56,
+  "arxiv": 0.48005213668703406
+ },
+ "frontier-ppr scholarcatalyst_core ndcg@20": {
+  "run": "nomic-scholarcatalyst_core-frontier_ppr_seed0",
+  "mean": 0.16601122774567628,
+  "holm": 0.0005962579267049198,
+  "arxiv": 0.17762786540563627
+ },
+ "frontier-ppr scholarcatalyst_core recall@5": {
+  "run": "nomic-scholarcatalyst_core-frontier_ppr_seed0",
+  "mean": 0.12260371137182731,
+  "holm": 0.00015260074677574025,
+  "arxiv": 0.13402629708599859
+ },
+ "frontier-ppr scholarcatalyst_core recall@20": {
+  "run": "nomic-scholarcatalyst_core-frontier_ppr_seed0",
+  "mean": 0.2801683153132428,
+  "holm": 0.762192132056748,
+  "arxiv": 0.30553186448708836
+ },
+ "frontier-ppr scholarcatalyst_core recall@100": {
+  "run": "nomic-scholarcatalyst_core-frontier_ppr_seed0",
+  "mean": 0.44870217007898167,
+  "holm": 1.582733588976649e-05,
+  "arxiv": 0.4926083866382374
+ },
+ "frontier-ppr scholarcatalyst_subfield ndcg@20": {
+  "run": "nomic-scholarcatalyst_subfield-frontier_ppr_seed0",
+  "mean": 0.23344046131376933,
+  "holm": 1.0730158176111316e-13,
+  "arxiv": 0.24883362999387776
+ },
+ "frontier-ppr scholarcatalyst_subfield recall@5": {
+  "run": "nomic-scholarcatalyst_subfield-frontier_ppr_seed0",
+  "mean": 0.1348053854604073,
+  "holm": 9.02409147472718e-14,
+  "arxiv": 0.15044526994673624
+ },
+ "frontier-ppr scholarcatalyst_subfield recall@20": {
+  "run": "nomic-scholarcatalyst_subfield-frontier_ppr_seed0",
+  "mean": 0.3253481881211139,
+  "holm": 0.004421136071226463,
+  "arxiv": 0.3576648750402416
+ },
+ "frontier-ppr scholarcatalyst_subfield recall@100": {
+  "run": "nomic-scholarcatalyst_subfield-frontier_ppr_seed0",
+  "mean": 0.5422227497555009,
+  "holm": 3.722808047901241e-07,
+  "arxiv": 0.5879444073359029
+ },
+ "frontier-bf scholarcatalyst_core ndcg@20": {
+  "run": "nomic-scholarcatalyst_core-frontier_bf_seed0",
+  "mean": 0.1568149821464226,
+  "holm": 0.004421136071226463,
+  "arxiv": 0.1679181999991435
+ },
+ "frontier-bf scholarcatalyst_core recall@5": {
+  "run": "nomic-scholarcatalyst_core-frontier_bf_seed0",
+  "mean": 0.10731155586228049,
+  "holm": 0.0001446729834042572,
+  "arxiv": 0.11709902866619284
+ },
+ "frontier-bf scholarcatalyst_core recall@20": {
+  "run": "nomic-scholarcatalyst_core-frontier_bf_seed0",
+  "mean": 0.2468388160417146,
+  "holm": 0.035164126486345156,
+  "arxiv": 0.2684553423359394
+ },
+ "frontier-bf scholarcatalyst_core recall@100": {
+  "run": "nomic-scholarcatalyst_core-frontier_bf_seed0",
+  "mean": 0.45609424123916875,
+  "holm": 0.0002718772810544272,
+  "arxiv": 0.49198057332385686
+ },
+ "frontier-bf scholarcatalyst_subfield ndcg@20": {
+  "run": "nomic-scholarcatalyst_subfield-frontier_bf_seed0",
+  "mean": 0.19310554286588882,
+  "holm": 7.914762254719595e-26,
+  "arxiv": 0.20351273897045397
+ },
+ "frontier-bf scholarcatalyst_subfield recall@5": {
+  "run": "nomic-scholarcatalyst_subfield-frontier_bf_seed0",
+  "mean": 0.11516453787196144,
+  "holm": 4.874699501111933e-15,
+  "arxiv": 0.1263764868237009
+ },
+ "frontier-bf scholarcatalyst_subfield recall@20": {
+  "run": "nomic-scholarcatalyst_subfield-frontier_bf_seed0",
+  "mean": 0.25195951953593876,
+  "holm": 4.14499431799423e-23,
+  "arxiv": 0.274996736726942
+ },
+ "frontier-bf scholarcatalyst_subfield recall@100": {
+  "run": "nomic-scholarcatalyst_subfield-frontier_bf_seed0",
+  "mean": 0.4681254577542787,
+  "holm": 3.623368019342788e-35,
+  "arxiv": 0.5032165496608312
+ },
+ "consensus-ppr scholarcatalyst_core ndcg@20": {
+  "run": "nomic-scholarcatalyst_core-consensus_ppr_seed0",
+  "mean": 0.10458444599068555,
+  "holm": 1.2532800796167027e-11,
+  "arxiv": 0.1127863948902885
+ },
+ "consensus-ppr scholarcatalyst_core recall@5": {
+  "run": "nomic-scholarcatalyst_core-consensus_ppr_seed0",
+  "mean": 0.04675254965110037,
+  "holm": 3.618834606262366e-11,
+  "arxiv": 0.0539149490642028
+ },
+ "consensus-ppr scholarcatalyst_core recall@20": {
+  "run": "nomic-scholarcatalyst_core-consensus_ppr_seed0",
+  "mean": 0.1915976535541753,
+  "holm": 2.5559306230529482e-06,
+  "arxiv": 0.21037668798862827
+ },
+ "consensus-ppr scholarcatalyst_core recall@100": {
+  "run": "nomic-scholarcatalyst_core-consensus_ppr_seed0",
+  "mean": 0.46509661835748795,
+  "holm": 0.0001567990924630699,
+  "arxiv": 0.508256337360815
+ },
+ "consensus-ppr scholarcatalyst_subfield ndcg@20": {
+  "run": "nomic-scholarcatalyst_subfield-consensus_ppr_seed0",
+  "mean": 0.15857183010088327,
+  "holm": 3.7418456902211e-55,
+  "arxiv": 0.16937614683091895
+ },
+ "consensus-ppr scholarcatalyst_subfield recall@5": {
+  "run": "nomic-scholarcatalyst_subfield-consensus_ppr_seed0",
+  "mean": 0.07973636827348618,
+  "holm": 2.796276766054767e-37,
+  "arxiv": 0.08976968372129662
+ },
+ "consensus-ppr scholarcatalyst_subfield recall@20": {
+  "run": "nomic-scholarcatalyst_subfield-consensus_ppr_seed0",
+  "mean": 0.24165839820861656,
+  "holm": 5.241305589834923e-33,
+  "arxiv": 0.268852412657398
+ },
+ "consensus-ppr scholarcatalyst_subfield recall@100": {
+  "run": "nomic-scholarcatalyst_subfield-consensus_ppr_seed0",
+  "mean": 0.5529092410096776,
+  "holm": 2.9239911979046282e-06,
+  "arxiv": 0.6004302271531011
+ },
+ "consensus-bf scholarcatalyst_core ndcg@20": {
+  "run": "nomic-scholarcatalyst_core-consensus_bf_seed0",
+  "mean": 0.13955384710094085,
+  "holm": 2.3587594993103669e-07,
+  "arxiv": 0.15236717967326566
+ },
+ "consensus-bf scholarcatalyst_core recall@5": {
+  "run": "nomic-scholarcatalyst_core-consensus_bf_seed0",
+  "mean": 0.10124031899394219,
+  "holm": 1.7418195286916813e-06,
+  "arxiv": 0.11408434020374318
+ },
+ "consensus-bf scholarcatalyst_core recall@20": {
+  "run": "nomic-scholarcatalyst_core-consensus_bf_seed0",
+  "mean": 0.20257648953301124,
+  "holm": 1.6550685339820188e-06,
+  "arxiv": 0.22075337597725658
+ },
+ "consensus-bf scholarcatalyst_core recall@100": {
+  "run": "nomic-scholarcatalyst_core-consensus_bf_seed0",
+  "mean": 0.40424814048002455,
+  "holm": 2.2626528417124203e-09,
+  "arxiv": 0.4392620232172471
+ },
+ "consensus-bf scholarcatalyst_subfield ndcg@20": {
+  "run": "nomic-scholarcatalyst_subfield-consensus_bf_seed0",
+  "mean": 0.1913408848664268,
+  "holm": 6.920885814625758e-44,
+  "arxiv": 0.20088558325043107
+ },
+ "consensus-bf scholarcatalyst_subfield recall@5": {
+  "run": "nomic-scholarcatalyst_subfield-consensus_bf_seed0",
+  "mean": 0.12928214030834118,
+  "holm": 3.1165294021807295e-18,
+  "arxiv": 0.13949394935465317
+ },
+ "consensus-bf scholarcatalyst_subfield recall@20": {
+  "run": "nomic-scholarcatalyst_subfield-consensus_bf_seed0",
+  "mean": 0.23871199962903017,
+  "holm": 5.26939540300456e-37,
+  "arxiv": 0.25772191314713305
+ },
+ "consensus-bf scholarcatalyst_subfield recall@100": {
+  "run": "nomic-scholarcatalyst_subfield-consensus_bf_seed0",
+  "mean": 0.44924841453225733,
+  "holm": 2.6443015182300516e-56,
+  "arxiv": 0.48232728496658117
+ }
+}

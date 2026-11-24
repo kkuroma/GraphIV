@@ -1,0 +1,4 @@
+retriever = "bm25"
+dataset = "surge"
+split = "test"
+method = "none"

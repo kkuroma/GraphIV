@@ -1,0 +1,12 @@
+retriever = "harrier_0_6b"
+dataset = "surge"
+split = "test"
+method = "bf"
+recipe = "survey"
+seed = 0
+variant = "zero_hub"
+
+[override]
+
+[override.weights]
+HUB = 0.0

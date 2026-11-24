@@ -35,12 +35,12 @@ class Encoder:
 
 
 class SciNCL(Method):
-    def retrieve(self, cases: list[Case], params: dict[str, Any], fitted: dict[str, Any]) -> list[Ranking]:
-        shards = common.INDEX / "scincl"
-        embed_corpus(Encoder, lambda e: e.tokenizer.sep_token, shards)
+    def retrieve(self, cases: list[Case], jobs: list[dict[str, Any]]) -> dict[str, list[Ranking]]:
+        root = common.CACHE / "scincl"
+        embed_corpus(Encoder, lambda e: e.tokenizer.sep_token, root)
         queries = Encoder()([c["query"] for c in cases])
         torch.cuda.empty_cache()
-        return search(cases, queries, shards)
+        return {j["name"]: search(cases, queries, root, j["dataset"]) for j in jobs}
 
 
 METHOD = SciNCL

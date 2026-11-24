@@ -1,0 +1,7 @@
+retriever = "nomic"
+dataset = "pasa"
+split = "real"
+method = "bf"
+recipe = "focused"
+seed = 0
+tune_variant = "without_bm25"

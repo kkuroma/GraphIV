@@ -1,0 +1,12 @@
+retriever = "harrier_0_6b"
+dataset = "frontiermatch"
+split = "test"
+method = "bf"
+recipe = "frontier"
+seed = 0
+variant = "zero_anc"
+
+[override]
+
+[override.weights]
+ANC = 0.0

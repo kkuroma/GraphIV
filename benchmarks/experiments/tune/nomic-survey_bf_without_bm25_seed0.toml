@@ -1,0 +1,9 @@
+retriever = "nomic"
+recipe = "survey"
+method = "bf"
+seed = 0
+variant = "without_bm25"
+at_pick = true
+
+[override]
+terms = ["rec", "anc", "fro", "anc2", "fro2", "anc_decay", "fro_decay", "cocite", "couple", "hub"]

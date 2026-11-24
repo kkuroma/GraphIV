@@ -1,0 +1,4 @@
+retriever = "harrier_0_6b"
+dataset = "scholarcatalyst"
+split = "subfield"
+method = "none"

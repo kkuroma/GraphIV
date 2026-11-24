@@ -1,0 +1,12 @@
+retriever = "nomic"
+dataset = "consensusmatch"
+split = "test"
+method = "bf"
+recipe = "consensus"
+seed = 0
+variant = "zero_fro"
+
+[override]
+
+[override.weights]
+FRO = 0.0

@@ -1,0 +1,4 @@
+retriever = "specter2"
+dataset = "pasa"
+split = "test"
+method = "none"

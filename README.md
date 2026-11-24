@@ -57,7 +57,7 @@ The server needs the store, built by the stages of [`docs/01_preprocessing.md`](
 | --- | --- |
 | [`src/`](src/README.md) | Library: [`core`](src/core/README.md), [`retrieve`](src/retrieve/README.md) (BoundedField), [`miner`](src/miner/README.md) (LeyLine), [`report`](src/report/README.md), [`mcp`](src/mcp/README.md) and [`webui`](src/webui/README.md) |
 | [`scripts/`](scripts/README.md) | Downloader, Labelers, HF Exports, GUI manager, and  `serve.py` |
-| [`retrieval_recipes/`](retrieval_recipes) | Tuned exponent for each search mode in TOML. Created by `benchmarks/tune.py` |
+| [`retrieval_recipes/`](retrieval_recipes) | Tuned exponent for each search mode in TOML. Created by `benchmarks/scripts/tune.py` |
 | [`benchmarks/`](benchmarks/README.md) | Source code for the comparison against other works. |
 | [`paper/`](paper/scripts/README.md) | Paper and source code that generates the figures |
 | [`assets/`](assets/README.md) | Figures used in the dosc and code that generates them |

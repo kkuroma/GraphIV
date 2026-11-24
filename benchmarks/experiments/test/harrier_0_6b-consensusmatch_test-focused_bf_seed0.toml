@@ -1,0 +1,6 @@
+retriever = "harrier_0_6b"
+dataset = "consensusmatch"
+split = "test"
+method = "bf"
+recipe = "focused"
+seed = 0

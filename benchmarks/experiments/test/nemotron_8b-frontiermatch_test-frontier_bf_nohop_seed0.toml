@@ -1,0 +1,10 @@
+retriever = "nemotron_8b"
+dataset = "frontiermatch"
+split = "test"
+method = "bf"
+recipe = "frontier"
+seed = 0
+variant = "nohop"
+
+[override]
+EXPAND = false

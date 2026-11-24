@@ -1,0 +1,418 @@
+{
+ "zero_rec focused": {
+  "mean": 0.6055028243292981,
+  "holm": 0.39803980648811843
+ },
+ "zero_rec survey": {
+  "mean": 0.3132028460301477,
+  "holm": 3.3040612837159224e-14
+ },
+ "zero_rec frontier": {
+  "mean": 0.11664752916342862,
+  "holm": 4.493294023522026e-07
+ },
+ "zero_rec consensus": {
+  "mean": 0.5227215221629582,
+  "holm": 0.0010712434604491009
+ },
+ "zero_bm25 focused": {
+  "mean": 0.5689343872046876,
+  "holm": 0.0001904822057312164
+ },
+ "zero_bm25 survey": {
+  "mean": 0.31704181024772754,
+  "holm": 3.0307563601618154e-05
+ },
+ "zero_bm25 frontier": {
+  "mean": 0.13864053404754634,
+  "holm": 1.0
+ },
+ "zero_bm25 consensus": {
+  "mean": 0.5719962410014752,
+  "holm": 0.010849769165602296
+ },
+ "zero_anc focused": {
+  "mean": 0.557749996265013,
+  "holm": 9.473652120313347e-11
+ },
+ "zero_anc survey": {
+  "mean": 0.2954321362227997,
+  "holm": 3.538009572664855e-80
+ },
+ "zero_anc frontier": {
+  "mean": 0.13358776978102996,
+  "holm": 0.08414125919202485
+ },
+ "zero_anc consensus": {
+  "mean": 0.08097846412781412,
+  "holm": 2.184128255033647e-11
+ },
+ "zero_fro focused": {
+  "mean": 0.6202242078771555,
+  "holm": 1.0
+ },
+ "zero_fro survey": {
+  "mean": 0.31791558099959827,
+  "holm": 0.02479954464265524
+ },
+ "zero_fro frontier": {
+  "mean": 0.13635496750864967,
+  "holm": 1.0
+ },
+ "zero_fro consensus": {
+  "mean": 0.6058713456934338,
+  "holm": 1.0
+ },
+ "zero_anc2 focused": {
+  "mean": 0.6161726636976915,
+  "holm": 1.0
+ },
+ "zero_anc2 survey": {
+  "mean": 0.31869979013005834,
+  "holm": 1.0
+ },
+ "zero_anc2 frontier": {
+  "mean": 0.14144659913510027,
+  "holm": 1.0
+ },
+ "zero_anc2 consensus": {
+  "mean": 0.6138975934703895,
+  "holm": 1.0
+ },
+ "zero_fro2 focused": {
+  "mean": 0.6196415498973896,
+  "holm": 1.0
+ },
+ "zero_fro2 survey": {
+  "mean": 0.3192123947246058,
+  "holm": 1.0
+ },
+ "zero_fro2 frontier": {
+  "mean": 0.1413057315987272,
+  "holm": 1.0
+ },
+ "zero_fro2 consensus": {
+  "mean": 0.6058713456934338,
+  "holm": 1.0
+ },
+ "zero_cocite focused": {
+  "mean": 0.5669387774504572,
+  "holm": 5.946000310686609e-10
+ },
+ "zero_cocite survey": {
+  "mean": 0.29245736505522163,
+  "holm": 7.06080004466357e-87
+ },
+ "zero_cocite frontier": {
+  "mean": 0.07703817856442395,
+  "holm": 1.66821538800402e-14
+ },
+ "zero_cocite consensus": {
+  "mean": 0.6123773642290465,
+  "holm": 1.0
+ },
+ "zero_couple focused": {
+  "mean": 0.6215484305584417,
+  "holm": 1.0
+ },
+ "zero_couple survey": {
+  "mean": 0.31930731802818557,
+  "holm": 1.0
+ },
+ "zero_couple frontier": {
+  "mean": 0.1415648015177954,
+  "holm": 1.0
+ },
+ "zero_couple consensus": {
+  "mean": 0.6061298104129996,
+  "holm": 1.0
+ },
+ "zero_anc_decay focused": {
+  "mean": 0.6198887381312298,
+  "holm": 1.0
+ },
+ "zero_anc_decay survey": {
+  "mean": 0.3192202974472855,
+  "holm": 1.0
+ },
+ "zero_anc_decay frontier": {
+  "mean": 0.1407029001483362,
+  "holm": 1.0
+ },
+ "zero_anc_decay consensus": {
+  "mean": 0.605612880973868,
+  "holm": 1.0
+ },
+ "zero_fro_decay focused": {
+  "mean": 0.6200123322481498,
+  "holm": 1.0
+ },
+ "zero_fro_decay survey": {
+  "mean": 0.31930863556088085,
+  "holm": 1.0
+ },
+ "zero_fro_decay frontier": {
+  "mean": 0.14142505384373336,
+  "holm": 1.0
+ },
+ "zero_fro_decay consensus": {
+  "mean": 0.6058713456934338,
+  "holm": 1.0
+ },
+ "zero_hub focused": {
+  "mean": 0.6209392881250502,
+  "holm": 1.0
+ },
+ "zero_hub survey": {
+  "mean": 0.31851645288910513,
+  "holm": 0.0244739404376713
+ },
+ "zero_hub frontier": {
+  "mean": 0.12486078583293227,
+  "holm": 0.012808262953231451
+ },
+ "zero_hub consensus": {
+  "mean": 0.6038777211565165,
+  "holm": 1.0
+ },
+ "without_rec focused": {
+  "mean": 0.6086705687095009,
+  "holm": 0.288922408114689
+ },
+ "without_rec survey": {
+  "mean": 0.315733973553057,
+  "holm": 2.2330387323100888e-10
+ },
+ "without_rec frontier": {
+  "mean": 0.12464018054927,
+  "holm": 0.0006283929371810322
+ },
+ "without_rec consensus": {
+  "mean": 0.5421019205396667,
+  "holm": 0.0010288887437891613
+ },
+ "without_bm25 focused": {
+  "mean": 0.5829937273207573,
+  "holm": 0.0010912692238165575
+ },
+ "without_bm25 survey": {
+  "mean": 0.3181471205169187,
+  "holm": 0.067173184246608
+ },
+ "without_bm25 frontier": {
+  "mean": 0.136815681563199,
+  "holm": 0.3429945676677236
+ },
+ "without_bm25 consensus": {
+  "mean": 0.590254261324581,
+  "holm": 1.0
+ },
+ "without_anc focused": {
+  "mean": 0.6112451631917705,
+  "holm": 1.0
+ },
+ "without_anc survey": {
+  "mean": 0.3098872132848271,
+  "holm": 4.264329567912158e-49
+ },
+ "without_anc frontier": {
+  "mean": 0.13804391132707858,
+  "holm": 1.0
+ },
+ "without_anc consensus": {
+  "mean": 0.5337231939963064,
+  "holm": 7.841283656652446e-05
+ },
+ "without_fro focused": {
+  "mean": 0.6229831409475458,
+  "holm": 1.0
+ },
+ "without_fro survey": {
+  "mean": 0.31810181097504614,
+  "holm": 0.02479954464265524
+ },
+ "without_fro frontier": {
+  "mean": 0.13748093021824642,
+  "holm": 1.0
+ },
+ "without_fro consensus": {
+  "mean": 0.6191107901318899,
+  "holm": 1.0
+ },
+ "without_anc2 focused": {
+  "mean": 0.6203858309531279,
+  "holm": 1.0
+ },
+ "without_anc2 survey": {
+  "mean": 0.3186762869302215,
+  "holm": 1.0
+ },
+ "without_anc2 frontier": {
+  "mean": 0.1382910424067149,
+  "holm": 0.5141175400122407
+ },
+ "without_anc2 consensus": {
+  "mean": 0.612254045036973,
+  "holm": 1.0
+ },
+ "without_fro2 focused": {
+  "mean": 0.6189053499954501,
+  "holm": 1.0
+ },
+ "without_fro2 survey": {
+  "mean": 0.3186685714434559,
+  "holm": 0.25035718758035835
+ },
+ "without_fro2 frontier": {
+  "mean": 0.135458459957119,
+  "holm": 0.9208676865584874
+ },
+ "without_fro2 consensus": {
+  "mean": 0.606814741919849,
+  "holm": 1.0
+ },
+ "without_cocite focused": {
+  "mean": 0.6083437912970727,
+  "holm": 0.6994050701094496
+ },
+ "without_cocite survey": {
+  "mean": 0.3099768398348994,
+  "holm": 2.8887510948716176e-20
+ },
+ "without_cocite frontier": {
+  "mean": 0.1198397816984114,
+  "holm": 0.00019275852752404453
+ },
+ "without_cocite consensus": {
+  "mean": 0.609323631320358,
+  "holm": 1.0
+ },
+ "without_couple focused": {
+  "mean": 0.6182273479826317,
+  "holm": 1.0
+ },
+ "without_couple survey": {
+  "mean": 0.3190839877452082,
+  "holm": 1.0
+ },
+ "without_couple frontier": {
+  "mean": 0.140008062562568,
+  "holm": 1.0
+ },
+ "without_couple consensus": {
+  "mean": 0.621547189349111,
+  "holm": 1.0
+ },
+ "without_anc_decay focused": {
+  "mean": 0.619565254298291,
+  "holm": 1.0
+ },
+ "without_anc_decay survey": {
+  "mean": 0.3186935076000279,
+  "holm": 0.9081275076248532
+ },
+ "without_anc_decay frontier": {
+  "mean": 0.1399045820750071,
+  "holm": 1.0
+ },
+ "without_anc_decay consensus": {
+  "mean": 0.6050052354861046,
+  "holm": 1.0
+ },
+ "without_fro_decay focused": {
+  "mean": 0.623387775862748,
+  "holm": 1.0
+ },
+ "without_fro_decay survey": {
+  "mean": 0.31860925312126126,
+  "holm": 1.0
+ },
+ "without_fro_decay frontier": {
+  "mean": 0.1385284346548473,
+  "holm": 0.7869486613952823
+ },
+ "without_fro_decay consensus": {
+  "mean": 0.6058713456934338,
+  "holm": 1.0
+ },
+ "without_hub focused": {
+  "mean": 0.6197877916176024,
+  "holm": 1.0
+ },
+ "without_hub survey": {
+  "mean": 0.3186564335995531,
+  "holm": 1.0
+ },
+ "without_hub frontier": {
+  "mean": 0.13735383962874115,
+  "holm": 1.0
+ },
+ "without_hub consensus": {
+  "mean": 0.6206931320148937,
+  "holm": 1.0
+ },
+ "only_anc focused": {
+  "mean": 0.5452009213132684,
+  "holm": 3.7462434975760923e-10
+ },
+ "only_anc survey": {
+  "mean": 0.2831576430964262,
+  "holm": 4.980745943429465e-83
+ },
+ "only_anc frontier": {
+  "mean": 0.0606291125036633,
+  "holm": 6.344394947063062e-17
+ },
+ "only_anc consensus": {
+  "mean": 0.4887488925375657,
+  "holm": 1.939820956704486e-05
+ },
+ "only_cos focused": {
+  "mean": 0.3794104085260926,
+  "holm": 2.3247025855949653e-48
+ },
+ "only_cos survey": {
+  "mean": 0.13173074897351977,
+  "holm": 1.829399166254337e-198
+ },
+ "only_cos frontier": {
+  "mean": 0.06800173073150445,
+  "holm": 1.166689661767584e-14
+ },
+ "only_cos consensus": {
+  "mean": 0.16963763623276884,
+  "holm": 4.713290697489691e-11
+ },
+ "nohop focused": {
+  "mean": 0.5578799398599177,
+  "holm": 2.4846507278000807e-13
+ },
+ "nohop survey": {
+  "mean": 0.2757614284415048,
+  "holm": 5.341051742078991e-134
+ },
+ "nohop frontier": {
+  "mean": 0.11804465335701132,
+  "holm": 6.178869855646223e-05
+ },
+ "nohop consensus": {
+  "mean": 0.5235143958847175,
+  "holm": 0.02479954464265524
+ },
+ "none focused": {
+  "mean": 0.3794104085260926,
+  "holm": 2.3247025855949653e-48
+ },
+ "none survey": {
+  "mean": 0.13172639779892018,
+  "holm": 1.829399166254337e-198
+ },
+ "none frontier": {
+  "mean": 0.06800173073150445,
+  "holm": 1.166689661767584e-14
+ },
+ "none consensus": {
+  "mean": 0.16963763623276884,
+  "holm": 4.713290697489691e-11
+ }
+}

@@ -1,0 +1,926 @@
+{
+ "sets": {
+  "surveymatch_test": {
+   "nomic": {
+    "runs": {
+     "cosine": "nomic-surveymatch_test-none",
+     "ppr": "nomic-surveymatch_test-survey_ppr_seed0",
+     "bf": "nomic-surveymatch_test-survey_bf_seed0"
+    },
+    "cosine": 0.13172639779892018,
+    "ppr": 0.23235006041780903,
+    "bf": 0.31920783096937816,
+    "p_cosine": 1.7590376598599392e-200,
+    "holm_cosine": 1.0906033491131624e-198,
+    "p_ppr": 9.21752457078696e-172,
+    "holm_ppr": 5.6226899881800454e-170
+   },
+   "qwen3_0_6b": {
+    "runs": {
+     "cosine": "qwen3_0_6b-surveymatch_test-none",
+     "ppr": "qwen3_0_6b-surveymatch_test-survey_ppr_seed0",
+     "bf": "qwen3_0_6b-surveymatch_test-survey_bf_seed0"
+    },
+    "cosine": 0.14922557553631385,
+    "ppr": 0.24858478855669486,
+    "bf": 0.33085582671565666,
+    "p_cosine": 6.118978044422775e-201,
+    "holm_cosine": 3.916145948430576e-199,
+    "p_ppr": 5.858133504989845e-171,
+    "holm_ppr": 3.514880102993907e-169
+   },
+   "harrier_0_6b": {
+    "runs": {
+     "cosine": "harrier_0_6b-surveymatch_test-none",
+     "ppr": "harrier_0_6b-surveymatch_test-survey_ppr_seed0",
+     "bf": "harrier_0_6b-surveymatch_test-survey_bf_seed0"
+    },
+    "cosine": 0.16001455900271308,
+    "ppr": 0.25228426575809254,
+    "bf": 0.3374312369330459,
+    "p_cosine": 2.209175600649604e-199,
+    "holm_cosine": 1.3475971163962585e-197,
+    "p_ppr": 6.068383289885912e-175,
+    "holm_ppr": 3.8837653055269834e-173
+   },
+   "nemotron_1b": {
+    "runs": {
+     "cosine": "nemotron_1b-surveymatch_test-none",
+     "ppr": "nemotron_1b-surveymatch_test-survey_ppr_seed0",
+     "bf": "nemotron_1b-surveymatch_test-survey_bf_seed0"
+    },
+    "cosine": 0.1407404449212566,
+    "ppr": 0.23993391674903022,
+    "bf": 0.33010700054678516,
+    "p_cosine": 9.60435473208469e-201,
+    "holm_cosine": 6.050743481213354e-199,
+    "p_ppr": 7.174256357234368e-172,
+    "holm_ppr": 4.448038941485308e-170
+   },
+   "qwen3_4b": {
+    "runs": {
+     "cosine": "qwen3_4b-surveymatch_test-none",
+     "ppr": "qwen3_4b-surveymatch_test-survey_ppr_seed0",
+     "bf": "qwen3_4b-surveymatch_test-survey_bf_seed0"
+    },
+    "cosine": 0.18281953096562928,
+    "ppr": 0.27842450529897605,
+    "bf": 0.35029486860477893,
+    "p_cosine": 1.4579829208231205e-198,
+    "holm_cosine": 8.602099232856411e-197,
+    "p_ppr": 3.120076231374049e-170,
+    "holm_ppr": 1.840844976510689e-168
+   },
+   "qwen3_8b": {
+    "runs": {
+     "cosine": "qwen3_8b-surveymatch_test-none",
+     "ppr": "qwen3_8b-surveymatch_test-survey_ppr_seed0",
+     "bf": "qwen3_8b-surveymatch_test-survey_bf_seed0"
+    },
+    "cosine": 0.19367880574215027,
+    "ppr": 0.2840780723607115,
+    "bf": 0.35318500771549516,
+    "p_cosine": 9.054899694238606e-197,
+    "holm_cosine": 5.161292825716005e-195,
+    "p_ppr": 6.452562457809204e-165,
+    "holm_ppr": 3.677960600951246e-163
+   },
+   "nemotron_8b": {
+    "runs": {
+     "cosine": "nemotron_8b-surveymatch_test-none",
+     "ppr": "nemotron_8b-surveymatch_test-survey_ppr_seed0",
+     "bf": "nemotron_8b-surveymatch_test-survey_bf_seed0"
+    },
+    "cosine": 0.19845558640109892,
+    "ppr": 0.294765605693344,
+    "bf": 0.3627082792869084,
+    "p_cosine": 5.364670173334491e-199,
+    "holm_cosine": 3.2188021040006943e-197,
+    "p_ppr": 6.5241541968196376e-167,
+    "holm_ppr": 3.7840094341553897e-165
+   },
+   "harrier_27b": {
+    "runs": {
+     "cosine": "harrier_27b-surveymatch_test-none",
+     "ppr": "harrier_27b-surveymatch_test-survey_ppr_seed0",
+     "bf": "harrier_27b-surveymatch_test-survey_bf_seed0"
+    },
+    "cosine": 0.20467393377423226,
+    "ppr": 0.29039628794385497,
+    "bf": 0.36111174028465154,
+    "p_cosine": 3.3610787784671194e-197,
+    "holm_cosine": 1.9494256915109294e-195,
+    "p_ppr": 3.9434644880386424e-172,
+    "holm_ppr": 2.484382627464345e-170
+   }
+  },
+  "frontiermatch_test": {
+   "nomic": {
+    "runs": {
+     "cosine": "nomic-frontiermatch_test-none",
+     "ppr": "nomic-frontiermatch_test-frontier_ppr_seed0",
+     "bf": "nomic-frontiermatch_test-frontier_bf_seed0"
+    },
+    "cosine": 0.06800173073150445,
+    "ppr": 0.07799881843218093,
+    "bf": 0.14154938462178956,
+    "p_cosine": 1.2545050126533162e-16,
+    "holm_cosine": 5.018020050613265e-15,
+    "p_ppr": 5.736160484634914e-16,
+    "holm_ppr": 2.868080242317457e-14
+   },
+   "qwen3_0_6b": {
+    "runs": {
+     "cosine": "qwen3_0_6b-frontiermatch_test-none",
+     "ppr": "qwen3_0_6b-frontiermatch_test-frontier_ppr_seed0",
+     "bf": "qwen3_0_6b-frontiermatch_test-frontier_bf_seed0"
+    },
+    "cosine": 0.06774162652114839,
+    "ppr": 0.07882881534936392,
+    "bf": 0.13943695764966876,
+    "p_cosine": 1.3948937088735617e-16,
+    "holm_cosine": 5.4400854646068905e-15,
+    "p_ppr": 1.8090594650607056e-15,
+    "holm_ppr": 8.864391378797458e-14
+   },
+   "harrier_0_6b": {
+    "runs": {
+     "cosine": "harrier_0_6b-frontiermatch_test-none",
+     "ppr": "harrier_0_6b-frontiermatch_test-frontier_ppr_seed0",
+     "bf": "harrier_0_6b-frontiermatch_test-frontier_bf_seed0"
+    },
+    "cosine": 0.07778766583907325,
+    "ppr": 0.08949354930553848,
+    "bf": 0.14536513315149804,
+    "p_cosine": 6.110679634938763e-16,
+    "holm_cosine": 2.1998446685779548e-14,
+    "p_ppr": 8.029305721830088e-14,
+    "holm_ppr": 3.5328945176052385e-12
+   },
+   "nemotron_1b": {
+    "runs": {
+     "cosine": "nemotron_1b-frontiermatch_test-none",
+     "ppr": "nemotron_1b-frontiermatch_test-frontier_ppr_seed0",
+     "bf": "nemotron_1b-frontiermatch_test-frontier_bf_seed0"
+    },
+    "cosine": 0.06904767363729113,
+    "ppr": 0.07890379237911498,
+    "bf": 0.14559795123920363,
+    "p_cosine": 1.333145208696454e-19,
+    "holm_cosine": 5.865838918264397e-18,
+    "p_ppr": 1.1352428421751848e-18,
+    "holm_ppr": 6.016787063528479e-17
+   },
+   "qwen3_4b": {
+    "runs": {
+     "cosine": "qwen3_4b-frontiermatch_test-none",
+     "ppr": "qwen3_4b-frontiermatch_test-frontier_ppr_seed0",
+     "bf": "qwen3_4b-frontiermatch_test-frontier_bf_seed0"
+    },
+    "cosine": 0.08503703184420192,
+    "ppr": 0.0974693087706237,
+    "bf": 0.1522267305925408,
+    "p_cosine": 3.1599670141756874e-15,
+    "holm_cosine": 1.0743887848197337e-13,
+    "p_ppr": 8.997593956927169e-13,
+    "holm_ppr": 3.509061643201596e-11
+   },
+   "qwen3_8b": {
+    "runs": {
+     "cosine": "qwen3_8b-frontiermatch_test-none",
+     "ppr": "qwen3_8b-frontiermatch_test-frontier_ppr_seed0",
+     "bf": "qwen3_8b-frontiermatch_test-frontier_bf_seed0"
+    },
+    "cosine": 0.09385291707978516,
+    "ppr": 0.10288828509319081,
+    "bf": 0.1550402821031744,
+    "p_cosine": 7.976817676785639e-16,
+    "holm_cosine": 2.7918861868749738e-14,
+    "p_ppr": 8.784408863805529e-14,
+    "holm_ppr": 3.689451722798322e-12
+   },
+   "nemotron_8b": {
+    "runs": {
+     "cosine": "nemotron_8b-frontiermatch_test-none",
+     "ppr": "nemotron_8b-frontiermatch_test-frontier_ppr_seed0",
+     "bf": "nemotron_8b-frontiermatch_test-frontier_bf_seed0"
+    },
+    "cosine": 0.09025922757592099,
+    "ppr": 0.09908063268896247,
+    "bf": 0.1587106787320322,
+    "p_cosine": 2.4913638144875704e-17,
+    "holm_cosine": 1.0214591639399039e-15,
+    "p_ppr": 2.0280868852045133e-15,
+    "holm_ppr": 9.734817048981663e-14
+   },
+   "harrier_27b": {
+    "runs": {
+     "cosine": "harrier_27b-frontiermatch_test-none",
+     "ppr": "harrier_27b-frontiermatch_test-frontier_ppr_seed0",
+     "bf": "harrier_27b-frontiermatch_test-frontier_bf_seed0"
+    },
+    "cosine": 0.09638690502803603,
+    "ppr": 0.09436181163164585,
+    "bf": 0.15294386285312098,
+    "p_cosine": 1.850226531237229e-13,
+    "holm_cosine": 6.105747553082856e-12,
+    "p_ppr": 2.2961018996732503e-15,
+    "holm_ppr": 1.0791678928464276e-13
+   }
+  },
+  "consensusmatch_test": {
+   "nomic": {
+    "runs": {
+     "cosine": "nomic-consensusmatch_test-none",
+     "ppr": "nomic-consensusmatch_test-consensus_ppr_seed0",
+     "bf": "nomic-consensusmatch_test-consensus_bf_seed0"
+    },
+    "cosine": 0.16963763623276884,
+    "ppr": 0.4698481806562701,
+    "bf": 0.606677755618479,
+    "p_cosine": 5.417575514355967e-13,
+    "holm_cosine": 1.62527265430679e-11,
+    "p_ppr": 4.3693458782127565e-08,
+    "holm_ppr": 1.4062889896671553e-06
+   },
+   "qwen3_0_6b": {
+    "runs": {
+     "cosine": "qwen3_0_6b-consensusmatch_test-none",
+     "ppr": "qwen3_0_6b-consensusmatch_test-consensus_ppr_seed0",
+     "bf": "qwen3_0_6b-consensusmatch_test-consensus_bf_seed0"
+    },
+    "cosine": 0.24324263289014594,
+    "ppr": 0.50385648439905,
+    "bf": 0.6276232652970637,
+    "p_cosine": 5.17951846335054e-13,
+    "holm_cosine": 1.6056507236386674e-11,
+    "p_ppr": 4.261481786870168e-08,
+    "holm_ppr": 1.4062889896671553e-06
+   },
+   "harrier_0_6b": {
+    "runs": {
+     "cosine": "harrier_0_6b-consensusmatch_test-none",
+     "ppr": "harrier_0_6b-consensusmatch_test-consensus_ppr_seed0",
+     "bf": "harrier_0_6b-consensusmatch_test-consensus_bf_seed0"
+    },
+    "cosine": 0.23202620598460072,
+    "ppr": 0.5092529804489306,
+    "bf": 0.635254061560934,
+    "p_cosine": 6.204331805693623e-13,
+    "holm_cosine": 1.7992562236511507e-11,
+    "p_ppr": 8.808473918964143e-08,
+    "holm_ppr": 2.7306269148788845e-06
+   },
+   "nemotron_1b": {
+    "runs": {
+     "cosine": "nemotron_1b-consensusmatch_test-none",
+     "ppr": "nemotron_1b-consensusmatch_test-consensus_ppr_seed0",
+     "bf": "nemotron_1b-consensusmatch_test-consensus_bf_seed0"
+    },
+    "cosine": 0.18542528245290252,
+    "ppr": 0.5023268931872439,
+    "bf": 0.6270041767410477,
+    "p_cosine": 2.1889994899430216e-13,
+    "holm_cosine": 7.004798367817669e-12,
+    "p_ppr": 6.304104495835082e-07,
+    "holm_ppr": 1.8912313487505246e-05
+   },
+   "qwen3_4b": {
+    "runs": {
+     "cosine": "qwen3_4b-consensusmatch_test-none",
+     "ppr": "qwen3_4b-consensusmatch_test-consensus_ppr_seed0",
+     "bf": "qwen3_4b-consensusmatch_test-consensus_bf_seed0"
+    },
+    "cosine": 0.28318038910748994,
+    "ppr": 0.5722600275774337,
+    "bf": 0.6506949865099966,
+    "p_cosine": 6.91318126652288e-13,
+    "holm_cosine": 1.8957638126110417e-11,
+    "p_ppr": 0.0001655676868871882,
+    "holm_ppr": 0.004139192172179705
+   },
+   "qwen3_8b": {
+    "runs": {
+     "cosine": "qwen3_8b-consensusmatch_test-none",
+     "ppr": "qwen3_8b-consensusmatch_test-consensus_ppr_seed0",
+     "bf": "qwen3_8b-consensusmatch_test-consensus_bf_seed0"
+    },
+    "cosine": 0.3077985097392682,
+    "ppr": 0.5989956243134159,
+    "bf": 0.6623877380993861,
+    "p_cosine": 6.770585045039435e-13,
+    "holm_cosine": 1.8957638126110417e-11,
+    "p_ppr": 0.000219212902959361,
+    "holm_ppr": 0.005041896768065303
+   },
+   "nemotron_8b": {
+    "runs": {
+     "cosine": "nemotron_8b-consensusmatch_test-none",
+     "ppr": "nemotron_8b-consensusmatch_test-consensus_ppr_seed0",
+     "bf": "nemotron_8b-consensusmatch_test-consensus_bf_seed0"
+    },
+    "cosine": 0.2784215141976096,
+    "ppr": 0.597045078274648,
+    "bf": 0.6634644880927955,
+    "p_cosine": 9.159560949180243e-13,
+    "holm_cosine": 2.381485846786863e-11,
+    "p_ppr": 0.00018318291358743072,
+    "holm_ppr": 0.0043963899260983375
+   },
+   "harrier_27b": {
+    "runs": {
+     "cosine": "harrier_27b-consensusmatch_test-none",
+     "ppr": "harrier_27b-consensusmatch_test-consensus_ppr_seed0",
+     "bf": "harrier_27b-consensusmatch_test-consensus_bf_seed0"
+    },
+    "cosine": 0.3205062899068753,
+    "ppr": 0.5876967362268724,
+    "bf": 0.672920128799179,
+    "p_cosine": 9.81710039542162e-13,
+    "holm_cosine": 2.454275098855405e-11,
+    "p_ppr": 8.944001432193044e-06,
+    "holm_ppr": 0.0002414880386692122
+   }
+  },
+  "pasa_test": {
+   "nomic": {
+    "runs": {
+     "cosine": "nomic-pasa_test-none",
+     "ppr": "nomic-pasa_test-focused_ppr_seed0",
+     "bf": "nomic-pasa_test-focused_bf_seed0"
+    },
+    "cosine": 0.3794104085260926,
+    "ppr": 0.4816002653878071,
+    "bf": 0.6209392881250502,
+    "p_cosine": 2.39660060370615e-50,
+    "holm_cosine": 1.3420963380754439e-48,
+    "p_ppr": 6.759628969486341e-29,
+    "holm_ppr": 3.785392222912351e-27
+   },
+   "qwen3_0_6b": {
+    "runs": {
+     "cosine": "qwen3_0_6b-pasa_test-none",
+     "ppr": "qwen3_0_6b-pasa_test-focused_ppr_seed0",
+     "bf": "qwen3_0_6b-pasa_test-focused_bf_seed0"
+    },
+    "cosine": 0.42251504520692507,
+    "ppr": 0.5271132217183385,
+    "bf": 0.6461903811180785,
+    "p_cosine": 1.368323651614472e-47,
+    "holm_cosine": 7.525780083879596e-46,
+    "p_ppr": 1.2505235732524776e-25,
+    "holm_ppr": 6.877879652888627e-24
+   },
+   "harrier_0_6b": {
+    "runs": {
+     "cosine": "harrier_0_6b-pasa_test-none",
+     "ppr": "harrier_0_6b-pasa_test-focused_ppr_seed0",
+     "bf": "harrier_0_6b-pasa_test-focused_bf_seed0"
+    },
+    "cosine": 0.42303950529756984,
+    "ppr": 0.5210211182958681,
+    "bf": 0.6407932908767169,
+    "p_cosine": 3.6372027345144614e-45,
+    "holm_cosine": 1.9640894766378092e-43,
+    "p_ppr": 1.8165505376123295e-24,
+    "holm_ppr": 9.809372903106579e-23
+   },
+   "nemotron_1b": {
+    "runs": {
+     "cosine": "nemotron_1b-pasa_test-none",
+     "ppr": "nemotron_1b-pasa_test-focused_ppr_seed0",
+     "bf": "nemotron_1b-pasa_test-focused_bf_seed0"
+    },
+    "cosine": 0.45536232090737094,
+    "ppr": 0.5568185584036529,
+    "bf": 0.6393019105477393,
+    "p_cosine": 2.992623208157969e-38,
+    "holm_cosine": 1.5860903003237236e-36,
+    "p_ppr": 4.0676957884183345e-16,
+    "holm_ppr": 2.0745248520933507e-14
+   },
+   "qwen3_4b": {
+    "runs": {
+     "cosine": "qwen3_4b-pasa_test-none",
+     "ppr": "qwen3_4b-pasa_test-focused_ppr_seed0",
+     "bf": "qwen3_4b-pasa_test-focused_bf_seed0"
+    },
+    "cosine": 0.5477095022145078,
+    "ppr": 0.632390181194408,
+    "bf": 0.6897243375830695,
+    "p_cosine": 1.5218892131073895e-32,
+    "holm_cosine": 7.913823908158426e-31,
+    "p_ppr": 5.357290009446938e-13,
+    "holm_ppr": 2.1964889038732444e-11
+   },
+   "qwen3_8b": {
+    "runs": {
+     "cosine": "qwen3_8b-pasa_test-none",
+     "ppr": "qwen3_8b-pasa_test-focused_ppr_seed0",
+     "bf": "qwen3_8b-pasa_test-focused_bf_seed0"
+    },
+    "cosine": 0.5694722870751792,
+    "ppr": 0.6300564594224216,
+    "bf": 0.6914942862106378,
+    "p_cosine": 7.585462793233061e-30,
+    "holm_cosine": 3.8685860245488613e-28,
+    "p_ppr": 3.3262710229497782e-15,
+    "holm_ppr": 1.530084670556898e-13
+   },
+   "nemotron_8b": {
+    "runs": {
+     "cosine": "nemotron_8b-pasa_test-none",
+     "ppr": "nemotron_8b-pasa_test-focused_ppr_seed0",
+     "bf": "nemotron_8b-pasa_test-focused_bf_seed0"
+    },
+    "cosine": 0.5822929696678306,
+    "ppr": 0.6634713173367234,
+    "bf": 0.7022999031619721,
+    "p_cosine": 1.3724499255966639e-29,
+    "holm_cosine": 6.862249627983319e-28,
+    "p_ppr": 7.004422559090514e-07,
+    "holm_ppr": 2.031282542136249e-05
+   },
+   "harrier_27b": {
+    "runs": {
+     "cosine": "harrier_27b-pasa_test-none",
+     "ppr": "harrier_27b-pasa_test-focused_ppr_seed0",
+     "bf": "harrier_27b-pasa_test-focused_bf_seed0"
+    },
+    "cosine": 0.5777341802925785,
+    "ppr": 0.6343012382500702,
+    "bf": 0.6939998112133818,
+    "p_cosine": 1.9963997354389024e-26,
+    "holm_cosine": 9.782358703650622e-25,
+    "p_ppr": 8.500541773479687e-14,
+    "holm_ppr": 3.655232962596266e-12
+   }
+  },
+  "pasa_real": {
+   "nomic": {
+    "runs": {
+     "cosine": "nomic-pasa_real-none",
+     "ppr": "nomic-pasa_real-focused_ppr_seed0",
+     "bf": "nomic-pasa_real-focused_bf_seed0"
+    },
+    "cosine": 0.3773914384970186,
+    "ppr": 0.40428094709100215,
+    "bf": 0.3735138540775623,
+    "p_cosine": 0.3343696066690003,
+    "holm_cosine": 1.0,
+    "p_ppr": 0.7816793780906288,
+    "holm_ppr": 1.0
+   },
+   "qwen3_0_6b": {
+    "runs": {
+     "cosine": "qwen3_0_6b-pasa_real-none",
+     "ppr": "qwen3_0_6b-pasa_real-focused_ppr_seed0",
+     "bf": "qwen3_0_6b-pasa_real-focused_bf_seed0"
+    },
+    "cosine": 0.411052810107225,
+    "ppr": 0.41441482191782314,
+    "bf": 0.40363026047879297,
+    "p_cosine": 0.48330153635266154,
+    "holm_cosine": 1.0,
+    "p_ppr": 0.6673739721866285,
+    "holm_ppr": 1.0
+   },
+   "harrier_0_6b": {
+    "runs": {
+     "cosine": "harrier_0_6b-pasa_real-none",
+     "ppr": "harrier_0_6b-pasa_real-focused_ppr_seed0",
+     "bf": "harrier_0_6b-pasa_real-focused_bf_seed0"
+    },
+    "cosine": 0.4340765927451981,
+    "ppr": 0.4453165250037792,
+    "bf": 0.38147430237518,
+    "p_cosine": 0.9459763653154686,
+    "holm_cosine": 1.0,
+    "p_ppr": 0.9800627384324913,
+    "holm_ppr": 1.0
+   },
+   "nemotron_1b": {
+    "runs": {
+     "cosine": "nemotron_1b-pasa_real-none",
+     "ppr": "nemotron_1b-pasa_real-focused_ppr_seed0",
+     "bf": "nemotron_1b-pasa_real-focused_bf_seed0"
+    },
+    "cosine": 0.45262406685151646,
+    "ppr": 0.4435392305822202,
+    "bf": 0.4251804160285139,
+    "p_cosine": 0.8766709044836305,
+    "holm_cosine": 1.0,
+    "p_ppr": 0.928552608392935,
+    "holm_ppr": 1.0
+   },
+   "qwen3_4b": {
+    "runs": {
+     "cosine": "qwen3_4b-pasa_real-none",
+     "ppr": "qwen3_4b-pasa_real-focused_ppr_seed0",
+     "bf": "qwen3_4b-pasa_real-focused_bf_seed0"
+    },
+    "cosine": 0.5333141669885678,
+    "ppr": 0.5160186511040301,
+    "bf": 0.46951380756602845,
+    "p_cosine": 0.9646648550928532,
+    "holm_cosine": 1.0,
+    "p_ppr": 0.966596992263198,
+    "holm_ppr": 1.0
+   },
+   "qwen3_8b": {
+    "runs": {
+     "cosine": "qwen3_8b-pasa_real-none",
+     "ppr": "qwen3_8b-pasa_real-focused_ppr_seed0",
+     "bf": "qwen3_8b-pasa_real-focused_bf_seed0"
+    },
+    "cosine": 0.5092914387244187,
+    "ppr": 0.4992953506463048,
+    "bf": 0.4925502759930669,
+    "p_cosine": 0.8464470147641362,
+    "holm_cosine": 1.0,
+    "p_ppr": 0.7282622597531918,
+    "holm_ppr": 1.0
+   },
+   "nemotron_8b": {
+    "runs": {
+     "cosine": "nemotron_8b-pasa_real-none",
+     "ppr": "nemotron_8b-pasa_real-focused_ppr_seed0",
+     "bf": "nemotron_8b-pasa_real-focused_bf_seed0"
+    },
+    "cosine": 0.5525108666359649,
+    "ppr": 0.5156048552703767,
+    "bf": 0.5742195132463999,
+    "p_cosine": 0.19649949182691273,
+    "holm_cosine": 1.0,
+    "p_ppr": 0.0006202511486861772,
+    "holm_ppr": 0.0136455252710959
+   },
+   "harrier_27b": {
+    "runs": {
+     "cosine": "harrier_27b-pasa_real-none",
+     "ppr": "harrier_27b-pasa_real-focused_ppr_seed0",
+     "bf": "harrier_27b-pasa_real-focused_bf_seed0"
+    },
+    "cosine": 0.5473220172118007,
+    "ppr": 0.5296049001339393,
+    "bf": 0.47046924062095646,
+    "p_cosine": 0.9923787444565164,
+    "holm_cosine": 1.0,
+    "p_ppr": 0.989324876232487,
+    "holm_ppr": 1.0
+   }
+  },
+  "surge_test": {
+   "nomic": {
+    "runs": {
+     "cosine": "nomic-surge_test-none",
+     "ppr": "nomic-surge_test-survey_ppr_seed0",
+     "bf": "nomic-surge_test-survey_bf_seed0"
+    },
+    "cosine": 0.25270124119622017,
+    "ppr": 0.39056660138370647,
+    "bf": 0.4495068334886011,
+    "p_cosine": 1.6360655543288514e-23,
+    "holm_cosine": 7.853114660778487e-22,
+    "p_ppr": 1.017400366758841e-12,
+    "holm_ppr": 3.866121393683596e-11
+   },
+   "qwen3_0_6b": {
+    "runs": {
+     "cosine": "qwen3_0_6b-surge_test-none",
+     "ppr": "qwen3_0_6b-surge_test-survey_ppr_seed0",
+     "bf": "qwen3_0_6b-surge_test-survey_bf_seed0"
+    },
+    "cosine": 0.29498983661527256,
+    "ppr": 0.4047004128808999,
+    "bf": 0.4580958525218632,
+    "p_cosine": 1.4647791934548729e-21,
+    "holm_cosine": 6.737984289892415e-20,
+    "p_ppr": 5.561567855504993e-13,
+    "holm_ppr": 2.224627142201997e-11
+   },
+   "harrier_0_6b": {
+    "runs": {
+     "cosine": "harrier_0_6b-surge_test-none",
+     "ppr": "harrier_0_6b-surge_test-survey_ppr_seed0",
+     "bf": "harrier_0_6b-surge_test-survey_bf_seed0"
+    },
+    "cosine": 0.3258749026311897,
+    "ppr": 0.42470231483475546,
+    "bf": 0.4792010745263087,
+    "p_cosine": 1.2544744411250463e-19,
+    "holm_cosine": 5.6451349850627084e-18,
+    "p_ppr": 9.310269254821862e-12,
+    "holm_ppr": 3.444799624284089e-10
+   },
+   "nemotron_1b": {
+    "runs": {
+     "cosine": "nemotron_1b-surge_test-none",
+     "ppr": "nemotron_1b-surge_test-survey_ppr_seed0",
+     "bf": "nemotron_1b-surge_test-survey_bf_seed0"
+    },
+    "cosine": 0.271033902517457,
+    "ppr": 0.36750311466033686,
+    "bf": 0.45295472917250357,
+    "p_cosine": 9.885468870673303e-23,
+    "holm_cosine": 4.646170369216453e-21,
+    "p_ppr": 1.893251057169769e-18,
+    "holm_ppr": 9.844905497282798e-17
+   },
+   "qwen3_4b": {
+    "runs": {
+     "cosine": "qwen3_4b-surge_test-none",
+     "ppr": "qwen3_4b-surge_test-survey_ppr_seed0",
+     "bf": "qwen3_4b-surge_test-survey_bf_seed0"
+    },
+    "cosine": 0.3739159661542843,
+    "ppr": 0.45333536250975587,
+    "bf": 0.48747981359246195,
+    "p_cosine": 1.4412609688288484e-16,
+    "holm_cosine": 5.4767916815496235e-15,
+    "p_ppr": 1.766851864682768e-08,
+    "holm_ppr": 6.183981526389688e-07
+   },
+   "qwen3_8b": {
+    "runs": {
+     "cosine": "qwen3_8b-surge_test-none",
+     "ppr": "qwen3_8b-surge_test-survey_ppr_seed0",
+     "bf": "qwen3_8b-surge_test-survey_bf_seed0"
+    },
+    "cosine": 0.3988079722388289,
+    "ppr": 0.4567090710727944,
+    "bf": 0.5021805211756136,
+    "p_cosine": 2.0851247671078727e-16,
+    "holm_cosine": 7.714961638299128e-15,
+    "p_ppr": 7.409446745245238e-11,
+    "holm_ppr": 2.6674008282882857e-09
+   },
+   "nemotron_8b": {
+    "runs": {
+     "cosine": "nemotron_8b-surge_test-none",
+     "ppr": "nemotron_8b-surge_test-survey_ppr_seed0",
+     "bf": "nemotron_8b-surge_test-survey_bf_seed0"
+    },
+    "cosine": 0.3739197654027597,
+    "ppr": 0.4748294781186815,
+    "bf": 0.5081940710851559,
+    "p_cosine": 4.1861537194533004e-18,
+    "holm_cosine": 1.8000460993649191e-16,
+    "p_ppr": 1.8164089419781057e-08,
+    "holm_ppr": 6.183981526389688e-07
+   },
+   "harrier_27b": {
+    "runs": {
+     "cosine": "harrier_27b-surge_test-none",
+     "ppr": "harrier_27b-surge_test-survey_ppr_seed0",
+     "bf": "harrier_27b-surge_test-survey_bf_seed0"
+    },
+    "cosine": 0.3867290401588323,
+    "ppr": 0.45285591647799317,
+    "bf": 0.5071189084320634,
+    "p_cosine": 6.695374010397303e-18,
+    "holm_cosine": 2.8120570843668675e-16,
+    "p_ppr": 4.61434445395846e-15,
+    "holm_ppr": 2.076455004281307e-13
+   }
+  },
+  "scholarcatalyst_core": {
+   "nomic": {
+    "runs": {
+     "cosine": "nomic-scholarcatalyst_core-none",
+     "ppr": "nomic-scholarcatalyst_core-focused_ppr_seed0",
+     "bf": "nomic-scholarcatalyst_core-focused_bf_seed0"
+    },
+    "cosine": 0.2928743961352657,
+    "ppr": 0.3038589832068093,
+    "bf": 0.2891227666589985,
+    "p_cosine": 0.40667331627597,
+    "holm_cosine": 1.0,
+    "p_ppr": 0.5686618019958369,
+    "holm_ppr": 1.0
+   },
+   "qwen3_0_6b": {
+    "runs": {
+     "cosine": "qwen3_0_6b-scholarcatalyst_core-none",
+     "ppr": "qwen3_0_6b-scholarcatalyst_core-focused_ppr_seed0",
+     "bf": "qwen3_0_6b-scholarcatalyst_core-focused_bf_seed0"
+    },
+    "cosine": 0.30139368146614526,
+    "ppr": 0.34057779311402503,
+    "bf": 0.32121386396748713,
+    "p_cosine": 0.0736112171628838,
+    "holm_cosine": 1.0,
+    "p_ppr": 0.7578681312976049,
+    "holm_ppr": 1.0
+   },
+   "harrier_0_6b": {
+    "runs": {
+     "cosine": "harrier_0_6b-scholarcatalyst_core-none",
+     "ppr": "harrier_0_6b-scholarcatalyst_core-focused_ppr_seed0",
+     "bf": "harrier_0_6b-scholarcatalyst_core-focused_bf_seed0"
+    },
+    "cosine": 0.32586458093704473,
+    "ppr": 0.3385783298826777,
+    "bf": 0.3154915267234108,
+    "p_cosine": 0.5449763875734489,
+    "holm_cosine": 1.0,
+    "p_ppr": 0.8465654602386333,
+    "holm_ppr": 1.0
+   },
+   "nemotron_1b": {
+    "runs": {
+     "cosine": "nemotron_1b-scholarcatalyst_core-none",
+     "ppr": "nemotron_1b-scholarcatalyst_core-focused_ppr_seed0",
+     "bf": "nemotron_1b-scholarcatalyst_core-focused_bf_seed0"
+    },
+    "cosine": 0.3136780154896097,
+    "ppr": 0.3331512153975922,
+    "bf": 0.326481864887662,
+    "p_cosine": 0.10838858980711269,
+    "holm_cosine": 1.0,
+    "p_ppr": 0.5025549371811808,
+    "holm_ppr": 1.0
+   },
+   "qwen3_4b": {
+    "runs": {
+     "cosine": "qwen3_4b-scholarcatalyst_core-none",
+     "ppr": "qwen3_4b-scholarcatalyst_core-focused_ppr_seed0",
+     "bf": "qwen3_4b-scholarcatalyst_core-focused_bf_seed0"
+    },
+    "cosine": 0.37820719269994635,
+    "ppr": 0.3777049306034813,
+    "bf": 0.3855379188712522,
+    "p_cosine": 0.36596495359561043,
+    "holm_cosine": 1.0,
+    "p_ppr": 0.3667229697483993,
+    "holm_ppr": 1.0
+   },
+   "qwen3_8b": {
+    "runs": {
+     "cosine": "qwen3_8b-scholarcatalyst_core-none",
+     "ppr": "qwen3_8b-scholarcatalyst_core-focused_ppr_seed0",
+     "bf": "qwen3_8b-scholarcatalyst_core-focused_bf_seed0"
+    },
+    "cosine": 0.35623418449505406,
+    "ppr": 0.37743079518441836,
+    "bf": 0.37532589525343146,
+    "p_cosine": 0.0713417692682365,
+    "holm_cosine": 1.0,
+    "p_ppr": 0.49330205079774764,
+    "holm_ppr": 1.0
+   },
+   "nemotron_8b": {
+    "runs": {
+     "cosine": "nemotron_8b-scholarcatalyst_core-none",
+     "ppr": "nemotron_8b-scholarcatalyst_core-focused_ppr_seed0",
+     "bf": "nemotron_8b-scholarcatalyst_core-focused_bf_seed0"
+    },
+    "cosine": 0.4012939958592132,
+    "ppr": 0.37111609539145773,
+    "bf": 0.43597883597883597,
+    "p_cosine": 0.01120012325355967,
+    "holm_cosine": 0.23520258832475308,
+    "p_ppr": 1.605602664692692e-05,
+    "holm_ppr": 0.0004174566928200999
+   },
+   "harrier_27b": {
+    "runs": {
+     "cosine": "harrier_27b-scholarcatalyst_core-none",
+     "ppr": "harrier_27b-scholarcatalyst_core-focused_ppr_seed0",
+     "bf": "harrier_27b-scholarcatalyst_core-focused_bf_seed0"
+    },
+    "cosine": 0.38012614063338707,
+    "ppr": 0.399422973698336,
+    "bf": 0.38459665669810594,
+    "p_cosine": 0.24766526417117218,
+    "holm_cosine": 1.0,
+    "p_ppr": 0.735978066176927,
+    "holm_ppr": 1.0
+   }
+  },
+  "scholarcatalyst_subfield": {
+   "nomic": {
+    "runs": {
+     "cosine": "nomic-scholarcatalyst_subfield-none",
+     "ppr": "nomic-scholarcatalyst_subfield-focused_ppr_seed0",
+     "bf": "nomic-scholarcatalyst_subfield-focused_bf_seed0"
+    },
+    "cosine": 0.2983417318570157,
+    "ppr": 0.32988923174512697,
+    "bf": 0.358188972599453,
+    "p_cosine": 2.9740131282219513e-07,
+    "holm_cosine": 7.137631507732683e-06,
+    "p_ppr": 0.0032316478239983273,
+    "holm_ppr": 0.06786460430396488
+   },
+   "qwen3_0_6b": {
+    "runs": {
+     "cosine": "qwen3_0_6b-scholarcatalyst_subfield-none",
+     "ppr": "qwen3_0_6b-scholarcatalyst_subfield-focused_ppr_seed0",
+     "bf": "qwen3_0_6b-scholarcatalyst_subfield-focused_bf_seed0"
+    },
+    "cosine": 0.3352941737221213,
+    "ppr": 0.3699820800257481,
+    "bf": 0.38746061879249655,
+    "p_cosine": 1.802701642570592e-05,
+    "holm_cosine": 0.0004146213777912362,
+    "p_ppr": 0.07806668258327251,
+    "holm_ppr": 1.0
+   },
+   "harrier_0_6b": {
+    "runs": {
+     "cosine": "harrier_0_6b-scholarcatalyst_subfield-none",
+     "ppr": "harrier_0_6b-scholarcatalyst_subfield-focused_ppr_seed0",
+     "bf": "harrier_0_6b-scholarcatalyst_subfield-focused_bf_seed0"
+    },
+    "cosine": 0.37269784638780273,
+    "ppr": 0.40484588595942306,
+    "bf": 0.3769543976967558,
+    "p_cosine": 0.591077032742326,
+    "holm_cosine": 1.0,
+    "p_ppr": 0.9997690829812554,
+    "holm_ppr": 1.0
+   },
+   "nemotron_1b": {
+    "runs": {
+     "cosine": "nemotron_1b-scholarcatalyst_subfield-none",
+     "ppr": "nemotron_1b-scholarcatalyst_subfield-focused_ppr_seed0",
+     "bf": "nemotron_1b-scholarcatalyst_subfield-focused_bf_seed0"
+    },
+    "cosine": 0.3649951011304723,
+    "ppr": 0.3850138418915712,
+    "bf": 0.39285142724007355,
+    "p_cosine": 0.0405759956135736,
+    "holm_cosine": 0.811519912271472,
+    "p_ppr": 0.4713996682620659,
+    "holm_ppr": 1.0
+   },
+   "qwen3_4b": {
+    "runs": {
+     "cosine": "qwen3_4b-scholarcatalyst_subfield-none",
+     "ppr": "qwen3_4b-scholarcatalyst_subfield-focused_ppr_seed0",
+     "bf": "qwen3_4b-scholarcatalyst_subfield-focused_bf_seed0"
+    },
+    "cosine": 0.4230951201475219,
+    "ppr": 0.4419918994154802,
+    "bf": 0.43183874592171534,
+    "p_cosine": 0.35392268203114063,
+    "holm_cosine": 1.0,
+    "p_ppr": 0.9833753693934386,
+    "holm_ppr": 1.0
+   },
+   "qwen3_8b": {
+    "runs": {
+     "cosine": "qwen3_8b-scholarcatalyst_subfield-none",
+     "ppr": "qwen3_8b-scholarcatalyst_subfield-focused_ppr_seed0",
+     "bf": "qwen3_8b-scholarcatalyst_subfield-focused_bf_seed0"
+    },
+    "cosine": 0.4639349046554287,
+    "ppr": 0.48681445515506655,
+    "bf": 0.4522025847353358,
+    "p_cosine": 0.9819550617646466,
+    "holm_cosine": 1.0,
+    "p_ppr": 0.9999998287166141,
+    "holm_ppr": 1.0
+   },
+   "nemotron_8b": {
+    "runs": {
+     "cosine": "nemotron_8b-scholarcatalyst_subfield-none",
+     "ppr": "nemotron_8b-scholarcatalyst_subfield-focused_ppr_seed0",
+     "bf": "nemotron_8b-scholarcatalyst_subfield-focused_bf_seed0"
+    },
+    "cosine": 0.4321606624008371,
+    "ppr": 0.4308348937169898,
+    "bf": 0.46568136699141066,
+    "p_cosine": 0.0013091372750815677,
+    "holm_cosine": 0.02880102005179449,
+    "p_ppr": 1.0971985907533255e-06,
+    "holm_ppr": 3.0721560541093115e-05
+   },
+   "harrier_27b": {
+    "runs": {
+     "cosine": "harrier_27b-scholarcatalyst_subfield-none",
+     "ppr": "harrier_27b-scholarcatalyst_subfield-focused_ppr_seed0",
+     "bf": "harrier_27b-scholarcatalyst_subfield-focused_bf_seed0"
+    },
+    "cosine": 0.47264348945571655,
+    "ppr": 0.49234668776153495,
+    "bf": 0.4633244202021495,
+    "p_cosine": 0.9638415758041031,
+    "holm_cosine": 1.0,
+    "p_ppr": 0.9999408234383341,
+    "holm_ppr": 1.0
+   }
+  }
+ },
+ "reported": {
+  "scholarcatalyst_core": {
+   "qwen3_4b": 0.39,
+   "qwen3_8b": 0.37
+  },
+  "scholarcatalyst_subfield": {
+   "qwen3_4b": 0.44,
+   "qwen3_8b": 0.51
+  }
+ }
+}

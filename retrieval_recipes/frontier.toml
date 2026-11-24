@@ -1,4 +1,4 @@
-# The frontier recipe written by benchmarks/tune.py
+# The frontier recipe written by benchmarks/scripts/tune.py
 NAME = "frontier"
 CORE = 200 # papers the expanders and the walks start from
 

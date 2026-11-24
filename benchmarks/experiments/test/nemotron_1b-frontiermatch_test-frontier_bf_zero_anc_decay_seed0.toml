@@ -1,0 +1,12 @@
+retriever = "nemotron_1b"
+dataset = "frontiermatch"
+split = "test"
+method = "bf"
+recipe = "frontier"
+seed = 0
+variant = "zero_anc_decay"
+
+[override]
+
+[override.weights]
+ANC_DECAY = 0.0

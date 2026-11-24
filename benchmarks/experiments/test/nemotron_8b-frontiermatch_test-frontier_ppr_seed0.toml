@@ -1,0 +1,6 @@
+retriever = "nemotron_8b"
+dataset = "frontiermatch"
+split = "test"
+method = "ppr"
+recipe = "frontier"
+seed = 0

@@ -1,0 +1,4 @@
+retriever = "nemotron_1b"
+recipe = "survey"
+method = "ppr"
+seed = 0

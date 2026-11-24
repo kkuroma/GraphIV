@@ -1,0 +1,4 @@
+retriever = "qwen3_4b"
+recipe = "frontier"
+method = "ppr"
+seed = 0

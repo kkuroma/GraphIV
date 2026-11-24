@@ -1,0 +1,4 @@
+retriever = "nemotron_8b"
+recipe = "consensus"
+method = "ppr"
+seed = 0

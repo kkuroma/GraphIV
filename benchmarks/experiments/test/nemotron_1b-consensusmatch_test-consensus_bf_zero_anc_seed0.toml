@@ -1,0 +1,12 @@
+retriever = "nemotron_1b"
+dataset = "consensusmatch"
+split = "test"
+method = "bf"
+recipe = "consensus"
+seed = 0
+variant = "zero_anc"
+
+[override]
+
+[override.weights]
+ANC = 0.0

@@ -1,5 +1,5 @@
 """
-The two interfaces every benchmark file implements, a dataset's splits as cases and a method's fit and retrieve
+The two interfaces every benchmark file implements, a dataset's splits as cases and a method family's rankings
 
 A case is a dict with sample_id, query, cutoff, anchors and key, and may carry more a dataset needs
 """
@@ -43,18 +43,6 @@ class Dataset(ABC):
             common.write_jsonl(path, self.build(split))
         return common.read_jsonl(path)
 
-    def source_size(self, split: str) -> int:
-        """
-        How many rows the source holds before any is dropped, which a fit that shuffles raw rows needs
-
-        Args:
-            split: One of SPLITS.
-
-        Returns:
-            The row count, the case count unless a dataset says otherwise.
-        """
-        return len(self.get(split))
-
     def corpus(self) -> Path | None:
         """
         The ids a ranking is cut to before it is scored, for a benchmark that searches its own corpus
@@ -79,35 +67,18 @@ class Dataset(ABC):
 
 class Method(ABC):
     """
-    One retrieval method, fit on a train split when it has anything to fit
+    One family of retrieval methods, ranking every job of one retriever on one test set together
     """
 
-    # bumped by hand when what fit learns changes, so every older fit stops matching
-    FIT_VERSION = 0
-
-    def fit(self, data: Dataset, params: dict[str, Any]) -> dict[str, Any]:
-        """
-        Learns whatever the method tunes, called only when the experiment has a [fit] table
-
-        Args:
-            data: The dataset [fit] names, whose splits the method picks from.
-            params: The rest of [fit].
-
-        Returns:
-            What was learned, as json, which retrieve receives as `fitted`.
-        """
-        raise NotImplementedError(f"{type(self).__name__} has nothing to fit")
-
     @abstractmethod
-    def retrieve(self, cases: list[Case], params: dict[str, Any], fitted: dict[str, Any]) -> list[Ranking]:
+    def retrieve(self, cases: list[Case], jobs: list[dict[str, Any]]) -> dict[str, list[Ranking]]:
         """
-        Ranks the corpus for every case
+        Ranks the corpus for every case under every job
 
         Args:
-            cases: The cases, each to be capped at its cutoff with its anchors removed.
-            params: [run] without ks.
-            fitted: What fit returned, empty when the experiment has no [fit].
+            cases: The test set's cases, each to be capped at its cutoff with its anchors removed.
+            jobs: Test tomls sharing one retriever and test set, each with its run name under "name".
 
         Returns:
-            One ranking per case.
+            One ranking per case for each job, by the job's name.
         """

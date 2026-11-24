@@ -1,0 +1,4 @@
+retriever = "qwen3_4b"
+recipe = "focused"
+method = "ppr"
+seed = 0

@@ -1,0 +1,677 @@
+{
+ "bm25-none pasa_test recall@20": {
+  "run": "bm25-pasa_test-none",
+  "mean": 0.23769657915931552,
+  "holm": 7.314755527352578e-51
+ },
+ "bm25-none pasa_test recall@50": {
+  "run": "bm25-pasa_test-none",
+  "mean": 0.31296967462151,
+  "holm": 6.94841999990944e-62
+ },
+ "bm25-none pasa_test recall@100": {
+  "run": "bm25-pasa_test-none",
+  "mean": 0.37563138258355167,
+  "holm": 1.8652103202177726e-68
+ },
+ "bm25-none pasa_real recall@20": {
+  "run": "bm25-pasa_real-none",
+  "mean": 0.1687615608756479,
+  "holm": 0.9043418291443156
+ },
+ "bm25-none pasa_real recall@50": {
+  "run": "bm25-pasa_real-none",
+  "mean": 0.25497575193646727,
+  "holm": 0.010232718800325337
+ },
+ "bm25-none pasa_real recall@100": {
+  "run": "bm25-pasa_real-none",
+  "mean": 0.3174071215041741,
+  "holm": 0.00032303106642003044
+ },
+ "bm25-none surge_test recall@100": {
+  "run": "bm25-surge_test-none",
+  "mean": 0.149688571947353,
+  "holm": 5.968745898932085e-23
+ },
+ "bm25-none surge_test recall@200": {
+  "run": "bm25-surge_test-none",
+  "mean": 0.19212186626325545,
+  "holm": 4.636440362690407e-25
+ },
+ "bm25-none surge_test recall@500": {
+  "run": "bm25-surge_test-none",
+  "mean": 0.25822179165460124,
+  "holm": 1.2697718117276687e-29
+ },
+ "specter2-none pasa_test recall@20": {
+  "run": "specter2-pasa_test-none",
+  "mean": 0.12002968296071743,
+  "holm": 3.4394470640505243e-77
+ },
+ "specter2-none pasa_test recall@50": {
+  "run": "specter2-pasa_test-none",
+  "mean": 0.17664631438268813,
+  "holm": 1.6282639338833745e-84
+ },
+ "specter2-none pasa_test recall@100": {
+  "run": "specter2-pasa_test-none",
+  "mean": 0.2200865566271573,
+  "holm": 3.0346058365664993e-93
+ },
+ "specter2-none pasa_real recall@20": {
+  "run": "specter2-pasa_real-none",
+  "mean": 0.10083834749707996,
+  "holm": 0.0005172091031099512
+ },
+ "specter2-none pasa_real recall@50": {
+  "run": "specter2-pasa_real-none",
+  "mean": 0.15216253443816882,
+  "holm": 1.132697979774376e-05
+ },
+ "specter2-none pasa_real recall@100": {
+  "run": "specter2-pasa_real-none",
+  "mean": 0.22598786931319942,
+  "holm": 9.560485322255169e-06
+ },
+ "specter2-none surge_test recall@100": {
+  "run": "specter2-surge_test-none",
+  "mean": 0.18443306675347987,
+  "holm": 3.580249837541475e-20
+ },
+ "specter2-none surge_test recall@200": {
+  "run": "specter2-surge_test-none",
+  "mean": 0.24522320648328125,
+  "holm": 2.8535491644919083e-21
+ },
+ "specter2-none surge_test recall@500": {
+  "run": "specter2-surge_test-none",
+  "mean": 0.3379424555901001,
+  "holm": 8.902652805018783e-26
+ },
+ "scincl-none pasa_test recall@20": {
+  "run": "scincl-pasa_test-none",
+  "mean": 0.11835138350711209,
+  "holm": 4.250862296480729e-77
+ },
+ "scincl-none pasa_test recall@50": {
+  "run": "scincl-pasa_test-none",
+  "mean": 0.1739664611744701,
+  "holm": 6.5240943950727446e-83
+ },
+ "scincl-none pasa_test recall@100": {
+  "run": "scincl-pasa_test-none",
+  "mean": 0.2245023299528305,
+  "holm": 5.910777205982003e-89
+ },
+ "scincl-none pasa_real recall@20": {
+  "run": "scincl-pasa_real-none",
+  "mean": 0.1043272020573631,
+  "holm": 0.013062730247566075
+ },
+ "scincl-none pasa_real recall@50": {
+  "run": "scincl-pasa_real-none",
+  "mean": 0.18113099722995404,
+  "holm": 0.000482376524420893
+ },
+ "scincl-none pasa_real recall@100": {
+  "run": "scincl-pasa_real-none",
+  "mean": 0.25275960248711415,
+  "holm": 0.00012153130675465427
+ },
+ "scincl-none surge_test recall@100": {
+  "run": "scincl-surge_test-none",
+  "mean": 0.18002218113007717,
+  "holm": 1.2121188382758025e-21
+ },
+ "scincl-none surge_test recall@200": {
+  "run": "scincl-surge_test-none",
+  "mean": 0.23852433550758267,
+  "holm": 2.2068770160936125e-22
+ },
+ "scincl-none surge_test recall@500": {
+  "run": "scincl-surge_test-none",
+  "mean": 0.3373097072142764,
+  "holm": 1.8629333147539268e-25
+ },
+ "nomic-none pasa_test recall@20": {
+  "run": "nomic-pasa_test-none",
+  "mean": 0.2854533459372169,
+  "holm": 2.1751522589713765e-41
+ },
+ "nomic-none pasa_test recall@50": {
+  "run": "nomic-pasa_test-none",
+  "mean": 0.3794104085260926,
+  "holm": 2.7081586821879495e-48
+ },
+ "nomic-none pasa_test recall@100": {
+  "run": "nomic-pasa_test-none",
+  "mean": 0.4450683230994688,
+  "holm": 2.945676558688833e-56
+ },
+ "nomic-none pasa_real recall@20": {
+  "run": "nomic-pasa_real-none",
+  "mean": 0.26995594371903514,
+  "holm": 1.0
+ },
+ "nomic-none pasa_real recall@50": {
+  "run": "nomic-pasa_real-none",
+  "mean": 0.3773914384970186,
+  "holm": 1.0
+ },
+ "nomic-none pasa_real recall@100": {
+  "run": "nomic-pasa_real-none",
+  "mean": 0.47222557661695386,
+  "holm": 0.9489982963384478
+ },
+ "nomic-none surge_test recall@100": {
+  "run": "nomic-surge_test-none",
+  "mean": 0.197834071119048,
+  "holm": 1.5971995894355697e-19
+ },
+ "nomic-none surge_test recall@200": {
+  "run": "nomic-surge_test-none",
+  "mean": 0.25270124119622017,
+  "holm": 1.2121188382758025e-21
+ },
+ "nomic-none surge_test recall@500": {
+  "run": "nomic-surge_test-none",
+  "mean": 0.3423574884703575,
+  "holm": 2.389904469470646e-26
+ },
+ "nomic-rerank pasa_test recall@20": {
+  "run": "nomic-pasa_test-rerank",
+  "mean": 0.30212928216265256,
+  "holm": 2.3985101296445424e-34
+ },
+ "nomic-rerank pasa_test recall@50": {
+  "run": "nomic-pasa_test-rerank",
+  "mean": 0.3887936467191194,
+  "holm": 1.7544869406632282e-42
+ },
+ "nomic-rerank pasa_test recall@100": {
+  "run": "nomic-pasa_test-rerank",
+  "mean": 0.45616194768030144,
+  "holm": 1.873015524521992e-47
+ },
+ "nomic-rerank pasa_real recall@20": {
+  "run": "nomic-pasa_real-rerank",
+  "mean": 0.23860650964119937,
+  "holm": 1.0
+ },
+ "nomic-rerank pasa_real recall@50": {
+  "run": "nomic-pasa_real-rerank",
+  "mean": 0.3806456941900085,
+  "holm": 1.0
+ },
+ "nomic-rerank pasa_real recall@100": {
+  "run": "nomic-pasa_real-rerank",
+  "mean": 0.4820528353097588,
+  "holm": 1.0
+ },
+ "nomic-rerank surge_test recall@100": {
+  "run": "nomic-surge_test-rerank",
+  "mean": 0.17450616629520438,
+  "holm": 2.231881027290056e-20
+ },
+ "nomic-rerank surge_test recall@200": {
+  "run": "nomic-surge_test-rerank",
+  "mean": 0.23258163246479552,
+  "holm": 4.0428455934055796e-22
+ },
+ "nomic-rerank surge_test recall@500": {
+  "run": "nomic-surge_test-rerank",
+  "mean": 0.3397781822823665,
+  "holm": 1.801341844806617e-25
+ },
+ "nomic-gar_sim pasa_test recall@20": {
+  "run": "nomic-pasa_test-gar_sim",
+  "mean": 0.3066078032707621,
+  "holm": 2.1103890564904404e-32
+ },
+ "nomic-gar_sim pasa_test recall@50": {
+  "run": "nomic-pasa_test-gar_sim",
+  "mean": 0.3959576914248772,
+  "holm": 2.747940352278585e-41
+ },
+ "nomic-gar_sim pasa_test recall@100": {
+  "run": "nomic-pasa_test-gar_sim",
+  "mean": 0.47226317126205897,
+  "holm": 2.808689355798303e-43
+ },
+ "nomic-gar_sim pasa_real recall@20": {
+  "run": "nomic-pasa_real-gar_sim",
+  "mean": 0.24221895461919057,
+  "holm": 1.0
+ },
+ "nomic-gar_sim pasa_real recall@50": {
+  "run": "nomic-pasa_real-gar_sim",
+  "mean": 0.384136376177089,
+  "holm": 1.0
+ },
+ "nomic-gar_sim pasa_real recall@100": {
+  "run": "nomic-pasa_real-gar_sim",
+  "mean": 0.47661253776882784,
+  "holm": 1.0
+ },
+ "nomic-gar_sim surge_test recall@100": {
+  "run": "nomic-surge_test-gar_sim",
+  "mean": 0.17543148733884803,
+  "holm": 2.5613945169662138e-21
+ },
+ "nomic-gar_sim surge_test recall@200": {
+  "run": "nomic-surge_test-gar_sim",
+  "mean": 0.23716228922895893,
+  "holm": 1.8036417614065464e-22
+ },
+ "nomic-gar_sim surge_test recall@500": {
+  "run": "nomic-surge_test-gar_sim",
+  "mean": 0.35850725463226185,
+  "holm": 3.135348983724313e-26
+ },
+ "nomic-gar_cite pasa_test recall@20": {
+  "run": "nomic-pasa_test-gar_cite",
+  "mean": 0.3116610370225498,
+  "holm": 6.888776034023154e-32
+ },
+ "nomic-gar_cite pasa_test recall@50": {
+  "run": "nomic-pasa_test-gar_cite",
+  "mean": 0.4098170060072174,
+  "holm": 8.284756192567879e-38
+ },
+ "nomic-gar_cite pasa_test recall@100": {
+  "run": "nomic-pasa_test-gar_cite",
+  "mean": 0.487497028987574,
+  "holm": 2.6366327268780324e-40
+ },
+ "nomic-gar_cite pasa_real recall@20": {
+  "run": "nomic-pasa_real-gar_cite",
+  "mean": 0.24962473744514146,
+  "holm": 1.0
+ },
+ "nomic-gar_cite pasa_real recall@50": {
+  "run": "nomic-pasa_real-gar_cite",
+  "mean": 0.3956405999112047,
+  "holm": 1.0
+ },
+ "nomic-gar_cite pasa_real recall@100": {
+  "run": "nomic-pasa_real-gar_cite",
+  "mean": 0.5013246432670408,
+  "holm": 1.0
+ },
+ "nomic-gar_cite surge_test recall@100": {
+  "run": "nomic-surge_test-gar_cite",
+  "mean": 0.18757575224551384,
+  "holm": 1.2278054428159006e-19
+ },
+ "nomic-gar_cite surge_test recall@200": {
+  "run": "nomic-surge_test-gar_cite",
+  "mean": 0.26297975919867456,
+  "holm": 4.231242920571747e-20
+ },
+ "nomic-gar_cite surge_test recall@500": {
+  "run": "nomic-surge_test-gar_cite",
+  "mean": 0.42097039889604043,
+  "holm": 4.0428455934055796e-22
+ },
+ "focused-ppr pasa_test recall@20": {
+  "run": "nomic-pasa_test-focused_ppr_seed0",
+  "mean": 0.39628779637122236,
+  "holm": 1.8031431858708544e-18
+ },
+ "focused-ppr pasa_test recall@50": {
+  "run": "nomic-pasa_test-focused_ppr_seed0",
+  "mean": 0.4816002653878071,
+  "holm": 6.218858651927434e-27
+ },
+ "focused-ppr pasa_test recall@100": {
+  "run": "nomic-pasa_test-focused_ppr_seed0",
+  "mean": 0.5188170345289367,
+  "holm": 5.544604645487858e-41
+ },
+ "focused-ppr pasa_real recall@20": {
+  "run": "nomic-pasa_real-focused_ppr_seed0",
+  "mean": 0.2518386436629596,
+  "holm": 1.0
+ },
+ "focused-ppr pasa_real recall@50": {
+  "run": "nomic-pasa_real-focused_ppr_seed0",
+  "mean": 0.40428094709100215,
+  "holm": 1.0
+ },
+ "focused-ppr pasa_real recall@100": {
+  "run": "nomic-pasa_real-focused_ppr_seed0",
+  "mean": 0.49166720190274443,
+  "holm": 1.0
+ },
+ "focused-ppr surge_test recall@100": {
+  "run": "nomic-surge_test-focused_ppr_seed0",
+  "mean": 0.2428736783985916,
+  "holm": 4.1192397380782303e-16
+ },
+ "focused-ppr surge_test recall@200": {
+  "run": "nomic-surge_test-focused_ppr_seed0",
+  "mean": 0.2757251511212064,
+  "holm": 1.3088245239866049e-20
+ },
+ "focused-ppr surge_test recall@500": {
+  "run": "nomic-surge_test-focused_ppr_seed0",
+  "mean": 0.5561522226136963,
+  "holm": 7.789222294504127e-07
+ },
+ "focused-bf pasa_test recall@20": {
+  "run": "nomic-pasa_test-focused_bf_seed0",
+  "mean": 0.5084809671850828,
+  "holm": null
+ },
+ "focused-bf pasa_test recall@50": {
+  "run": "nomic-pasa_test-focused_bf_seed0",
+  "mean": 0.6209392881250502,
+  "holm": null
+ },
+ "focused-bf pasa_test recall@100": {
+  "run": "nomic-pasa_test-focused_bf_seed0",
+  "mean": 0.7024273742571852,
+  "holm": null
+ },
+ "focused-bf pasa_real recall@20": {
+  "run": "nomic-pasa_real-focused_bf_seed0",
+  "mean": 0.2252398082097548,
+  "holm": null
+ },
+ "focused-bf pasa_real recall@50": {
+  "run": "nomic-pasa_real-focused_bf_seed0",
+  "mean": 0.3735138540775623,
+  "holm": null
+ },
+ "focused-bf pasa_real recall@100": {
+  "run": "nomic-pasa_real-focused_bf_seed0",
+  "mean": 0.5039422153694414,
+  "holm": null
+ },
+ "focused-bf surge_test recall@100": {
+  "run": "nomic-surge_test-focused_bf_seed0",
+  "mean": 0.3328588384010209,
+  "holm": 8.00044324491092e-05
+ },
+ "focused-bf surge_test recall@200": {
+  "run": "nomic-surge_test-focused_bf_seed0",
+  "mean": 0.42581686440185784,
+  "holm": 1.663091466679046e-05
+ },
+ "focused-bf surge_test recall@500": {
+  "run": "nomic-surge_test-focused_bf_seed0",
+  "mean": 0.5642554742096746,
+  "holm": 5.2722609344305e-08
+ },
+ "survey-ppr pasa_test recall@20": {
+  "run": "nomic-pasa_test-survey_ppr_seed0",
+  "mean": 0.15366806904626704,
+  "holm": 2.568459729076612e-67
+ },
+ "survey-ppr pasa_test recall@50": {
+  "run": "nomic-pasa_test-survey_ppr_seed0",
+  "mean": 0.25490720193167354,
+  "holm": 8.894980548297808e-68
+ },
+ "survey-ppr pasa_test recall@100": {
+  "run": "nomic-pasa_test-survey_ppr_seed0",
+  "mean": 0.3853396788602573,
+  "holm": 7.866315515767635e-62
+ },
+ "survey-ppr pasa_real recall@20": {
+  "run": "nomic-pasa_real-survey_ppr_seed0",
+  "mean": 0.0032820223882855833,
+  "holm": 3.513241259353789e-06
+ },
+ "survey-ppr pasa_real recall@50": {
+  "run": "nomic-pasa_real-survey_ppr_seed0",
+  "mean": 0.026887148883982102,
+  "holm": 1.8895732239584835e-07
+ },
+ "survey-ppr pasa_real recall@100": {
+  "run": "nomic-pasa_real-survey_ppr_seed0",
+  "mean": 0.06888107403382479,
+  "holm": 9.120581962982561e-08
+ },
+ "survey-ppr surge_test recall@100": {
+  "run": "nomic-surge_test-survey_ppr_seed0",
+  "mean": 0.26834985106431963,
+  "holm": 1.7173054671369112e-16
+ },
+ "survey-ppr surge_test recall@200": {
+  "run": "nomic-surge_test-survey_ppr_seed0",
+  "mean": 0.39056660138370647,
+  "holm": 5.69744205384951e-11
+ },
+ "survey-ppr surge_test recall@500": {
+  "run": "nomic-surge_test-survey_ppr_seed0",
+  "mean": 0.5648214682229236,
+  "holm": 2.3841110424150432e-07
+ },
+ "survey-bf pasa_test recall@20": {
+  "run": "nomic-pasa_test-survey_bf_seed0",
+  "mean": 0.4195521880171491,
+  "holm": 3.0671788763400742e-12
+ },
+ "survey-bf pasa_test recall@50": {
+  "run": "nomic-pasa_test-survey_bf_seed0",
+  "mean": 0.5521374373988389,
+  "holm": 2.6084655533134775e-07
+ },
+ "survey-bf pasa_test recall@100": {
+  "run": "nomic-pasa_test-survey_bf_seed0",
+  "mean": 0.6445344298514488,
+  "holm": 3.0628384872748475e-06
+ },
+ "survey-bf pasa_real recall@20": {
+  "run": "nomic-pasa_real-survey_bf_seed0",
+  "mean": 0.08552469301879412,
+  "holm": 1.775156754404821e-05
+ },
+ "survey-bf pasa_real recall@50": {
+  "run": "nomic-pasa_real-survey_bf_seed0",
+  "mean": 0.22141205917119733,
+  "holm": 8.497307916859174e-06
+ },
+ "survey-bf pasa_real recall@100": {
+  "run": "nomic-pasa_real-survey_bf_seed0",
+  "mean": 0.3335547614736877,
+  "holm": 1.9733637590369226e-06
+ },
+ "survey-bf surge_test recall@100": {
+  "run": "nomic-surge_test-survey_bf_seed0",
+  "mean": 0.3519652370157482,
+  "holm": null
+ },
+ "survey-bf surge_test recall@200": {
+  "run": "nomic-surge_test-survey_bf_seed0",
+  "mean": 0.4495068334886011,
+  "holm": null
+ },
+ "survey-bf surge_test recall@500": {
+  "run": "nomic-surge_test-survey_bf_seed0",
+  "mean": 0.6029072687793587,
+  "holm": null
+ },
+ "frontier-ppr pasa_test recall@20": {
+  "run": "nomic-pasa_test-frontier_ppr_seed0",
+  "mean": 0.3708101933908386,
+  "holm": 9.896530688028716e-24
+ },
+ "frontier-ppr pasa_test recall@50": {
+  "run": "nomic-pasa_test-frontier_ppr_seed0",
+  "mean": 0.4822283883462971,
+  "holm": 5.671923865187859e-26
+ },
+ "frontier-ppr pasa_test recall@100": {
+  "run": "nomic-pasa_test-frontier_ppr_seed0",
+  "mean": 0.5323179261722087,
+  "holm": 2.057374443808558e-36
+ },
+ "frontier-ppr pasa_real recall@20": {
+  "run": "nomic-pasa_real-frontier_ppr_seed0",
+  "mean": 0.19800390679256016,
+  "holm": 1.0
+ },
+ "frontier-ppr pasa_real recall@50": {
+  "run": "nomic-pasa_real-frontier_ppr_seed0",
+  "mean": 0.3703458973874381,
+  "holm": 1.0
+ },
+ "frontier-ppr pasa_real recall@100": {
+  "run": "nomic-pasa_real-frontier_ppr_seed0",
+  "mean": 0.48836128426888864,
+  "holm": 1.0
+ },
+ "frontier-ppr surge_test recall@100": {
+  "run": "nomic-surge_test-frontier_ppr_seed0",
+  "mean": 0.26058281305772824,
+  "holm": 2.848329780197468e-14
+ },
+ "frontier-ppr surge_test recall@200": {
+  "run": "nomic-surge_test-frontier_ppr_seed0",
+  "mean": 0.2968420219380115,
+  "holm": 4.116980413078432e-19
+ },
+ "frontier-ppr surge_test recall@500": {
+  "run": "nomic-surge_test-frontier_ppr_seed0",
+  "mean": 0.5795502346125034,
+  "holm": 0.004762544055777741
+ },
+ "frontier-bf pasa_test recall@20": {
+  "run": "nomic-pasa_test-frontier_bf_seed0",
+  "mean": 0.2757221767232891,
+  "holm": 3.317880026019171e-44
+ },
+ "frontier-bf pasa_test recall@50": {
+  "run": "nomic-pasa_test-frontier_bf_seed0",
+  "mean": 0.38998738253465726,
+  "holm": 9.444810654543063e-43
+ },
+ "frontier-bf pasa_test recall@100": {
+  "run": "nomic-pasa_test-frontier_bf_seed0",
+  "mean": 0.4790251955435493,
+  "holm": 1.8053747324454737e-41
+ },
+ "frontier-bf pasa_real recall@20": {
+  "run": "nomic-pasa_real-frontier_bf_seed0",
+  "mean": 0.18726795513969005,
+  "holm": 1.0
+ },
+ "frontier-bf pasa_real recall@50": {
+  "run": "nomic-pasa_real-frontier_bf_seed0",
+  "mean": 0.32298470768551907,
+  "holm": 0.32107855090260395
+ },
+ "frontier-bf pasa_real recall@100": {
+  "run": "nomic-pasa_real-frontier_bf_seed0",
+  "mean": 0.43684298253450055,
+  "holm": 0.1229899130987499
+ },
+ "frontier-bf surge_test recall@100": {
+  "run": "nomic-surge_test-frontier_bf_seed0",
+  "mean": 0.20588881768670217,
+  "holm": 1.2606100775357297e-24
+ },
+ "frontier-bf surge_test recall@200": {
+  "run": "nomic-surge_test-frontier_bf_seed0",
+  "mean": 0.2782935944306689,
+  "holm": 1.977337750849316e-25
+ },
+ "frontier-bf surge_test recall@500": {
+  "run": "nomic-surge_test-frontier_bf_seed0",
+  "mean": 0.3868930705116242,
+  "holm": 5.0754453861177815e-28
+ },
+ "consensus-ppr pasa_test recall@20": {
+  "run": "nomic-pasa_test-consensus_ppr_seed0",
+  "mean": 0.30337700551827357,
+  "holm": 3.843776649766738e-39
+ },
+ "consensus-ppr pasa_test recall@50": {
+  "run": "nomic-pasa_test-consensus_ppr_seed0",
+  "mean": 0.4688513964097946,
+  "holm": 1.68273367753719e-28
+ },
+ "consensus-ppr pasa_test recall@100": {
+  "run": "nomic-pasa_test-consensus_ppr_seed0",
+  "mean": 0.5663448805551141,
+  "holm": 1.0157730809906073e-27
+ },
+ "consensus-ppr pasa_real recall@20": {
+  "run": "nomic-pasa_real-consensus_ppr_seed0",
+  "mean": 0.058948848867299,
+  "holm": 1.4270881271856211e-05
+ },
+ "consensus-ppr pasa_real recall@50": {
+  "run": "nomic-pasa_real-consensus_ppr_seed0",
+  "mean": 0.26142643889083844,
+  "holm": 0.0005172091031099512
+ },
+ "consensus-ppr pasa_real recall@100": {
+  "run": "nomic-pasa_real-consensus_ppr_seed0",
+  "mean": 0.43313147883034453,
+  "holm": 0.3013058241863942
+ },
+ "consensus-ppr surge_test recall@100": {
+  "run": "nomic-surge_test-consensus_ppr_seed0",
+  "mean": 0.302159528875361,
+  "holm": 2.8164393931482568e-08
+ },
+ "consensus-ppr surge_test recall@200": {
+  "run": "nomic-surge_test-consensus_ppr_seed0",
+  "mean": 0.36647815707212117,
+  "holm": 9.50323271735285e-13
+ },
+ "consensus-ppr surge_test recall@500": {
+  "run": "nomic-surge_test-consensus_ppr_seed0",
+  "mean": 0.4209476239275931,
+  "holm": 2.8429310489867305e-24
+ },
+ "consensus-bf pasa_test recall@20": {
+  "run": "nomic-pasa_test-consensus_bf_seed0",
+  "mean": 0.39733356496426575,
+  "holm": 4.361304485426791e-16
+ },
+ "consensus-bf pasa_test recall@50": {
+  "run": "nomic-pasa_test-consensus_bf_seed0",
+  "mean": 0.5375812081874373,
+  "holm": 8.111893013879322e-10
+ },
+ "consensus-bf pasa_test recall@100": {
+  "run": "nomic-pasa_test-consensus_bf_seed0",
+  "mean": 0.636068164933571,
+  "holm": 1.008170418903159e-07
+ },
+ "consensus-bf pasa_real recall@20": {
+  "run": "nomic-pasa_real-consensus_bf_seed0",
+  "mean": 0.08447893796002005,
+  "holm": 2.4646502171623455e-05
+ },
+ "consensus-bf pasa_real recall@50": {
+  "run": "nomic-pasa_real-consensus_bf_seed0",
+  "mean": 0.1979505462758764,
+  "holm": 1.1741100682347704e-06
+ },
+ "consensus-bf pasa_real recall@100": {
+  "run": "nomic-pasa_real-consensus_bf_seed0",
+  "mean": 0.32068349486209735,
+  "holm": 5.573384376298221e-07
+ },
+ "consensus-bf surge_test recall@100": {
+  "run": "nomic-surge_test-consensus_bf_seed0",
+  "mean": 0.34752842236393816,
+  "holm": 0.29418192363563866
+ },
+ "consensus-bf surge_test recall@200": {
+  "run": "nomic-surge_test-consensus_bf_seed0",
+  "mean": 0.4465980226006761,
+  "holm": 0.0019493469906277075
+ },
+ "consensus-bf surge_test recall@500": {
+  "run": "nomic-surge_test-consensus_bf_seed0",
+  "mean": 0.5672780812469551,
+  "holm": 4.306904834680878e-14
+ }
+}

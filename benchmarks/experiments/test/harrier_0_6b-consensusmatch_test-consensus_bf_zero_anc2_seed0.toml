@@ -1,0 +1,12 @@
+retriever = "harrier_0_6b"
+dataset = "consensusmatch"
+split = "test"
+method = "bf"
+recipe = "consensus"
+seed = 0
+variant = "zero_anc2"
+
+[override]
+
+[override.weights]
+ANC2 = 0.0

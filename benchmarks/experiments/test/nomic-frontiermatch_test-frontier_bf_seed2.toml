@@ -1,0 +1,6 @@
+retriever = "nomic"
+dataset = "frontiermatch"
+split = "test"
+method = "bf"
+recipe = "frontier"
+seed = 2

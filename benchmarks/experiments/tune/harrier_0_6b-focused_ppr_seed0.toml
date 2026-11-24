@@ -1,0 +1,4 @@
+retriever = "harrier_0_6b"
+recipe = "focused"
+method = "ppr"
+seed = 0

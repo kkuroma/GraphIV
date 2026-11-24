@@ -1,0 +1,5 @@
+retriever = "nemotron_1b"
+recipe = "survey"
+method = "bf"
+seed = 3
+at_pick = true

@@ -1,0 +1,5 @@
+retriever = "qwen3_4b"
+recipe = "frontier"
+method = "bf"
+seed = 4
+at_pick = true

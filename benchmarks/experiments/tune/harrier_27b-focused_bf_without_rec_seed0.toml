@@ -1,0 +1,9 @@
+retriever = "harrier_27b"
+recipe = "focused"
+method = "bf"
+seed = 0
+variant = "without_rec"
+at_pick = true
+
+[override]
+terms = ["anc", "fro", "anc2", "fro2", "anc_decay", "fro_decay", "cocite", "couple", "bm25", "hub"]

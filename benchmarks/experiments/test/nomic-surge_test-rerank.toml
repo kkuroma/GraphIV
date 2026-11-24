@@ -1,0 +1,4 @@
+retriever = "nomic"
+dataset = "surge"
+split = "test"
+method = "rerank"

@@ -1,0 +1,6 @@
+retriever = "harrier_27b"
+dataset = "scholarcatalyst"
+split = "core"
+method = "bf"
+recipe = "consensus"
+seed = 0

@@ -1,0 +1,6 @@
+retriever = "nemotron_1b"
+dataset = "scholarcatalyst"
+split = "subfield"
+method = "bf"
+recipe = "consensus"
+seed = 0

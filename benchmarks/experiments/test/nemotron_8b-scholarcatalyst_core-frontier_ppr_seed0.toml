@@ -1,0 +1,6 @@
+retriever = "nemotron_8b"
+dataset = "scholarcatalyst"
+split = "core"
+method = "ppr"
+recipe = "frontier"
+seed = 0

@@ -1,0 +1,9 @@
+retriever = "nemotron_1b"
+recipe = "survey"
+method = "bf"
+seed = 0
+variant = "without_fro2"
+at_pick = true
+
+[override]
+terms = ["rec", "anc", "fro", "anc2", "anc_decay", "fro_decay", "cocite", "couple", "bm25", "hub"]

@@ -1,0 +1,6 @@
+retriever = "nomic"
+dataset = "consensusmatch"
+split = "test"
+method = "ppr"
+recipe = "frontier"
+seed = 0

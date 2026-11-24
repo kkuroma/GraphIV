@@ -1,0 +1,6 @@
+retriever = "qwen3_8b"
+dataset = "scholarcatalyst"
+split = "subfield"
+method = "bf"
+recipe = "focused"
+seed = 4

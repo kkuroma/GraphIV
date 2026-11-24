@@ -1,0 +1,5 @@
+retriever = "qwen3_0_6b"
+recipe = "focused"
+method = "bf"
+seed = 4
+at_pick = true

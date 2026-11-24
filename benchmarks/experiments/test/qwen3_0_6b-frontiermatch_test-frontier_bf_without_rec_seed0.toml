@@ -1,0 +1,7 @@
+retriever = "qwen3_0_6b"
+dataset = "frontiermatch"
+split = "test"
+method = "bf"
+recipe = "frontier"
+seed = 0
+tune_variant = "without_rec"

@@ -1,0 +1,4 @@
+retriever = "scincl"
+dataset = "consensusmatch"
+split = "test"
+method = "none"

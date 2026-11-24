@@ -1,0 +1,7 @@
+retriever = "nemotron_8b"
+dataset = "surveymatch"
+split = "test"
+method = "bf"
+recipe = "survey"
+seed = 0
+tune_variant = "without_fro_decay"

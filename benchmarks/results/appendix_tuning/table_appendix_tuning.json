@@ -1,0 +1,194 @@
+{
+ "nomic-focused": {
+  "core": 200,
+  "pool": 1000,
+  "point": "fit",
+  "judged": 0.4714927762277112
+ },
+ "nomic-survey": {
+  "core": 200,
+  "pool": 5000,
+  "point": "fit",
+  "judged": 0.33939884461481296
+ },
+ "nomic-frontier": {
+  "core": 500,
+  "pool": 5000,
+  "point": "fit",
+  "judged": 0.27742241405361073
+ },
+ "nomic-consensus": {
+  "core": 500,
+  "pool": 2000,
+  "point": "fit",
+  "judged": 0.5424677230455954
+ },
+ "qwen3_0_6b-focused": {
+  "core": 200,
+  "pool": 1000,
+  "point": "fit",
+  "judged": 0.5124299590350381
+ },
+ "qwen3_0_6b-survey": {
+  "core": 200,
+  "pool": 5000,
+  "point": "fit",
+  "judged": 0.3537834781393883
+ },
+ "qwen3_0_6b-frontier": {
+  "core": 200,
+  "pool": 5000,
+  "point": "fit",
+  "judged": 0.2813247622387371
+ },
+ "qwen3_0_6b-consensus": {
+  "core": 200,
+  "pool": 1000,
+  "point": "fit",
+  "judged": 0.5732922106232137
+ },
+ "harrier_0_6b-focused": {
+  "core": 200,
+  "pool": 1000,
+  "point": "fit",
+  "judged": 0.4826236388291622
+ },
+ "harrier_0_6b-survey": {
+  "core": 200,
+  "pool": 1000,
+  "point": "fit",
+  "judged": 0.3583057976236751
+ },
+ "harrier_0_6b-frontier": {
+  "core": 200,
+  "pool": 5000,
+  "point": "fit",
+  "judged": 0.2880397448916777
+ },
+ "harrier_0_6b-consensus": {
+  "core": 200,
+  "pool": 2000,
+  "point": "fit",
+  "judged": 0.582675463029722
+ },
+ "nemotron_1b-focused": {
+  "core": 200,
+  "pool": 2000,
+  "point": "fit",
+  "judged": 0.5027286212586859
+ },
+ "nemotron_1b-survey": {
+  "core": 200,
+  "pool": 1000,
+  "point": "fit",
+  "judged": 0.34836214756056116
+ },
+ "nemotron_1b-frontier": {
+  "core": 200,
+  "pool": 2000,
+  "point": "fit",
+  "judged": 0.28291556381324884
+ },
+ "nemotron_1b-consensus": {
+  "core": 200,
+  "pool": 1000,
+  "point": "fit",
+  "judged": 0.5508984051582727
+ },
+ "qwen3_4b-focused": {
+  "core": 200,
+  "pool": 1000,
+  "point": "fit",
+  "judged": 0.5521861179088445
+ },
+ "qwen3_4b-survey": {
+  "core": 200,
+  "pool": 2000,
+  "point": "fit",
+  "judged": 0.3758811444209264
+ },
+ "qwen3_4b-frontier": {
+  "core": 200,
+  "pool": 5000,
+  "point": "fit",
+  "judged": 0.29196613524079335
+ },
+ "qwen3_4b-consensus": {
+  "core": 200,
+  "pool": 1000,
+  "point": "fit",
+  "judged": 0.5827852815785689
+ },
+ "qwen3_8b-focused": {
+  "core": 200,
+  "pool": 1000,
+  "point": "fit",
+  "judged": 0.5401002006995349
+ },
+ "qwen3_8b-survey": {
+  "core": 200,
+  "pool": 1000,
+  "point": "fit",
+  "judged": 0.3757356321239594
+ },
+ "qwen3_8b-frontier": {
+  "core": 200,
+  "pool": 5000,
+  "point": "fit",
+  "judged": 0.28672203389241296
+ },
+ "qwen3_8b-consensus": {
+  "core": 200,
+  "pool": 1000,
+  "point": "fit",
+  "judged": 0.5813158462881204
+ },
+ "nemotron_8b-focused": {
+  "core": 200,
+  "pool": 1000,
+  "point": "fit",
+  "judged": 0.5582679487458493
+ },
+ "nemotron_8b-survey": {
+  "core": 200,
+  "pool": 2000,
+  "point": "fit",
+  "judged": 0.383907031892828
+ },
+ "nemotron_8b-frontier": {
+  "core": 200,
+  "pool": 1000,
+  "point": "fit",
+  "judged": 0.3046421633946658
+ },
+ "nemotron_8b-consensus": {
+  "core": 500,
+  "pool": 1000,
+  "point": "fit",
+  "judged": 0.5783789863968207
+ },
+ "harrier_27b-focused": {
+  "core": 200,
+  "pool": 2000,
+  "point": "fit",
+  "judged": 0.5686987026234269
+ },
+ "harrier_27b-survey": {
+  "core": 200,
+  "pool": 5000,
+  "point": "fit",
+  "judged": 0.3870191595069567
+ },
+ "harrier_27b-frontier": {
+  "core": 200,
+  "pool": 1000,
+  "point": "fit",
+  "judged": 0.29487898513127814
+ },
+ "harrier_27b-consensus": {
+  "core": 200,
+  "pool": 2000,
+  "point": "fit",
+  "judged": 0.588915955110269
+ }
+}

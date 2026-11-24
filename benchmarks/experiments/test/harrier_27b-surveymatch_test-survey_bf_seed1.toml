@@ -1,0 +1,6 @@
+retriever = "harrier_27b"
+dataset = "surveymatch"
+split = "test"
+method = "bf"
+recipe = "survey"
+seed = 1

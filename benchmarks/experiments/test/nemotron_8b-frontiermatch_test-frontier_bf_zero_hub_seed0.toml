@@ -1,0 +1,12 @@
+retriever = "nemotron_8b"
+dataset = "frontiermatch"
+split = "test"
+method = "bf"
+recipe = "frontier"
+seed = 0
+variant = "zero_hub"
+
+[override]
+
+[override.weights]
+HUB = 0.0

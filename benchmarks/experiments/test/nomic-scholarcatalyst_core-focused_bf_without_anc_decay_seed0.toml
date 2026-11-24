@@ -1,0 +1,7 @@
+retriever = "nomic"
+dataset = "scholarcatalyst"
+split = "core"
+method = "bf"
+recipe = "focused"
+seed = 0
+tune_variant = "without_anc_decay"

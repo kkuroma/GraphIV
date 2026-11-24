@@ -1,0 +1,4 @@
+retriever = "scincl"
+dataset = "surge"
+split = "test"
+method = "none"

@@ -1,0 +1,4 @@
+retriever = "specter2"
+dataset = "surge"
+split = "test"
+method = "none"

@@ -1,0 +1,4 @@
+retriever = "nomic"
+dataset = "pasa"
+split = "test"
+method = "none"

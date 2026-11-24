@@ -1,0 +1,6 @@
+retriever = "nemotron_1b"
+dataset = "scholarcatalyst"
+split = "core"
+method = "ppr"
+recipe = "consensus"
+seed = 0

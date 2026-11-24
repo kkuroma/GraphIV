@@ -1,0 +1,6 @@
+retriever = "nemotron_1b"
+dataset = "surge"
+split = "test"
+method = "bf"
+recipe = "frontier"
+seed = 0

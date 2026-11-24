@@ -1,0 +1,6 @@
+retriever = "qwen3_0_6b"
+dataset = "pasa"
+split = "real"
+method = "ppr"
+recipe = "consensus"
+seed = 0

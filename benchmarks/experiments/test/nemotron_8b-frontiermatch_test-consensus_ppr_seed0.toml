@@ -1,0 +1,6 @@
+retriever = "nemotron_8b"
+dataset = "frontiermatch"
+split = "test"
+method = "ppr"
+recipe = "consensus"
+seed = 0

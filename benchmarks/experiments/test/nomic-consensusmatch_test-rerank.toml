@@ -1,0 +1,4 @@
+retriever = "nomic"
+dataset = "consensusmatch"
+split = "test"
+method = "rerank"

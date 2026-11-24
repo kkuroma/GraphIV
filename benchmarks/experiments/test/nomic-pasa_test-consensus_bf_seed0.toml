@@ -1,0 +1,6 @@
+retriever = "nomic"
+dataset = "pasa"
+split = "test"
+method = "bf"
+recipe = "consensus"
+seed = 0

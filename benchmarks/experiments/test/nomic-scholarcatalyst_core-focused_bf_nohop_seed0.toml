@@ -1,0 +1,10 @@
+retriever = "nomic"
+dataset = "scholarcatalyst"
+split = "core"
+method = "bf"
+recipe = "focused"
+seed = 0
+variant = "nohop"
+
+[override]
+EXPAND = false

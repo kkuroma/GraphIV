@@ -1,0 +1,6 @@
+retriever = "harrier_0_6b"
+dataset = "scholarcatalyst"
+split = "core"
+method = "ppr"
+recipe = "survey"
+seed = 0

@@ -1,0 +1,4 @@
+retriever = "qwen3_0_6b"
+recipe = "consensus"
+method = "ppr"
+seed = 0

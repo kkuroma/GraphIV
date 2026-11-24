@@ -1,0 +1,12 @@
+retriever = "harrier_27b"
+dataset = "surge"
+split = "test"
+method = "bf"
+recipe = "survey"
+seed = 0
+variant = "zero_cocite"
+
+[override]
+
+[override.weights]
+COCITE = 0.0

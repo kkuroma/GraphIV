@@ -1,5 +1,5 @@
 """
-Fits one recipe's exponents at each cached core size and picks the core and the point on val, for tune.py
+Fits one recipe's exponents at one cached core and pool size and picks the point on val, for scripts/tune.py
 
 The log of the score is linear in the exponents, so a smooth recall@k is fit by minibatch gradient from a neutral start
 CMA-ES then searches the exact recall from the fitted point, and val picks among the start, the fit and the search
@@ -7,6 +7,7 @@ CMA-ES then searches the exact recall from the fitted point, and val picks among
 
 import argparse
 import json
+import os
 import warnings
 from pathlib import Path
 from typing import Any
@@ -15,9 +16,8 @@ import numpy as np
 import optuna
 import torch
 
-from src.retrieve.scorer import Weights
+from engine import TERMS
 
-TERMS = list(Weights.__dataclass_fields__)
 COS, HUB = TERMS.index("cos"), TERMS.index("hub")
 LR = 0.05
 # optuna 4.9 marks x0 and sigma0 for removal in 6.0, and they still set the start and the step
@@ -163,41 +163,39 @@ def search(cases: list[Case], origin: torch.Tensor, slots: list[int], k: int, pa
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    _ = ap.add_argument("--terms", required=True, help="the recipe's term directory, holding train/ and val/")
-    _ = ap.add_argument("--spec", required=True, help="json: the tuning toml, with cores resolved")
-    _ = ap.add_argument("--out", required=True, help="the report json")
+    _ = ap.add_argument("--terms", required=True, help="the term directory, holding train/ and val/")
+    _ = ap.add_argument("--spec", required=True, help="json: the [bf] table of the tuning toml")
+    _ = ap.add_argument("--core", type=int, required=True)
+    _ = ap.add_argument("--pool", type=int, required=True)
+    _ = ap.add_argument("--out", required=True, help="the json this fit writes")
     args = ap.parse_args()
+    torch.set_num_threads(int(os.environ.get("OMP_NUM_THREADS", "4")))
     spec = json.loads(args.spec)
     params, k = spec["fit"], spec["k"]
     slots = [TERMS.index(t) for t in spec["terms"]]
     torch.manual_seed(params["seed"])
     root = Path(args.terms)
-    report: dict[str, Any] = {"k": k, "terms": spec["terms"], "cores": {}}
-    for core in spec["cores"]:
-        train, val = Shards(root / "train" / f"core-{core}"), Shards(root / "val" / f"core-{core}")
-        rng = np.random.default_rng(params["seed"])
-        n = len(train.index)
-        sample = sorted(rng.choice(n, min(params["search_cases"] or n, n), replace=False).tolist())
-        searched_on = train.take(sample)
-        judge = val.take(list(range(len(val.index))))
-        start = exponents_of(torch.full((len(slots),), float(np.log(np.expm1(spec["start"])))), slots)
-        fitted = fit(train, slots, spec["start"], k, params)
-        found = search(searched_on, fitted, slots, k, params)
-        rows = {}
-        for label, e in (("start", start), ("fit", fitted), ("search", found)):
-            rows[label] = {
-                "train_sample": recall_at(searched_on, e, k),
-                "judged": recall_at(judge, e, k),
-                "exponents": {t: round(float(v), 3) for t, v in zip(TERMS, e, strict=True)},
-            }
-            print(f"core {core} {label:6} train R@{k} {rows[label]['train_sample']:.4f} judged R@{k} {rows[label]['judged']:.4f}", flush=True)
-        best = max(rows, key=lambda r: rows[r]["judged"])
-        report["cores"][str(core)] = {"train_cases": n, "judged_cases": len(judge), "picked": best, "candidates": rows}
-    core = max(report["cores"], key=lambda c: report["cores"][c]["candidates"][report["cores"][c]["picked"]]["judged"])
-    pick = report["cores"][core]
-    report["pick"] = {"core": int(core), "point": pick["picked"], "judged": pick["candidates"][pick["picked"]]["judged"], "exponents": pick["candidates"][pick["picked"]]["exponents"]}
+    at = f"core-{args.core}-pool-{args.pool}"
+    train, val = Shards(root / spec["train"] / at), Shards(root / spec["val"] / at)
+    rng = np.random.default_rng(params["seed"])
+    n = len(train.index)
+    sample = sorted(rng.choice(n, min(params["search_cases"] or n, n), replace=False).tolist())
+    searched_on = train.take(sample)
+    judge = val.take(list(range(len(val.index))))
+    start = exponents_of(torch.full((len(slots),), float(np.log(np.expm1(spec["start"])))), slots)
+    fitted = fit(train, slots, spec["start"], k, params)
+    found = search(searched_on, fitted, slots, k, params)
+    rows = {}
+    for label, e in (("start", start), ("fit", fitted), ("search", found)):
+        rows[label] = {
+            "train_sample": recall_at(searched_on, e, k),
+            "judged": recall_at(judge, e, k),
+            "exponents": {t: round(float(v), 3) for t, v in zip(TERMS, e, strict=True)},
+        }
+        print(f"{at} {label:6} train R@{k} {rows[label]['train_sample']:.4f} judged R@{k} {rows[label]['judged']:.4f}", flush=True)
+    best = max(rows, key=lambda r: rows[r]["judged"])
+    report = {"core": args.core, "pool": args.pool, "k": k, "terms": spec["terms"], "train_cases": n, "judged_cases": len(judge), "picked": best, "candidates": rows}
     Path(args.out).write_text(json.dumps(report, indent=1))
-    print(f"picked core {core}, {pick['picked']}, judged R@{k} {report['pick']['judged']:.4f}", flush=True)
 
 
 if __name__ == "__main__":

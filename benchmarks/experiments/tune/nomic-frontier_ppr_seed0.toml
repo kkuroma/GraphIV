@@ -1,0 +1,4 @@
+retriever = "nomic"
+recipe = "frontier"
+method = "ppr"
+seed = 0

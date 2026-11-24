@@ -1,0 +1,6 @@
+retriever = "harrier_27b"
+dataset = "scholarcatalyst"
+split = "subfield"
+method = "bf"
+recipe = "focused"
+seed = 4

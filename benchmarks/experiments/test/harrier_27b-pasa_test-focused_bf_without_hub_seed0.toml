@@ -1,0 +1,7 @@
+retriever = "harrier_27b"
+dataset = "pasa"
+split = "test"
+method = "bf"
+recipe = "focused"
+seed = 0
+tune_variant = "without_hub"

@@ -1,0 +1,12 @@
+retriever = "qwen3_0_6b"
+dataset = "frontiermatch"
+split = "test"
+method = "bf"
+recipe = "frontier"
+seed = 0
+variant = "zero_bm25"
+
+[override]
+
+[override.weights]
+BM25 = 0.0

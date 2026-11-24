@@ -1,0 +1,6 @@
+retriever = "nomic"
+dataset = "pasa"
+split = "test"
+method = "ppr"
+recipe = "focused"
+seed = 0

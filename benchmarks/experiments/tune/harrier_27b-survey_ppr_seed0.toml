@@ -1,0 +1,4 @@
+retriever = "harrier_27b"
+recipe = "survey"
+method = "ppr"
+seed = 0

@@ -1,0 +1,12 @@
+retriever = "nemotron_1b"
+dataset = "pasa"
+split = "test"
+method = "bf"
+recipe = "focused"
+seed = 0
+variant = "zero_cocite"
+
+[override]
+
+[override.weights]
+COCITE = 0.0

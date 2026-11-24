@@ -1,0 +1,4 @@
+retriever = "nomic"
+recipe = "focused"
+method = "ppr"
+seed = 0

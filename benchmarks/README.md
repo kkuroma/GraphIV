@@ -1,24 +1,27 @@
 # benchmarks
 
 GraphIV's retrieval against the baselines it is compared with, on our three benchmarks, PaSa, SurGE and ScholarCatalyst.
-An experiment is one toml naming a method, a dataset and its `[fit]` and `[run]`, and one experiment is one row of one table.
-The baselines run in this directory's own environment, since `adapters` pins `transformers` 4 and the root project runs 5, while BoundedField, PPR and nomic run on GraphIV's own code through `src/graphiv/`.
+A tune is one toml under `experiments/tune/` and a test is one toml under `experiments/test/`, and each writes one directory under `data/runs/` named by its fields.
+The baselines run in this directory's own environment, since `adapters` pins `transformers` 4 and the root project runs 5, while BoundedField, PPR and cosine run on GraphIV's own code through `src/graphiv/`.
 
 ```
 benchmarks/
   flake.nix, pyproject.toml   python 3.13 and the baselines' own uv lock
-  config.toml                 what the checkout's config.toml leaves out: where the data lives, the checkout itself, and where the tables go
-  tune.py                     tunes BoundedField's four recipes into data/recipes/, and --promote copies them to ../retrieval_recipes/
-  run.py                      runs experiments, fitting only when the fit is not cached
-  make_table.py               every table the paper reports, from runs/ and fit_cache/
-  tuning/                     one toml per tuned recipe, over the pipeline in the checkout's config.toml
-  experiments/                {row}-{eval}.toml, one per method and eval, plus focused on ScholarCatalyst's two
+  config.toml                 what the checkout's config.toml leaves out: where the data lives and the checkout itself
+  scripts/generate_experiment_configs.py   writes every toml under experiments/ from experiments/grid.toml
+  scripts/tune.py             runs tune tomls into data/runs/tune/, and --promote copies the nomic recipes to ../retrieval_recipes/
+  scripts/run.py              runs test tomls into data/runs/test/
+  scripts/results/            one script per paper figure and table, and config.toml with where each is copied
+  scripts/copy.sh             copies results/ into ../paper
+  results/                    what those scripts wrote, one directory per figure or table name
+  tuning/                     one toml per recipe, its grid and its [bf] and [ppr] tables, and embedders.toml
+  experiments/                grid.toml, tune/{name}.toml and test/{name}.toml
   src/
-    schema.py                 Dataset, a split's cases, and Method, fit and retrieve
-    common.py                 paths, jsonl, the frozen graph, and the call into graphiv/
-    graphiv/                  scripts run in the checkout's environment, importing its src and nothing here, terms.py, fit.py and ablate.py among them
+    schema.py                 Dataset, a split's cases, and Method, one family of methods ranking a group of tests
+    common.py                 paths, run names, jsonl and toml, the frozen graph, and the call into graphiv/
+    graphiv/                  the in-memory engine and every script run in the checkout's environment
     datasets/                 surveymatch, frontiermatch, consensusmatch, pasa, surge, scholarcatalyst
-    methods/                  boundedfield, nomic, ppr, bm25, specter2, scincl, gar
+    methods/                  graph (cosine, BoundedField, PPR), gar, bm25, specter2, scincl
   data -> /Vault/graphiv/benchmarks
 ```
 
@@ -27,99 +30,115 @@ benchmarks/
 From this directory, under the checkout's direnv, which carries the native libraries the wheels load.
 
 ```sh
-direnv exec .. .venv/bin/python run.py --experiment survey-surge
-direnv exec .. .venv/bin/python run.py --run-all
-direnv exec .. .venv/bin/python run.py --experiment gar_cite-surge --rerun
-direnv exec .. .venv/bin/python make_table.py
+direnv exec .. .venv/bin/python -m scripts.generate_experiment_configs
+direnv exec .. .venv/bin/python -m scripts.tune 'qwen3_8b-*'
+direnv exec .. .venv/bin/python -m scripts.run 'qwen3_8b-surveymatch_test-*'
+direnv exec .. .venv/bin/python -m scripts.run experiments/test/nomic-pasa_test-gar_cite.toml --rerun
 ```
 
-`--experiment` takes names under `experiments/` or paths to tomls anywhere, run in the order given.
-A run whose results exist is skipped, and named as stale when its toml has changed since, until `--rerun` is passed.
-A fit is never redone by `--rerun`; deleting its file under `fit_cache/` is what refits it.
+Both take toml paths or glob patterns of names, and skip a run whose directory holds the same toml until `--rerun` is passed.
+`scripts/run.py` ranks every test of one retriever and test set in one call, so a pool is built once for all of them.
+A query is embedded once per retriever and split into `data/cache/<retriever>/queries/`, by `src/graphiv/queries.py` before anything touches the GPU.
 
-## Tuning
+## Names
 
-BoundedField's recipes are tuned here and nowhere else, on the same case readers the experiments score with.
-
-```sh
-direnv exec .. .venv/bin/python tune.py --recipe survey --recipe frontier --recipe focused --recipe consensus
-direnv exec .. .venv/bin/python tune.py --promote
-```
-
-Each recipe pools every train and val case at every core of its grid and caches the terms under `data/tuning/<recipe>/terms/`.
-The expanders hop from the core, so each core builds its own pool on one shared cosine retrieval.
-`fit.py` then fits the free exponents at each core by minibatch gradient on a smooth recall@k from a neutral start, searches the exact recall with CMA-ES from there, and picks the core and the point on val.
-A case's anchors are blocked from the retriever, both expanders and the hub count, so no case sees its own review.
-
-`--embedder` pools from another embedder's npy under `data/index_cache/` instead of the store, one section of `tuning/embedders.toml` each, and writes `<recipe>_<embedder>`.
-The embedder comparison is three runs per embedder and benchmark under `experiments/embedders/`: `cosine_` alone, `bf_` on the nomic recipe and `bfrefit_` on its own.
-
-```sh
-direnv exec .. .venv/bin/python run.py --experiment experiments/embedders/{cosine,bf}_*.toml
-direnv exec .. .venv/bin/python tune.py --recipe survey --recipe frontier --recipe focused --recipe consensus --embedder qwen3_8b --embedder harrier_27b
-direnv exec .. .venv/bin/python run.py --experiment experiments/embedders/bfrefit_*.toml
-```
-
-| Key | What it does |
+| run | name |
 | --- | --- |
-| `dataset`, `train`, `val` | The dataset under `src/datasets/` and the splits fit and picked on |
-| `k` | The recall the fit maximizes and val picks on |
-| `cores` | The core grid, one term cache per value from one pool per case |
-| `terms` | The exponents the fit may move, every other at 0 and `cos` pinned at 1 |
-| `start` | Every free exponent's starting value |
-| `[fit]` | The gradient steps and batch, the CMA-ES trials and the train sample they score, the seed, and a cap on train cases |
+| tune | `{retriever}-{recipe}_{bf,ppr}[_{variant}]_seed{n}` |
+| test, tuned | `{retriever}-{dataset}_{split}-{recipe}_{bf,ppr}[_{tune variant}][_{variant}]_seed{n}` |
+| test, untuned | `{retriever}-{dataset}_{split}-{none,gar_cite,gar_sim,rerank}` |
 
-## An Experiment
+`none` is the retriever's own ranking, and `bm25`, `specter2` and `scincl` are retrievers that run only as `none`.
+GAR reads `nomic-{dataset}_{split}-none` as its first stage.
+A file whose name is not the one its fields give is refused, and so is an `[override]` with no variant in the name.
+
+## A Tune
 
 ```toml
-method = "ppr"
-dataset = "surge"
-split = "test"
-
-# SurGE has no train split, so it takes SurveyMatch's pick
-[fit]
-train = "surveymatch"
-split = "train"
-cases = 200
+retriever = "nomic"
+recipe = "survey"
+method = "bf"
 seed = 0
-k = 1000
-alphas = [0.1, 0.3, 0.5, 0.7, 0.85, 0.95]
-teleports = ["pool", "core"]
-directions = ["back", "both"]
+variant = "without_anc"
+at_pick = true
 
-[run]
-ks = [100, 1000]
+[override]
+terms = ["rec", "fro", "anc2", "fro2", "anc_decay", "fro_decay", "cocite", "couple", "bm25", "hub"]
 ```
 
 | Key | What it does |
 | --- | --- |
-| `method`, `dataset`, `split` | The module under `src/methods/` and `src/datasets/`, and the split scored |
-| `[fit] train` | The dataset the fit reads, which may differ from `dataset`, so a cross-fit is one line |
-| The rest of `[fit]` | The method's fit settings, hashed with the method and its `FIT_VERSION` into the fit's file name |
-| `[run] ks` | The cut-offs recall is written at |
-| `[run] ndcg` | The cut-offs nDCG is written at, none when absent |
-| The rest of `[run]` | The method's run settings |
+| `retriever` | A section of `tuning/embedders.toml`, whose vectors are `data/cache/<retriever>/corpus.npy` |
+| `recipe` | `tuning/<recipe>.toml`, its dataset, its grid of cores and pools, and its `[bf]` and `[ppr]` tables |
+| `seed` | The fit's seed for BoundedField, the sample's seed for PPR |
+| `at_pick` | Fit only at the core and pool the seed-0 tune picked, instead of the whole grid |
+| `[override]` | Merged over the method's table, so a variant changes only what it names |
+
+A BoundedField tune caches every train and val case's terms at each core of one pool size in `/dev/shm`, fits each core in its own process, and moves to the next pool size.
+`src/graphiv/fit.py` fits the free exponents by minibatch gradient on a smooth recall@k from a neutral start, searches the exact recall with CMA-ES from there, and keeps the point best on val.
+The core and pool best on val are picked, the first in grid order on a tie.
+A PPR tune scores every core, pool, damping, teleport set and direction on a seeded sample of one split and keeps the first best.
+A case's anchors are blocked from the retriever, both expanders and the hub count, so no case sees its own review.
+
+| File in `runs/tune/<name>/` | Holds |
+| --- | --- |
+| `recipe.toml` | CORE, POOL, HOPS and the exponents or the PPR setting, which tests read |
+| `report.json` | The method's table as it ran, the pick, and every grid point's candidates and val score |
+| `fits/` | One BoundedField fit's report per core and pool |
+| `tune.toml`, `log` | The toml as it ran and the output |
+
+## A Test
+
+```toml
+retriever = "qwen3_8b"
+dataset = "surveymatch"
+split = "test"
+method = "bf"
+recipe = "survey"
+seed = 0
+variant = "zero_anc"
+
+[override.weights]
+ANC = 0.0
+```
+
+| Key | What it does |
+| --- | --- |
+| `method` | `none`, `bf`, `ppr`, `gar_cite`, `gar_sim` or `rerank` |
+| `recipe`, `seed`, `tune_variant` | Which tune run's `recipe.toml` a tuned test reads |
+| `[override]` | Merged over that recipe, `tune` naming another retriever's tune run in place of its own |
+
+| File in `runs/test/<name>/` | Holds |
+| --- | --- |
+| `rankings.jsonl` | One line per case: its 1,000-paper ranking, recall at 5 to 1,000 and nDCG at 10, 20 and 100 |
+| `summary.json` | The means, the tune run read, and the group's wall time |
+| `recipe.toml` | The recipe as it ran, override merged in |
+| `test.toml`, `log` | The toml as it ran and its group's output |
 
 ## The Data
 
 | Path | Holds |
 | --- | --- |
-| `sources/` | The 2026-10-22 release, PaSa's two query sets, SurGE with its title map, ScholarCatalyst from HF at `a5a7346`, and `graph_export.npy`, the graph frozen on 2026-10-21 |
+| `sources/` | The 2026-10-22 release, PaSa's two query sets, SurGE with its title map, ScholarCatalyst from HF at `a5a7346`, `graph_export.npy`, the graph frozen on 2026-10-21, and `corpus.arrow`, every searchable paper's title, abstract and date |
 | `cases/{dataset}/{split}.jsonl` | Each split as cases, built from `sources/` on first use |
-| `index_cache/` | `corpus.parquet` and `nomic.npy` exported from the store, and the SPECTER2 and SciNCL paper vectors in shards |
-| `fit_cache/{method}/{key}.json` | What a baseline's fit learned, with the `[fit]` table that made it |
-| `tuning/{recipe}/` | `terms/{split}/core-{c}/shard-{i}/`, the cached terms, and `report.json`, every core's candidates and the pick |
-| `recipes/{recipe}.toml` | The tuned recipe as `tune.py` wrote it, which BoundedField and PPR run |
-| `leaked-2026-11-05/` | The recipes, runs, fits and tuning made before anchors were blocked past the retriever, kept to compare against |
-| `tables.md` | What `make_table.py` writes |
-| `ablation/{recipe}-{dataset}_{shard}.jsonl` | One line per test case: every variant's recall at each stored k, as `src/graphiv/ablate.py` writes it |
-| `runs/{name}.jsonl` | One line per case: its ranking, its recall at each k, and its seconds when measured |
-| `runs/{name}.json` | The summary: mean recall at each k, mean seconds, the fit's key, the toml it ran with, and the recipe file as it ran |
-| `logs/{name}.log` | Each run's output |
+| `cache/` | Everything rebuildable from `sources/` and model weights, below |
+| `runs/tune/`, `runs/test/` | One directory per run |
+| `leaked-2026-11-05/` | Runs made before anchors were blocked past the retriever |
+| `superseded-2026-11-23/` | PPR runs pooled from Postgres HNSW |
+| `prelayout-2026-11-23/` | Every run, recipe, fit, log and ablation of the flat layout before this one |
+
+| Path in `cache/` | Holds | Rebuilt by |
+| --- | --- | --- |
+| `corpus_ids.npy` | The corpus order every vector file shares | `src/graphiv/cache.py` |
+| `graph/` | CSR both ways, citers sorted by day with a `(row << 16) \| day` key for the hub count, and which rows are in the corpus | `src/graphiv/cache.py` |
+| `keyword/` | BoundedField's BM25 postings, document lengths and vocabulary | `src/graphiv/cache.py` |
+| `{retriever}/corpus.npy` | Every corpus paper's vector, fp16, in corpus order | the embedder over `corpus.arrow`, hours for a large one |
+| `{retriever}/queries/` | Each split's query vectors and a hash of its texts | `src/graphiv/queries.py` |
+| `openscholar/{set}.npz` | Every reranker score GAR has computed, by case and paper | `src/methods/gar.py` |
 
 | Footnote | |
 | --- | --- |
-| Store | BoundedField, PPR and nomic still search the live store's HNSW index, so after an ingest they reproduce only against the 2026-10-21 dump |
-| gar_cite | `warm = ["sim"]` runs gar_sim first on each case and reuses its reranker scores, as the stored runs were made; without it the order shifts within the same 1,000 papers |
-| GAR cost | Each variant scores its own 1,000 papers per case, where the stored runs shared one scoring pass across the three |
-| Corpus | A dataset with a corpus of its own, ScholarCatalyst, has every ranking cut to it before scoring, and BoundedField cuts before its 1,000 |
+| Pools | Every retriever's top `POOL` is exact cosine over its own `corpus.npy`, never the store's HNSW index |
+| Corpus | ScholarCatalyst has every ranking cut to its corpus before the 1,000-paper cut |
+| GAR | The three variants step every case together and share one score cache, and `src/methods/gar.py` matches `pyterrier_adaptive` ranking for ranking on the same scores |
+| Promote | `scripts.tune --promote` refuses a recipe whose POOL differs from `COSINE_LIMIT`, since the server does not read POOL yet |

@@ -1,0 +1,677 @@
+{
+ "bm25-none surveymatch_test recall@100": {
+  "run": "bm25-surveymatch_test-none",
+  "mean": 0.06578410860864498,
+  "holm": 1.3185922418271808e-196
+ },
+ "bm25-none surveymatch_test recall@200": {
+  "run": "bm25-surveymatch_test-none",
+  "mean": 0.09961529243652642,
+  "holm": 5.220747632640101e-199
+ },
+ "bm25-none surveymatch_test recall@500": {
+  "run": "bm25-surveymatch_test-none",
+  "mean": 0.16227238220985046,
+  "holm": 5.676520470958112e-200
+ },
+ "bm25-none frontiermatch_test recall@20": {
+  "run": "bm25-frontiermatch_test-none",
+  "mean": 0.02659786075479937,
+  "holm": 1.2029623722450076e-12
+ },
+ "bm25-none frontiermatch_test recall@50": {
+  "run": "bm25-frontiermatch_test-none",
+  "mean": 0.05055905348774931,
+  "holm": 1.8015432885902453e-21
+ },
+ "bm25-none frontiermatch_test recall@100": {
+  "run": "bm25-frontiermatch_test-none",
+  "mean": 0.0804977890775841,
+  "holm": 7.61676953362986e-25
+ },
+ "bm25-none consensusmatch_test recall@20": {
+  "run": "bm25-consensusmatch_test-none",
+  "mean": 0.058412155888720015,
+  "holm": 8.431049643445479e-11
+ },
+ "bm25-none consensusmatch_test recall@50": {
+  "run": "bm25-consensusmatch_test-none",
+  "mean": 0.11321767287289594,
+  "holm": 2.2754972169567256e-11
+ },
+ "bm25-none consensusmatch_test recall@100": {
+  "run": "bm25-consensusmatch_test-none",
+  "mean": 0.16723638162787405,
+  "holm": 7.779914935130461e-12
+ },
+ "specter2-none surveymatch_test recall@100": {
+  "run": "specter2-surveymatch_test-none",
+  "mean": 0.03697870194135578,
+  "holm": 1.184762231353307e-199
+ },
+ "specter2-none surveymatch_test recall@200": {
+  "run": "specter2-surveymatch_test-none",
+  "mean": 0.05708359322292269,
+  "holm": 2.2269086132430536e-200
+ },
+ "specter2-none surveymatch_test recall@500": {
+  "run": "specter2-surveymatch_test-none",
+  "mean": 0.09664935643042429,
+  "holm": 1.5232969221101097e-200
+ },
+ "specter2-none frontiermatch_test recall@20": {
+  "run": "specter2-frontiermatch_test-none",
+  "mean": 0.01814860079139197,
+  "holm": 3.75665218789354e-16
+ },
+ "specter2-none frontiermatch_test recall@50": {
+  "run": "specter2-frontiermatch_test-none",
+  "mean": 0.037699964755632726,
+  "holm": 2.296629828684691e-21
+ },
+ "specter2-none frontiermatch_test recall@100": {
+  "run": "specter2-frontiermatch_test-none",
+  "mean": 0.05609645910990158,
+  "holm": 2.2623375489357858e-24
+ },
+ "specter2-none consensusmatch_test recall@20": {
+  "run": "specter2-consensusmatch_test-none",
+  "mean": 0.036910183640430895,
+  "holm": 3.387515631427414e-11
+ },
+ "specter2-none consensusmatch_test recall@50": {
+  "run": "specter2-consensusmatch_test-none",
+  "mean": 0.07321092342984925,
+  "holm": 1.4420206327530931e-11
+ },
+ "specter2-none consensusmatch_test recall@100": {
+  "run": "specter2-consensusmatch_test-none",
+  "mean": 0.11956168119457707,
+  "holm": 7.2133376190370015e-12
+ },
+ "scincl-none surveymatch_test recall@100": {
+  "run": "scincl-surveymatch_test-none",
+  "mean": 0.059323338000054314,
+  "holm": 2.717235042474488e-198
+ },
+ "scincl-none surveymatch_test recall@200": {
+  "run": "scincl-surveymatch_test-none",
+  "mean": 0.09268379267637077,
+  "holm": 1.3912564962872716e-199
+ },
+ "scincl-none surveymatch_test recall@500": {
+  "run": "scincl-surveymatch_test-none",
+  "mean": 0.1580906416365054,
+  "holm": 4.2031704972064665e-200
+ },
+ "scincl-none frontiermatch_test recall@20": {
+  "run": "scincl-frontiermatch_test-none",
+  "mean": 0.023096545533196663,
+  "holm": 4.6638163646277046e-12
+ },
+ "scincl-none frontiermatch_test recall@50": {
+  "run": "scincl-frontiermatch_test-none",
+  "mean": 0.04746710029838282,
+  "holm": 3.014578210019436e-20
+ },
+ "scincl-none frontiermatch_test recall@100": {
+  "run": "scincl-frontiermatch_test-none",
+  "mean": 0.07725354295772792,
+  "holm": 4.451774237157711e-22
+ },
+ "scincl-none consensusmatch_test recall@20": {
+  "run": "scincl-consensusmatch_test-none",
+  "mean": 0.08178429166148987,
+  "holm": 2.521339415666262e-10
+ },
+ "scincl-none consensusmatch_test recall@50": {
+  "run": "scincl-consensusmatch_test-none",
+  "mean": 0.14794182589763116,
+  "holm": 4.425035930524737e-11
+ },
+ "scincl-none consensusmatch_test recall@100": {
+  "run": "scincl-consensusmatch_test-none",
+  "mean": 0.23294502404009793,
+  "holm": 2.923182317611449e-11
+ },
+ "nomic-none surveymatch_test recall@100": {
+  "run": "nomic-surveymatch_test-none",
+  "mean": 0.08676789919562532,
+  "holm": 3.726792849536928e-195
+ },
+ "nomic-none surveymatch_test recall@200": {
+  "run": "nomic-surveymatch_test-none",
+  "mean": 0.13172639779892018,
+  "holm": 2.0228933088389302e-198
+ },
+ "nomic-none surveymatch_test recall@500": {
+  "run": "nomic-surveymatch_test-none",
+  "mean": 0.20982952478190564,
+  "holm": 3.203600956303619e-199
+ },
+ "nomic-none frontiermatch_test recall@20": {
+  "run": "nomic-frontiermatch_test-none",
+  "mean": 0.032584890632569856,
+  "holm": 2.0195389564721046e-09
+ },
+ "nomic-none frontiermatch_test recall@50": {
+  "run": "nomic-frontiermatch_test-none",
+  "mean": 0.06800173073150445,
+  "holm": 7.652480577185228e-15
+ },
+ "nomic-none frontiermatch_test recall@100": {
+  "run": "nomic-frontiermatch_test-none",
+  "mean": 0.10649524601954197,
+  "holm": 3.024666142628769e-18
+ },
+ "nomic-none consensusmatch_test recall@20": {
+  "run": "nomic-consensusmatch_test-none",
+  "mean": 0.09741256266783198,
+  "holm": 8.174732416182498e-11
+ },
+ "nomic-none consensusmatch_test recall@50": {
+  "run": "nomic-consensusmatch_test-none",
+  "mean": 0.16963763623276884,
+  "holm": 2.4379089814601853e-11
+ },
+ "nomic-none consensusmatch_test recall@100": {
+  "run": "nomic-consensusmatch_test-none",
+  "mean": 0.2577358493283953,
+  "holm": 1.8658946880816056e-11
+ },
+ "nomic-rerank surveymatch_test recall@100": {
+  "run": "nomic-surveymatch_test-rerank",
+  "mean": 0.08305662618303668,
+  "holm": 2.11345467259e-194
+ },
+ "nomic-rerank surveymatch_test recall@200": {
+  "run": "nomic-surveymatch_test-rerank",
+  "mean": 0.12951332943242028,
+  "holm": 9.831724113080467e-198
+ },
+ "nomic-rerank surveymatch_test recall@500": {
+  "run": "nomic-surveymatch_test-rerank",
+  "mean": 0.21551203997851215,
+  "holm": 1.418261563897302e-199
+ },
+ "nomic-rerank frontiermatch_test recall@20": {
+  "run": "nomic-frontiermatch_test-rerank",
+  "mean": 0.028759968032788567,
+  "holm": 1.2246391856046572e-11
+ },
+ "nomic-rerank frontiermatch_test recall@50": {
+  "run": "nomic-frontiermatch_test-rerank",
+  "mean": 0.05537115160607247,
+  "holm": 8.148707935959974e-19
+ },
+ "nomic-rerank frontiermatch_test recall@100": {
+  "run": "nomic-frontiermatch_test-rerank",
+  "mean": 0.09296350717360476,
+  "holm": 8.17298173820371e-21
+ },
+ "nomic-rerank consensusmatch_test recall@20": {
+  "run": "nomic-consensusmatch_test-rerank",
+  "mean": 0.06894220892161616,
+  "holm": 1.4511890279188702e-10
+ },
+ "nomic-rerank consensusmatch_test recall@50": {
+  "run": "nomic-consensusmatch_test-rerank",
+  "mean": 0.15074977454429425,
+  "holm": 2.0987920983261417e-11
+ },
+ "nomic-rerank consensusmatch_test recall@100": {
+  "run": "nomic-consensusmatch_test-rerank",
+  "mean": 0.217300998779625,
+  "holm": 1.7637291015803935e-11
+ },
+ "nomic-gar_sim surveymatch_test recall@100": {
+  "run": "nomic-surveymatch_test-gar_sim",
+  "mean": 0.08458726750755174,
+  "holm": 1.3205117285668272e-193
+ },
+ "nomic-gar_sim surveymatch_test recall@200": {
+  "run": "nomic-surveymatch_test-gar_sim",
+  "mean": 0.13434265912410756,
+  "holm": 1.8354797534309715e-197
+ },
+ "nomic-gar_sim surveymatch_test recall@500": {
+  "run": "nomic-surveymatch_test-gar_sim",
+  "mean": 0.2340141631782639,
+  "holm": 1.8882227168406636e-198
+ },
+ "nomic-gar_sim frontiermatch_test recall@20": {
+  "run": "nomic-frontiermatch_test-gar_sim",
+  "mean": 0.02893668170953209,
+  "holm": 7.779914935130461e-12
+ },
+ "nomic-gar_sim frontiermatch_test recall@50": {
+  "run": "nomic-frontiermatch_test-gar_sim",
+  "mean": 0.05617429144074693,
+  "holm": 2.3667394508375076e-18
+ },
+ "nomic-gar_sim frontiermatch_test recall@100": {
+  "run": "nomic-frontiermatch_test-gar_sim",
+  "mean": 0.09424414712701469,
+  "holm": 4.6457505959221665e-20
+ },
+ "nomic-gar_sim consensusmatch_test recall@20": {
+  "run": "nomic-consensusmatch_test-gar_sim",
+  "mean": 0.07334179405599467,
+  "holm": 1.7125881642240172e-10
+ },
+ "nomic-gar_sim consensusmatch_test recall@50": {
+  "run": "nomic-consensusmatch_test-gar_sim",
+  "mean": 0.15926532539041469,
+  "holm": 6.138299386668777e-11
+ },
+ "nomic-gar_sim consensusmatch_test recall@100": {
+  "run": "nomic-consensusmatch_test-gar_sim",
+  "mean": 0.2378001269609368,
+  "holm": 9.100315478168326e-11
+ },
+ "nomic-gar_cite surveymatch_test recall@100": {
+  "run": "nomic-surveymatch_test-gar_cite",
+  "mean": 0.08998798660283623,
+  "holm": 1.883856738353026e-192
+ },
+ "nomic-gar_cite surveymatch_test recall@200": {
+  "run": "nomic-surveymatch_test-gar_cite",
+  "mean": 0.14694734962474607,
+  "holm": 3.9544838309544155e-196
+ },
+ "nomic-gar_cite surveymatch_test recall@500": {
+  "run": "nomic-surveymatch_test-gar_cite",
+  "mean": 0.27371490416652,
+  "holm": 4.618102019673009e-196
+ },
+ "nomic-gar_cite frontiermatch_test recall@20": {
+  "run": "nomic-frontiermatch_test-gar_cite",
+  "mean": 0.029636614023719813,
+  "holm": 4.139385814289808e-11
+ },
+ "nomic-gar_cite frontiermatch_test recall@50": {
+  "run": "nomic-frontiermatch_test-gar_cite",
+  "mean": 0.0571676120708568,
+  "holm": 4.922564144389228e-18
+ },
+ "nomic-gar_cite frontiermatch_test recall@100": {
+  "run": "nomic-frontiermatch_test-gar_cite",
+  "mean": 0.09892854779383702,
+  "holm": 1.2770764111106064e-19
+ },
+ "nomic-gar_cite consensusmatch_test recall@20": {
+  "run": "nomic-consensusmatch_test-gar_cite",
+  "mean": 0.07799051523863595,
+  "holm": 1.614369901409566e-10
+ },
+ "nomic-gar_cite consensusmatch_test recall@50": {
+  "run": "nomic-consensusmatch_test-gar_cite",
+  "mean": 0.16874138045049397,
+  "holm": 6.764931633711495e-11
+ },
+ "nomic-gar_cite consensusmatch_test recall@100": {
+  "run": "nomic-consensusmatch_test-gar_cite",
+  "mean": 0.25539563350199546,
+  "holm": 1.2261894449530497e-10
+ },
+ "focused-ppr surveymatch_test recall@100": {
+  "run": "nomic-surveymatch_test-focused_ppr_seed0",
+  "mean": 0.10828197159613873,
+  "holm": 6.591956442602828e-191
+ },
+ "focused-ppr surveymatch_test recall@200": {
+  "run": "nomic-surveymatch_test-focused_ppr_seed0",
+  "mean": 0.136177312785422,
+  "holm": 1.463689752226825e-197
+ },
+ "focused-ppr surveymatch_test recall@500": {
+  "run": "nomic-surveymatch_test-focused_ppr_seed0",
+  "mean": 0.3404339277932065,
+  "holm": 1.3685784759618323e-184
+ },
+ "focused-ppr frontiermatch_test recall@20": {
+  "run": "nomic-frontiermatch_test-focused_ppr_seed0",
+  "mean": 0.023412487687292555,
+  "holm": 1.270138661524914e-14
+ },
+ "focused-ppr frontiermatch_test recall@50": {
+  "run": "nomic-frontiermatch_test-focused_ppr_seed0",
+  "mean": 0.06503405791537308,
+  "holm": 1.0448979222510233e-15
+ },
+ "focused-ppr frontiermatch_test recall@100": {
+  "run": "nomic-frontiermatch_test-focused_ppr_seed0",
+  "mean": 0.1081365639562862,
+  "holm": 1.234904446091948e-18
+ },
+ "focused-ppr consensusmatch_test recall@20": {
+  "run": "nomic-consensusmatch_test-focused_ppr_seed0",
+  "mean": 0.25120006998199557,
+  "holm": 1.2104678013982778e-07
+ },
+ "focused-ppr consensusmatch_test recall@50": {
+  "run": "nomic-consensusmatch_test-focused_ppr_seed0",
+  "mean": 0.3148269188902153,
+  "holm": 7.614288842049128e-11
+ },
+ "focused-ppr consensusmatch_test recall@100": {
+  "run": "nomic-consensusmatch_test-focused_ppr_seed0",
+  "mean": 0.36090401165843794,
+  "holm": 1.906766716064585e-11
+ },
+ "focused-bf surveymatch_test recall@100": {
+  "run": "nomic-surveymatch_test-focused_bf_seed0",
+  "mean": 0.1906374182092787,
+  "holm": 1.0185784005441638e-92
+ },
+ "focused-bf surveymatch_test recall@200": {
+  "run": "nomic-surveymatch_test-focused_bf_seed0",
+  "mean": 0.28330231885189366,
+  "holm": 1.1508447457022533e-109
+ },
+ "focused-bf surveymatch_test recall@500": {
+  "run": "nomic-surveymatch_test-focused_bf_seed0",
+  "mean": 0.427987297897219,
+  "holm": 1.9967318614825207e-127
+ },
+ "focused-bf frontiermatch_test recall@20": {
+  "run": "nomic-frontiermatch_test-focused_bf_seed0",
+  "mean": 0.0420060887122736,
+  "holm": 4.250762232251937e-06
+ },
+ "focused-bf frontiermatch_test recall@50": {
+  "run": "nomic-frontiermatch_test-focused_bf_seed0",
+  "mean": 0.10321945905750246,
+  "holm": 1.384579285201848e-07
+ },
+ "focused-bf frontiermatch_test recall@100": {
+  "run": "nomic-frontiermatch_test-focused_bf_seed0",
+  "mean": 0.17342846426753392,
+  "holm": 5.917482613222533e-06
+ },
+ "focused-bf consensusmatch_test recall@20": {
+  "run": "nomic-consensusmatch_test-focused_bf_seed0",
+  "mean": 0.3230199962569661,
+  "holm": 0.00020791789847073096
+ },
+ "focused-bf consensusmatch_test recall@50": {
+  "run": "nomic-consensusmatch_test-focused_bf_seed0",
+  "mean": 0.5371491438734278,
+  "holm": 0.009255338024139883
+ },
+ "focused-bf consensusmatch_test recall@100": {
+  "run": "nomic-consensusmatch_test-focused_bf_seed0",
+  "mean": 0.6760158447225049,
+  "holm": 0.04676471926845363
+ },
+ "survey-ppr surveymatch_test recall@100": {
+  "run": "nomic-surveymatch_test-survey_ppr_seed0",
+  "mean": 0.14634107632566748,
+  "holm": 8.35756139502194e-158
+ },
+ "survey-ppr surveymatch_test recall@200": {
+  "run": "nomic-surveymatch_test-survey_ppr_seed0",
+  "mean": 0.23235006041780903,
+  "holm": 8.664473096539743e-170
+ },
+ "survey-ppr surveymatch_test recall@500": {
+  "run": "nomic-surveymatch_test-survey_ppr_seed0",
+  "mean": 0.3813804865234467,
+  "holm": 2.5708454676126546e-174
+ },
+ "survey-ppr frontiermatch_test recall@20": {
+  "run": "nomic-frontiermatch_test-survey_ppr_seed0",
+  "mean": 0.013556635866924892,
+  "holm": 4.798767506854812e-16
+ },
+ "survey-ppr frontiermatch_test recall@50": {
+  "run": "nomic-frontiermatch_test-survey_ppr_seed0",
+  "mean": 0.03568565989622992,
+  "holm": 3.733084680145502e-21
+ },
+ "survey-ppr frontiermatch_test recall@100": {
+  "run": "nomic-frontiermatch_test-survey_ppr_seed0",
+  "mean": 0.06541955087856845,
+  "holm": 1.9290369406940067e-23
+ },
+ "survey-ppr consensusmatch_test recall@20": {
+  "run": "nomic-consensusmatch_test-survey_ppr_seed0",
+  "mean": 0.22260575744984543,
+  "holm": 1.2472698371743526e-07
+ },
+ "survey-ppr consensusmatch_test recall@50": {
+  "run": "nomic-consensusmatch_test-survey_ppr_seed0",
+  "mean": 0.365192149022051,
+  "holm": 3.0250157975735e-10
+ },
+ "survey-ppr consensusmatch_test recall@100": {
+  "run": "nomic-consensusmatch_test-survey_ppr_seed0",
+  "mean": 0.4658013858587774,
+  "holm": 1.301336234510411e-09
+ },
+ "survey-bf surveymatch_test recall@100": {
+  "run": "nomic-surveymatch_test-survey_bf_seed0",
+  "mean": 0.21537776605247944,
+  "holm": null
+ },
+ "survey-bf surveymatch_test recall@200": {
+  "run": "nomic-surveymatch_test-survey_bf_seed0",
+  "mean": 0.31920783096937816,
+  "holm": null
+ },
+ "survey-bf surveymatch_test recall@500": {
+  "run": "nomic-surveymatch_test-survey_bf_seed0",
+  "mean": 0.4754358709395326,
+  "holm": null
+ },
+ "survey-bf frontiermatch_test recall@20": {
+  "run": "nomic-frontiermatch_test-survey_bf_seed0",
+  "mean": 0.039631267022338754,
+  "holm": 1.0432712973037445e-06
+ },
+ "survey-bf frontiermatch_test recall@50": {
+  "run": "nomic-frontiermatch_test-survey_bf_seed0",
+  "mean": 0.09920693054835616,
+  "holm": 8.859672363950135e-09
+ },
+ "survey-bf frontiermatch_test recall@100": {
+  "run": "nomic-frontiermatch_test-survey_bf_seed0",
+  "mean": 0.16525837060350937,
+  "holm": 3.99545268915244e-07
+ },
+ "survey-bf consensusmatch_test recall@20": {
+  "run": "nomic-consensusmatch_test-survey_bf_seed0",
+  "mean": 0.40782903553818683,
+  "holm": 1.0
+ },
+ "survey-bf consensusmatch_test recall@50": {
+  "run": "nomic-consensusmatch_test-survey_bf_seed0",
+  "mean": 0.6045774977203732,
+  "holm": 1.0
+ },
+ "survey-bf consensusmatch_test recall@100": {
+  "run": "nomic-consensusmatch_test-survey_bf_seed0",
+  "mean": 0.704443050371989,
+  "holm": 1.0
+ },
+ "frontier-ppr surveymatch_test recall@100": {
+  "run": "nomic-surveymatch_test-frontier_ppr_seed0",
+  "mean": 0.1177833952563002,
+  "holm": 2.3092987840125884e-186
+ },
+ "frontier-ppr surveymatch_test recall@200": {
+  "run": "nomic-surveymatch_test-frontier_ppr_seed0",
+  "mean": 0.1423112539903463,
+  "holm": 9.001670660169114e-198
+ },
+ "frontier-ppr surveymatch_test recall@500": {
+  "run": "nomic-surveymatch_test-frontier_ppr_seed0",
+  "mean": 0.38277974276192284,
+  "holm": 8.771734791691713e-156
+ },
+ "frontier-ppr frontiermatch_test recall@20": {
+  "run": "nomic-frontiermatch_test-frontier_ppr_seed0",
+  "mean": 0.027279007149932418,
+  "holm": 3.3481192787015246e-13
+ },
+ "frontier-ppr frontiermatch_test recall@50": {
+  "run": "nomic-frontiermatch_test-frontier_ppr_seed0",
+  "mean": 0.07799881843218093,
+  "holm": 3.3843346859345994e-14
+ },
+ "frontier-ppr frontiermatch_test recall@100": {
+  "run": "nomic-frontiermatch_test-frontier_ppr_seed0",
+  "mean": 0.12202400470987998,
+  "holm": 1.2510276670162186e-15
+ },
+ "frontier-ppr consensusmatch_test recall@20": {
+  "run": "nomic-consensusmatch_test-frontier_ppr_seed0",
+  "mean": 0.2923324093523857,
+  "holm": 2.766215733769698e-06
+ },
+ "frontier-ppr consensusmatch_test recall@50": {
+  "run": "nomic-consensusmatch_test-frontier_ppr_seed0",
+  "mean": 0.36949206734182827,
+  "holm": 5.073181684593026e-10
+ },
+ "frontier-ppr consensusmatch_test recall@100": {
+  "run": "nomic-consensusmatch_test-frontier_ppr_seed0",
+  "mean": 0.42419723508455703,
+  "holm": 7.82568836166218e-11
+ },
+ "frontier-bf surveymatch_test recall@100": {
+  "run": "nomic-surveymatch_test-frontier_bf_seed0",
+  "mean": 0.14055513992998128,
+  "holm": 4.614819056650391e-161
+ },
+ "frontier-bf surveymatch_test recall@200": {
+  "run": "nomic-surveymatch_test-frontier_bf_seed0",
+  "mean": 0.2110842502032255,
+  "holm": 4.9204935971112026e-177
+ },
+ "frontier-bf surveymatch_test recall@500": {
+  "run": "nomic-surveymatch_test-frontier_bf_seed0",
+  "mean": 0.3248115858371175,
+  "holm": 3.0851787277844556e-188
+ },
+ "frontier-bf frontiermatch_test recall@20": {
+  "run": "nomic-frontiermatch_test-frontier_bf_seed0",
+  "mean": 0.06407078024975682,
+  "holm": null
+ },
+ "frontier-bf frontiermatch_test recall@50": {
+  "run": "nomic-frontiermatch_test-frontier_bf_seed0",
+  "mean": 0.14154938462178956,
+  "holm": null
+ },
+ "frontier-bf frontiermatch_test recall@100": {
+  "run": "nomic-frontiermatch_test-frontier_bf_seed0",
+  "mean": 0.21386264476333924,
+  "holm": null
+ },
+ "frontier-bf consensusmatch_test recall@20": {
+  "run": "nomic-consensusmatch_test-frontier_bf_seed0",
+  "mean": 0.21766010248710593,
+  "holm": 1.541186477230345e-06
+ },
+ "frontier-bf consensusmatch_test recall@50": {
+  "run": "nomic-consensusmatch_test-frontier_bf_seed0",
+  "mean": 0.3500855163366057,
+  "holm": 3.99545268915244e-07
+ },
+ "frontier-bf consensusmatch_test recall@100": {
+  "run": "nomic-consensusmatch_test-frontier_bf_seed0",
+  "mean": 0.4548101496492554,
+  "holm": 2.395806416810386e-07
+ },
+ "consensus-ppr surveymatch_test recall@100": {
+  "run": "nomic-surveymatch_test-consensus_ppr_seed0",
+  "mean": 0.1458108969563465,
+  "holm": 4.8208385327565435e-170
+ },
+ "consensus-ppr surveymatch_test recall@200": {
+  "run": "nomic-surveymatch_test-consensus_ppr_seed0",
+  "mean": 0.19448927520151613,
+  "holm": 1.7873590541354256e-188
+ },
+ "consensus-ppr surveymatch_test recall@500": {
+  "run": "nomic-surveymatch_test-consensus_ppr_seed0",
+  "mean": 0.23801508486996115,
+  "holm": 1.052214528539262e-198
+ },
+ "consensus-ppr frontiermatch_test recall@20": {
+  "run": "nomic-frontiermatch_test-consensus_ppr_seed0",
+  "mean": 0.019709284898626066,
+  "holm": 9.920743137346748e-16
+ },
+ "consensus-ppr frontiermatch_test recall@50": {
+  "run": "nomic-frontiermatch_test-consensus_ppr_seed0",
+  "mean": 0.0623699407187421,
+  "holm": 3.046617773213957e-17
+ },
+ "consensus-ppr frontiermatch_test recall@100": {
+  "run": "nomic-frontiermatch_test-consensus_ppr_seed0",
+  "mean": 0.12485378366746525,
+  "holm": 3.357287051532001e-15
+ },
+ "consensus-ppr consensusmatch_test recall@20": {
+  "run": "nomic-consensusmatch_test-consensus_ppr_seed0",
+  "mean": 0.33753727947833345,
+  "holm": 0.003897249368147689
+ },
+ "consensus-ppr consensusmatch_test recall@50": {
+  "run": "nomic-consensusmatch_test-consensus_ppr_seed0",
+  "mean": 0.4698481806562701,
+  "holm": 5.680149641676584e-07
+ },
+ "consensus-ppr consensusmatch_test recall@100": {
+  "run": "nomic-consensusmatch_test-consensus_ppr_seed0",
+  "mean": 0.572347758435138,
+  "holm": 4.4330462045563843e-07
+ },
+ "consensus-bf surveymatch_test recall@100": {
+  "run": "nomic-surveymatch_test-consensus_bf_seed0",
+  "mean": 0.20505705474639987,
+  "holm": 3.417587482317168e-27
+ },
+ "consensus-bf surveymatch_test recall@200": {
+  "run": "nomic-surveymatch_test-consensus_bf_seed0",
+  "mean": 0.3012779788790336,
+  "holm": 5.020124539097742e-55
+ },
+ "consensus-bf surveymatch_test recall@500": {
+  "run": "nomic-surveymatch_test-consensus_bf_seed0",
+  "mean": 0.44515476285168937,
+  "holm": 3.2429341556922243e-91
+ },
+ "consensus-bf frontiermatch_test recall@20": {
+  "run": "nomic-frontiermatch_test-consensus_bf_seed0",
+  "mean": 0.03487236538102319,
+  "holm": 1.384579285201848e-07
+ },
+ "consensus-bf frontiermatch_test recall@50": {
+  "run": "nomic-frontiermatch_test-consensus_bf_seed0",
+  "mean": 0.08441943714861982,
+  "holm": 2.923182317611449e-11
+ },
+ "consensus-bf frontiermatch_test recall@100": {
+  "run": "nomic-frontiermatch_test-consensus_bf_seed0",
+  "mean": 0.15134557900972928,
+  "holm": 5.555908022378104e-10
+ },
+ "consensus-bf consensusmatch_test recall@20": {
+  "run": "nomic-consensusmatch_test-consensus_bf_seed0",
+  "mean": 0.41446439513653494,
+  "holm": null
+ },
+ "consensus-bf consensusmatch_test recall@50": {
+  "run": "nomic-consensusmatch_test-consensus_bf_seed0",
+  "mean": 0.606677755618479,
+  "holm": null
+ },
+ "consensus-bf consensusmatch_test recall@100": {
+  "run": "nomic-consensusmatch_test-consensus_bf_seed0",
+  "mean": 0.7119697828066103,
+  "holm": null
+ }
+}

@@ -1,0 +1,4 @@
+retriever = "specter2"
+dataset = "scholarcatalyst"
+split = "core"
+method = "none"

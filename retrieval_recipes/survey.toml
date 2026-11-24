@@ -1,4 +1,4 @@
-# The survey recipe written by benchmarks/tune.py
+# The survey recipe written by benchmarks/scripts/tune.py
 NAME = "survey"
 CORE = 200 # papers the expanders and the walks start from
 

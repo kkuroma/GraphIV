@@ -1,0 +1,6 @@
+retriever = "nemotron_1b"
+dataset = "consensusmatch"
+split = "test"
+method = "ppr"
+recipe = "consensus"
+seed = 0

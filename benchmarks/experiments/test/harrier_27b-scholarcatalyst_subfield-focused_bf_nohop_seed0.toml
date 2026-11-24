@@ -1,0 +1,10 @@
+retriever = "harrier_27b"
+dataset = "scholarcatalyst"
+split = "subfield"
+method = "bf"
+recipe = "focused"
+seed = 0
+variant = "nohop"
+
+[override]
+EXPAND = false

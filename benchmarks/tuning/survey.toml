@@ -1,18 +1,32 @@
 # This config tunes what a field cites
 
 dataset = "surveymatch" # Tuned on SurveyMatch (median key = 149 papers)
+cores = [200, 500, 1000] # the grid of core sizes
+pools = [1000, 2000, 5000] # the grid of cosine pool sizes
+
+# BoundedField's exponent fit, run at every core and pool size
+[bf]
 train = "train" # split the exponents are fit on
-val = "val" # split the core and exponents are picked on
+val = "val" # split the core, the pool and the exponents are picked on
 k = 250 # recall cutoff the fit maximizes
-cores = [200, 500, 1000] # the grid of core configs
 terms = ["rec", "anc", "fro", "anc2", "fro2", "anc_decay", "fro_decay", "cocite", "couple", "bm25", "hub"] # exponents the fit may move
 start = 0.25 # starting value of every free exponent
 
 # The exponent fit
-[fit]
+[bf.fit]
 steps = 600 # gradient steps
 batch = 128 # train cases per step
 trials = 200 # CMA-ES trials
 search_cases = 2000 # train cases each trial scores (0 means all)
-seed = 0 # random seed
+seed = 0 # random seed, which a tune toml's seed replaces
 train_cases = 0 # train cases cached (0 means all)
+
+# PPR's grid, scored on a seeded sample of one split at every core and pool size
+[ppr]
+split = "train" # split the sample is drawn from
+cases = 200 # cases in the sample
+seed = 0 # sample seed, which a tune toml's seed replaces
+k = 250 # recall cutoff the grid is scored at
+alphas = [0.1, 0.3, 0.5, 0.7, 0.85, 0.95] # damping
+teleports = ["pool", "core"] # teleport over the whole pool or the core by cosine
+directions = ["back", "both"] # rank flows to what a paper cites, or along citations both ways

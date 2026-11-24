@@ -1,0 +1,4 @@
+retriever = "nomic"
+dataset = "scholarcatalyst"
+split = "subfield"
+method = "none"

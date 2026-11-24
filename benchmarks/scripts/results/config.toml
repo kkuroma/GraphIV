@@ -1,0 +1,185 @@
+# What the results scripts read and where their outputs go, paths relative to benchmarks/
+
+[paths]
+RUNS = "data/runs/test" # one directory per test run
+CASES = "data/cases" # each set's cases and answer keys
+TUNES = "data/runs/tune" # one directory per tune
+RESULTS = "results" # every figure and table lands here first
+ROOT_CONFIG = "../config.toml" # the checkout's config, whose [benchmarks] block mined the cases
+FONTS = "/nix/store/5xhrl01vhivcmwvr3sdkz0ygdbsyd84l-texlive-2025-r78234-final-env-texmfdist/fonts/opentype/public/libertine"
+
+# The Akiba light palette
+[colors]
+RED = "#902020"
+BLUE = "#1F74A8"
+AMBER = "#806000"
+BASE = "#A09692"
+INK = "#2A1E18"
+MUTED = "#60504A"
+GRID = "#EDE3DD"
+FAINT = "#ABA09B"
+RULE = "#D8C8C0"
+
+# One-sided Wilcoxon signed-rank on per-case recall, Holm over each hypothesis's family
+[significance]
+ALPHA = 0.05
+
+# Embedders top to bottom, run name then label
+[embedders]
+nomic = "Nomic 0.5B"
+qwen3_0_6b = "Qwen3 0.6B"
+harrier_0_6b = "Harrier 0.6B"
+nemotron_1b = "Nemotron 1B"
+qwen3_4b = "Qwen3 4B"
+qwen3_8b = "Qwen3 8B"
+nemotron_8b = "Nemotron 8B"
+harrier_27b = "Harrier 27B"
+
+# Test sets in panel order, each with its label, its mode's recipe and its middle cutoff
+[sets.surveymatch_test]
+label = "SurveyMatch"
+recipe = "survey"
+cutoff = "200"
+
+[sets.frontiermatch_test]
+label = "FrontierMatch"
+recipe = "frontier"
+cutoff = "50"
+
+[sets.consensusmatch_test]
+label = "ConsensusMatch"
+recipe = "consensus"
+cutoff = "50"
+
+[sets.pasa_test]
+label = "AutoScholarQuery"
+recipe = "focused"
+cutoff = "50"
+
+[sets.pasa_real]
+label = "RealScholarQuery"
+recipe = "focused"
+cutoff = "50"
+
+[sets.surge_test]
+label = "SurGE"
+recipe = "survey"
+cutoff = "200"
+
+[sets.scholarcatalyst_core]
+label = "ScholarCatalyst core"
+recipe = "focused"
+cutoff = "20"
+
+[sets.scholarcatalyst_subfield]
+label = "ScholarCatalyst subfield"
+recipe = "focused"
+cutoff = "20"
+
+# Figure 4, cosine, PPR and BoundedField by embedder on every set
+[figure_main_embedders]
+copy_to = "../paper/figures/embedders.pdf"
+alt_to = "../paper/figures/embedders_alt.tex" # its alt text, input inside the figure
+reported_html = "../data/arxiv/html/2610/2610.02202.html" # ScholarCatalyst's paper
+reported_table = "S4.T3" # its Table 3
+reported_rows = { qwen3_4b = "Qwen3-Emb-4B", qwen3_8b = "Qwen3-Emb-8B" }
+reported_columns = { scholarcatalyst_core = 3, scholarcatalyst_subfield = 7 } # R@20 of each query type
+
+# Table 3, every method we ran on every set at the paper cutoffs beside the reported rows
+[table_main_benchmarks]
+copy_to = "../paper/tables/results_retrieval.tex"
+embedders = ["nomic", "nemotron_8b"] # PPR and BoundedField rows, a mark per BoundedField in this order
+marks = ["\\dagger", "\\ddagger"] # a score significantly below each BoundedField row
+baselines = [
+    ["bm25", "none", "BM25"],
+    ["specter2", "none", "SPECTER2"],
+    ["scincl", "none", "SciNCL"],
+    ["nomic", "none", "Nomic cosine"],
+    ["nomic", "rerank", "OpenScholar rerank"],
+    ["nomic", "gar_sim", "GAR (similarity)"],
+    ["nomic", "gar_cite", "GAR (citations)"],
+]
+
+[table_main_benchmarks.proposed]
+columns = { surveymatch_test = ["recall@100", "recall@200", "recall@500"], frontiermatch_test = ["recall@20", "recall@50", "recall@100"], consensusmatch_test = ["recall@20", "recall@50", "recall@100"] }
+
+[table_main_benchmarks.existing]
+columns = { pasa_test = ["recall@20", "recall@50", "recall@100"], pasa_real = ["recall@20", "recall@50", "recall@100"], surge_test = ["recall@100", "recall@200", "recall@500"] }
+reported_html = "../data/arxiv/html/2501/2501.10120.html" # PaSa's paper
+reported_columns = { pasa_test = ["S5.T5", 6, 5, 4], pasa_real = ["S5.T6", 6, 5, 4] } # its table and the cells of each column
+reported_rows = ["Google", "Google Scholar", "Google with GPT-4o", "PaSa-7b", "PaSa-7b-ensemble"]
+
+[table_main_benchmarks.scholarcatalyst]
+columns = { scholarcatalyst_core = ["ndcg@20", "recall@5", "recall@20", "recall@100"], scholarcatalyst_subfield = ["ndcg@20", "recall@5", "recall@20", "recall@100"] }
+reported_html = "../data/arxiv/html/2610/2610.02202.html" # ScholarCatalyst's paper
+reported_columns = { scholarcatalyst_core = ["S4.T3", 1, 2, 3, 4], scholarcatalyst_subfield = ["S4.T3", 5, 6, 7, 8] }
+reported_rows = ["BM25", "LateOn 0.1B", "SPECTER2", "OpenScholar", "Qwen3-Emb-4B", "Qwen3-Emb-8B", "Gemini-Emb-2", "ReasonEmbed", "Inf-Retriever-v1-Pro", "GPT-4.1 + Tool-calling Agent", "o3 + Deep research Agent"]
+
+# Figure 3, one schematic case of each proposed benchmark with its counts
+[figure_main_benchmarks]
+copy_to = "../paper/figures/benchmarks.pdf"
+datasets = { surveymatch = "SurveyMatch", frontiermatch = "FrontierMatch", consensusmatch = "ConsensusMatch" }
+hues = { surveymatch = "#902020", frontiermatch = "#1F74A8", consensusmatch = "#806000" }
+seed = 7 # the schematic's illustrative positions
+
+# Table 2, the exponents of the four recipes as tuned on one embedder
+[table_main_recipes]
+copy_to = "../paper/tables/recipes.tex"
+embedder = "nomic"
+recipes = ["focused", "survey", "frontier", "consensus"]
+terms = ["cos", "rec", "bm25", "anc", "fro", "anc2", "fro2", "cocite", "couple", "anc_decay", "fro_decay", "hub"]
+sources = { pasa = "PaSa", surveymatch = "SurveyMatch", frontiermatch = "FrontierMatch", consensusmatch = "ConsensusMatch" }
+
+# Appendix, the PPR pick of every recipe and embedder
+[table_appendix_ppr]
+copy_to = "../paper/tables/ppr.tex"
+
+# Appendix, BoundedField's core and pool pick with its val recall
+[table_appendix_tuning]
+copy_to = "../paper/tables/tuning.tex"
+
+# Appendix, val recall over the core and pool grid
+[figure_appendix_tuning]
+copy_to = "../paper/figures/tuning.pdf"
+families = { nomic = "RED", qwen3 = "BLUE", harrier = "AMBER", nemotron = "MUTED" }
+dashes = { nomic = "-", qwen3_0_6b = "-", harrier_0_6b = "-", nemotron_1b = "-", qwen3_4b = "--", qwen3_8b = "--", nemotron_8b = "--", harrier_27b = ":" }
+
+# Appendix, every embedder's exponents
+[table_appendix_exponents]
+copy_to = "../paper/tables/exponents.tex"
+
+# Appendix, five tune seeds
+[table_appendix_seeds]
+copy_to = "../paper/tables/seeds.tex"
+seeds = [0, 1, 2, 3, 4]
+
+# Appendix, one term at a time on Nomic
+[table_appendix_ablation]
+copy_to = "../paper/tables/ablation.tex"
+embedder = "nomic"
+variants = { only_anc = "\\term{cos} and \\term{anc} only", only_cos = "\\term{cos} only, expanded pool", nohop = "Tuned exponents, cosine pool" }
+
+# Appendix, the same changes over every embedder
+[figure_appendix_ablation]
+copy_to = "../paper/figures/ablation.pdf"
+
+# Appendix, every recipe on every set on Nomic
+[table_appendix_recipes_proposed]
+copy_to = "../paper/tables/recipes_proposed.tex"
+part = "proposed"
+label = "tab:recipes-proposed"
+
+[table_appendix_recipes_existing]
+copy_to = "../paper/tables/recipes_existing.tex"
+part = "existing"
+label = "tab:recipes-existing"
+
+[table_appendix_recipes_sc]
+copy_to = "../paper/tables/recipes_sc.tex"
+part = "scholarcatalyst"
+label = "tab:recipes-sc"
+
+# Appendix, Nomic's recipe on the other embedders
+[table_appendix_transfer]
+copy_to = "../paper/tables/transfer.tex"
+source = "nomic"

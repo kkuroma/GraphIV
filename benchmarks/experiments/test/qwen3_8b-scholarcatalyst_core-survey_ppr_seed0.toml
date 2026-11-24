@@ -1,0 +1,6 @@
+retriever = "qwen3_8b"
+dataset = "scholarcatalyst"
+split = "core"
+method = "ppr"
+recipe = "survey"
+seed = 0

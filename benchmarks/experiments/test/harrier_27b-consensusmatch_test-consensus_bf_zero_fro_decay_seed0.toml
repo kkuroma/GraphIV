@@ -1,0 +1,12 @@
+retriever = "harrier_27b"
+dataset = "consensusmatch"
+split = "test"
+method = "bf"
+recipe = "consensus"
+seed = 0
+variant = "zero_fro_decay"
+
+[override]
+
+[override.weights]
+FRO_DECAY = 0.0

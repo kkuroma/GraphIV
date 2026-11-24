@@ -1,0 +1,6 @@
+retriever = "nemotron_1b"
+dataset = "frontiermatch"
+split = "test"
+method = "bf"
+recipe = "survey"
+seed = 0

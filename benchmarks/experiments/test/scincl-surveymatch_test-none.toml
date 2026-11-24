@@ -1,0 +1,4 @@
+retriever = "scincl"
+dataset = "surveymatch"
+split = "test"
+method = "none"

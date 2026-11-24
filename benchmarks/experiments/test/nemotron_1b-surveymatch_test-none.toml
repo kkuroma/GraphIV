@@ -1,0 +1,4 @@
+retriever = "nemotron_1b"
+dataset = "surveymatch"
+split = "test"
+method = "none"

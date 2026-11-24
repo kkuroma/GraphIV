@@ -1,0 +1,4 @@
+retriever = "harrier_27b"
+dataset = "pasa"
+split = "test"
+method = "none"

@@ -1,0 +1,6 @@
+retriever = "nemotron_8b"
+dataset = "pasa"
+split = "real"
+method = "bf"
+recipe = "survey"
+seed = 0

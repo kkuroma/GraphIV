@@ -1,0 +1,4 @@
+retriever = "nemotron_8b"
+dataset = "consensusmatch"
+split = "test"
+method = "none"

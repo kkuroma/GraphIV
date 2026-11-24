@@ -1,0 +1,6 @@
+retriever = "harrier_0_6b"
+dataset = "scholarcatalyst"
+split = "subfield"
+method = "ppr"
+recipe = "frontier"
+seed = 0

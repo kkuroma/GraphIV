@@ -1,0 +1,4 @@
+retriever = "bm25"
+dataset = "scholarcatalyst"
+split = "subfield"
+method = "none"

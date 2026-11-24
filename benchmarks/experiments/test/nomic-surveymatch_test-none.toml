@@ -1,0 +1,4 @@
+retriever = "nomic"
+dataset = "surveymatch"
+split = "test"
+method = "none"

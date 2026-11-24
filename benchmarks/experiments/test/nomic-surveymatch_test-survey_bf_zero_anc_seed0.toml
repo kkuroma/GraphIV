@@ -1,0 +1,12 @@
+retriever = "nomic"
+dataset = "surveymatch"
+split = "test"
+method = "bf"
+recipe = "survey"
+seed = 0
+variant = "zero_anc"
+
+[override]
+
+[override.weights]
+ANC = 0.0

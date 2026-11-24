@@ -1,0 +1,5 @@
+retriever = "qwen3_0_6b"
+recipe = "survey"
+method = "bf"
+seed = 2
+at_pick = true

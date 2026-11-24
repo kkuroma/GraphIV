@@ -1,0 +1,12 @@
+# Every tune and test generate.py writes, as the cross product of these lists
+
+# Retrievers BoundedField and PPR run on, sections of tuning/embedders.toml
+retrievers = ["nomic", "qwen3_0_6b", "harrier_0_6b", "nemotron_1b", "qwen3_4b", "qwen3_8b", "nemotron_8b", "harrier_27b"]
+# Retrievers with their own search code, run as cosine alone
+baselines = ["bm25", "specter2", "scincl"]
+# GAR's variants, on nomic's cosine run
+gar = ["gar_cite", "gar_sim", "rerank"]
+# Seeds the BoundedField fit is repeated with at its seed-0 pick
+seeds = [1, 2, 3, 4]
+# The retriever whose recipes every other retriever also runs
+transfer_from = "nomic"

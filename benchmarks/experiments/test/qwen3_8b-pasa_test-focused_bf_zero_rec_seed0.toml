@@ -1,0 +1,12 @@
+retriever = "qwen3_8b"
+dataset = "pasa"
+split = "test"
+method = "bf"
+recipe = "focused"
+seed = 0
+variant = "zero_rec"
+
+[override]
+
+[override.weights]
+REC = 0.0

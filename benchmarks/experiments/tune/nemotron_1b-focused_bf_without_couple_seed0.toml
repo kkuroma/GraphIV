@@ -1,0 +1,9 @@
+retriever = "nemotron_1b"
+recipe = "focused"
+method = "bf"
+seed = 0
+variant = "without_couple"
+at_pick = true
+
+[override]
+terms = ["rec", "anc", "fro", "anc2", "fro2", "anc_decay", "fro_decay", "cocite", "bm25", "hub"]
