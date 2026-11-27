@@ -10,19 +10,28 @@ import psycopg
 
 from src.mcp.papers import clean, read_records
 from src.mcp.runs import Run
+from src.miner.store import read_papers
 
 SENTENCE_CHARS = 300
 MOST = 100
 ORDER = ("critiques", "extends", "compares", "uses", "motivates", "background")
+# the intents by which a newer paper builds on or argues with an older one
+ARGUING = ["extends", "critiques", "compares"]
+BUILDERS = """
+SELECT c.source_id, p.date, p.title, c.intent, c.target_id
+FROM citations c JOIN papers p ON p.arxiv_id = c.source_id AND p.stage >= 3
+WHERE c.target_id = ANY(%s) AND c.stage = 1 AND c.intent = ANY(%s)
+  AND c.source_id <> c.target_id AND NOT c.source_id = ANY(%s)
+"""
 CITED_BY = """
 SELECT c.source_id, p.date, p.title, c.intent, c.intent_score, c.sentence
 FROM citations c JOIN papers p ON p.arxiv_id = c.source_id
-WHERE c.target_id = %s AND c.stage = 1
+WHERE c.target_id = %s AND c.stage = 1 AND c.source_id <> c.target_id
 """
 CITES = """
 SELECT c.target_id, p.date, p.title, c.intent, c.intent_score, c.sentence
 FROM citations c JOIN papers p ON p.arxiv_id = c.target_id
-WHERE c.source_id = %s AND c.target_id IS NOT NULL AND c.stage = 1
+WHERE c.source_id = %s AND c.target_id IS NOT NULL AND c.stage = 1 AND c.source_id <> c.target_id
 """
 
 
@@ -70,9 +79,45 @@ def list_citations(
         citer, cited = (other, me) if direction == "cited_by" else (me, other)
         label = run.cite(citer, cited, sentence, keys.get(citer, "Paper"))
         lines.append(
-            f"{other} | {when} | {title} | {intent}\n  {sentence[:SENTENCE_CHARS]} [{label}]"
+            f"{other} | {when} | {title} | {intent}\n  {sentence[:SENTENCE_CHARS]}{run.mark(label)}"
         )
     if not lines:
         side = "of" if direction == "cited_by" else "from"
         return f"No labeled citations {side} {arxiv_id} in the store."
     return f"{total} papers in all, {len(lines)} shown\n" + "\n".join(lines)
+
+
+def builders(
+    dsn: str, arxiv_ids: list[str], skip: set[str], vector: list[float], limit: int
+) -> list[str]:
+    """
+    The newer papers that extend, critique or compare against a set of papers, closest first
+
+    Ranked by closeness to the question rather than by how many of the set they cite, since a
+    paper citing several heavily cited ones is usually a general paper the question does not need.
+
+    Args:
+        dsn: libpq connection string.
+        arxiv_ids: The papers, such as the rows of a table.
+        skip: Papers to leave out, such as the ones already read.
+        vector: The question's embedding.
+        limit: How many to list.
+
+    Returns:
+        One line per paper: id, date, title, and how it relates to which of the set.
+    """
+    if not arxiv_ids:
+        return []
+    with psycopg.connect(dsn) as conn:
+        rows = conn.execute(
+            BUILDERS, (arxiv_ids, ARGUING, sorted(skip | set(arxiv_ids)))
+        ).fetchall()
+    links: dict[str, dict[str, str]] = {}
+    for citer, _, _, intent, cited in rows:
+        links.setdefault(citer, {}).setdefault(cited, intent)
+    ranked = sorted(read_papers(dsn, vector, list(links)), key=lambda p: -(p.cosine or 0.0))
+    return [
+        f"{p.arxiv_id} | {p.date} | {clean(p.title)} | "
+        + ", ".join(f"{intent} {cited}" for cited, intent in links[p.arxiv_id].items())
+        for p in ranked[:limit]
+    ]
