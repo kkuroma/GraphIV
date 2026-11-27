@@ -7,14 +7,15 @@ description: Find what a field has not done or not settled, and check each candi
 
 An absence in what you read is not an absence in the field, so every candidate is checked before it is called open.
 
-1. Collect candidates from three places:
-   - limitations and future work: read 4 to 8 recent papers with the question "what do the authors say is unsolved, limited or left for future work".
+1. Collect candidates from four places:
+   - limitations and future work the reads state: ask "what do the authors say is unsolved, limited or left for future work".
    - disagreement: `list_citations` on a central paper, direction cited_by, intents critiques, shows who disputes it and why.
-   - untried combinations: in a comparison table, two options no method combines.
-2. Check each candidate with a `search_papers` call in focused mode that names the combination or problem directly, with a date range starting a year before the newest paper you read.
+   - zero cells of a coverage block: an approach no paper tested with some kind of evidence.
+   - untried combinations: two options of a table no paper combines.
+2. Check each candidate with a `search_papers` call in focused mode that names the problem directly, with a date range starting a year before the newest paper you read.
    Read the one or two closest hits with the question "does this paper address <candidate>".
-3. Report a candidate as open only when the check found nothing, and say how it was checked, quoting the search words exactly as you sent them, for example: a focused search for "dense retrieval with graph rerankers" and reads of the two closest papers found no work combining them.
-   The server checks that a search with those exact words was run.
-   A candidate the check found work on is not open: report that work instead.
-4. Mark each open area as your inference, since it rests on what was searched, not on a paper's claim:
-   "Inference: no paper in the corpus combines X with Y; a focused search and reads of A and B found none."
+3. A candidate the check found nothing on is an open block:
+   {"type": "open", "text": "what is open and why it matters", "search": "<the exact words of that search>", "cites": [markers of the papers that leave it open]}.
+   The server checks the search was run and prints what it returned beside the block.
+   A candidate the check found work on is not open: write findings about that work instead.
+4. Prefer open areas a researcher would act on: specific, tied to the papers that leave them open, and saying what a first study would test.
