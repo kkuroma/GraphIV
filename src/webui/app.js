@@ -28,7 +28,8 @@ const asked = (q) => String(q ?? "").replace(/\s*Effort:\s*\w+\.?\s*$/i, "");
 const deTeX = (s) => String(s ?? "").replace(/\$([^$]*)\$/g, "$1").replace(/[{}\\]/g, "").trim();
 
 function authors(a) {
-  const parts = deTeX(a).split(/,\s*/).filter(Boolean);
+  // arXiv lists authors with commas, or with "and" between every name as in BibTeX
+  const parts = deTeX(a).split(/,\s*|\s+and\s+/).filter(Boolean);
   return parts.length > 3 ? parts.slice(0, 3).join(", ") + " et al." : parts.join(", ");
 }
 
@@ -82,7 +83,7 @@ function theme() {
 
 // -- the library -----------------------------------------------------------------------------
 
-function library() {
+function libraryCards() {
   const wanted = filter.trim().toLowerCase();
   const shown = runs.filter((r) => !wanted || `${r.question} ${r.tldr || ""}`.toLowerCase().includes(wanted));
   const cards = shown.map((r) => `
@@ -98,6 +99,10 @@ function library() {
       </div>
       <div class="byline">${esc(when(r.saved))}</div>
     </a>`).join("");
+  return cards || `<p class="empty">${runs.length ? "No question matches." : "No saved runs yet."}</p>`;
+}
+
+function library() {
   document.getElementById("view").innerHTML = `
     <section class="hero">
       <h1>Research library</h1>
@@ -105,9 +110,10 @@ function library() {
       <div class="searchwrap"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
         <input id="q" type="search" placeholder="Search questions" value="${esc(filter)}"></div>
     </section>
-    <div class="grid">${cards || '<p class="empty">No saved runs yet.</p>'}</div>`;
+    <div class="grid">${libraryCards()}</div>`;
   const box = document.getElementById("q");
-  box.oninput = () => { filter = box.value; library(); document.getElementById("q").focus(); };
+  // only the cards redraw, so the box keeps its caret while typing
+  box.oninput = () => { filter = box.value; document.querySelector("#view .grid").innerHTML = libraryCards(); };
 }
 
 // -- one run ---------------------------------------------------------------------------------
@@ -219,8 +225,10 @@ function clearInspector() {
 }
 
 function wire(root) {
+  // inside the panel a citation opens on click alone, so hovering never resizes what is being read
+  const inPanel = root.id === "inspector";
   for (const a of root.querySelectorAll(".cite")) {
-    a.onmouseenter = () => { if (!pinned) inspect(a.dataset.m); };
+    a.onmouseenter = inPanel ? null : () => { if (!pinned) inspect(a.dataset.m); };
     a.onclick = () => { pinned = pinned === a.dataset.m ? null : a.dataset.m; inspect(a.dataset.m); };
   }
 }
@@ -357,7 +365,7 @@ function lineageGraph(line, label) {
 }
 
 function lineagesCard() {
-  const lines = (run.lineages || []).flatMap((call, c) => call.lines.map((line, i) => lineageGraph(line, `${c + 1}.${i + 1}`)));
+  const lines = (run.lineages || []).flatMap((call, c) => (call.lines || []).map((line, i) => lineageGraph(line, `${c + 1}.${i + 1}`)));
   if (!lines.length) return "";
   const legend = Object.entries(INTENT_COLORS).map(([k, c]) => `<span><i style="background:var(${c})"></i>${k}</span>`).join("");
   return `<div class="ov-card wide"><div class="ov-h">How the field developed <span class="dim">filled dots are papers the run searched, hollow ones were reached through citations</span></div><div class="lines">${lines.join("")}</div><div class="legend">${legend}</div></div>`;
@@ -465,7 +473,9 @@ function describe(c, title) {
     case "list_citations":
       return [`Listed ${a.direction === "cited_by" ? "the papers citing" : "the references of"} ${named(a.arxiv_id)}`, esc(first)];
     case "trace_lineages":
-      return [`Traced how ${(a.arxiv_ids || []).length} papers connect through their citations`, esc(first)];
+      return a.query !== undefined
+        ? [`Mapped which papers extend, critique or compare against which, for “${esc(clip(a.query || "", 140))}”`, esc(first)]
+        : [`Traced how ${(a.arxiv_ids || []).length} papers connect through their citations`, esc(first)];
     case "save_report":
       return [`Submitted the report for the check`, esc(first)];
     default:
@@ -556,7 +566,7 @@ function processTab() {
   return `<div class="process"><h2>Thinking process</h2>
     <p class="dim">A breakdown of how this response was generated.</p>
     <div class="proc-top">
-      <div class="proc-stats"><div><b>${calls.length}</b> tool calls</div><div><b>${run.session ? nodes.filter((n) => n.kind === "thinking").length : "n/a"}</b> thinking loops</div><div><b>${duration(total)}</b> spent</div></div>
+      <div class="proc-stats"><div><b>${calls.length}</b> tool calls</div>${run.session ? `<div><b>${nodes.filter((n) => n.kind === "thinking").length}</b> thinking loops</div>` : ""}<div><b>${duration(total)}</b> spent</div></div>
       <div class="proc-time"><div class="st-h">Where the time went</div><div class="pt-bar">${bar}</div><div class="pt-key">${key}</div></div>
     </div>
     <div class="tree-legend">${legend}<span class="dim">Hover a dot for what it did, click it or use the arrow keys for everything.</span></div>
@@ -687,7 +697,10 @@ let hiddenRoles = new Set();
 let pickedLine = "";
 let focusId = "";
 
-const linesOf = () => (run.lineages || []).flatMap((call, c) => (call.lines || []).map((line, i) => ({ id: `${c + 1}.${i + 1}`, papers: line.papers.map((p) => p.arxiv_id) })));
+// a poset offers its longest chain where an older run offered its lines
+const linesOf = () => (run.lineages || []).flatMap((call, c) => call.chain
+  ? [{ id: `${call.id} chain`, papers: call.chain }]
+  : (call.lines || []).map((line, i) => ({ id: `${c + 1}.${i + 1}`, papers: line.papers.map((p) => p.arxiv_id) })));
 
 function timelineTab() {
   const g = run.graph;
@@ -828,7 +841,7 @@ function showRun(tab) {
         <span class="chip">${quotes} quotes</span><span class="byline">${esc(when(run.saved))}</span></div>
     </header>
     <nav class="tabs">${tabs}</nav>
-    <div class="runlayout${tab === "report" || tab === "papers" ? "" : " solo"}"><section class="tab-panel active">${views[tab]()}</section>
+    <div class="runlayout${tab === "timeline" && (run.lineages || []).some((p) => p.id) ? " below" : tab === "report" || tab === "papers" ? "" : " solo"}"><section class="tab-panel active">${views[tab]()}</section>
       <aside id="inspector" class="inspector"></aside></div>`;
   clearInspector();
   wire(document.getElementById("view"));

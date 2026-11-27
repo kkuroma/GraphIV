@@ -62,7 +62,7 @@ def read_runs(root: Path) -> list[dict[str, Any]]:
                 "unverified": len({str(f.get("line", "")) for f in check.get("faults") or []}),
                 "papers": len(parsed.get("papers") or {}),
                 "tables": len(parsed.get("tables") or []),
-                "lineages": sum(len(x.get("lines", [])) for x in parsed.get("lineages") or []),
+                "lineages": len(parsed.get("lineages") or []),
             }
         )
     return out
@@ -110,8 +110,14 @@ def read_one(root: Path, slug: str) -> dict[str, Any] | None:
         else []
     )
     session = where / "session.json"
+    transcript = json.loads(session.read_text(encoding="utf-8")) if session.is_file() else None
+    # a run saved before the server's state moved to state.json keeps that state here instead
     parsed["session"] = (
-        json.loads(session.read_text(encoding="utf-8")) if session.is_file() else None
+        transcript if isinstance(transcript, dict) and "events" in transcript else None
+    )
+    drafted = where / "report.json"
+    parsed["object"] = (
+        json.loads(drafted.read_text(encoding="utf-8")) if drafted.is_file() else None
     )
     return parsed
 
@@ -198,6 +204,34 @@ def mount(mcp: FastMCP, root: Path, pdfs: Path, fetch: bool = False) -> None:
         """
         _ = request
         return FileResponse(HERE / "app.js", media_type=TYPES[".js"])
+
+    @mcp.custom_route("/report.css", methods=["GET"])
+    async def report_styles(request: Request) -> Response:
+        """
+        The stylesheet of the report, papers and check tabs
+
+        Args:
+            request: The http request, which carries nothing this reads.
+
+        Returns:
+            The file.
+        """
+        _ = request
+        return FileResponse(HERE / "report.css", media_type=TYPES[".css"])
+
+    @mcp.custom_route("/report.js", methods=["GET"])
+    async def report_script(request: Request) -> Response:
+        """
+        The script drawing the report object, the poset, the papers and the check
+
+        Args:
+            request: The http request, which carries nothing this reads.
+
+        Returns:
+            The file.
+        """
+        _ = request
+        return FileResponse(HERE / "report.js", media_type=TYPES[".js"])
 
     @mcp.custom_route("/vendor/marked.min.js", methods=["GET"])
     async def markdown(request: Request) -> Response:
