@@ -4,7 +4,7 @@ BoundedField is GraphIV's retriever and reranker: LLM-free, citation-aware, and 
 
 As human researchers leverage the citations to curate a literature list, BoundedField does the same. It takes the papers most similar to a question as the core, expands the pool with their citations, and scores each candidate as a product of bounded citation-walk terms whose exponents are fitted per task. It needs no LLM training or invocation, its scoring runs entirely on the CPU, and it is compatible with any off-the-shelf embedding model, so it is a cheap performance uplift over whatever embedder sits underneath it.
 
-P.S. I named it after Fate/Type-Moon's bounded field, a ward drawn around a territory. The retrieval similarly draws the bounds of a research field around a question, bounding each term in $[0, 1]$, and runs [LeyLine](03_tools.md#leyline) inside the field it draws.
+P.S. I named it after Fate/Type-Moon's bounded field, a ward drawn around a territory. The retrieval similarly draws the bounds of a research field around a question, bounding each term in $[0, 1]$, and [`trace_lineages`](03_tools.md#the-poset) builds its poset inside the field it draws.
 
 The code is [`src/retrieve/`](../src/retrieve/README.md), and the experiments behind every number here are [`benchmarks/`](../benchmarks/README.md).
 
@@ -300,7 +300,7 @@ Every ranked paper carries its terms in `paper.signals`, which is what `search_p
 
 ## Limitations
 
-- A paper too new to be cited scores exactly zero on `anc`, `anc2`, `cocite` and `hub`, so BoundedField cannot surface it on citations, and [LeyLine's successors](03_tools.md#successors) are the answer to that case.
+- A paper too new to be cited scores exactly zero on `anc`, `anc2`, `cocite` and `hub`, so BoundedField cannot surface it on citations, and the [poset](03_tools.md#the-poset)'s two-year focused search and the papers it adds for arguing with the set are the answer to that case.
 - The pool is capped by the first retrieval and one citation hop, and two hops greatly increase both the pool and its noise.
 - The terms are classic bibliometrics, co-citation and coupling included. What BoundedField adds is putting them together as a bounded product, the per-task exponents and the measurement behind them.
 - The reported numbers of PaSa and ScholarCatalyst were copied from their papers and not rerun.

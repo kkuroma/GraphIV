@@ -16,7 +16,7 @@ The layers stack as `mcp`, `report`, `miner`, `retrieve`, `core`, top to bottom.
 A layer may import the ones below it and never the ones above, and the import-linter contract in `pyproject.toml` checks that.
 
 A recipe file under `retrieval_recipes/` holds what each mode tunes, its core and its exponents.
-The pool sizes and the miner's constants are shared by every mode and live in `config.toml` under `[retrieve]` and `[miner]`.
+The pool sizes and the poset's counts are shared by every mode and live in `config.toml` under `[retrieve]` and `[lineages]`.
 
 ## Where the Models Are
 

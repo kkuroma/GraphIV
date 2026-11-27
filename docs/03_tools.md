@@ -16,25 +16,30 @@ The code is [`src/mcp/`](../src/mcp/README.md), which also covers connecting [op
 | `search_papers` | **a list of papers** answering a question under one of the four [recipes](02_retrieval.md#recipes), `focused`, `survey`, `frontier` or `consensus`. A paper can replace the question, its embedding taking the question's, and an author filter keeps only their papers. |
 | `read_paper` | **a list of claims** answering a question about each paper, each backed by a verbatim quote. It splits the paper into chunks, retrieves the likeliest by fused cosine and BM25, and has an LLM answer from them. |
 | `list_citations` | **a list of citations** of a paper, its citers or its references, each with its intent and labeled citing sentence. Filtering by intent shows who extended, compared against or critiqued a paper. |
-| `trace_lineages` | **a list of lineages** through a set of papers, typically a whole search, following `extends`, `compares` and `critiques` citations, each line oldest first with its labeled citing sentences, by [LeyLine](#leyline). |
+| `trace_lineages` | **a poset** of the `extends`, `critiques` and `compares` citations among a field's past and present papers, with its longest chain, the papers argued with most and the newest positions taken, each citing sentence labeled, as [The poset](#the-poset) describes. |
 | `save_report` | **a pass or a list of faults** for the agent's report before saving it. |
 
 Every tool returns papers as one shape: id, date, title, authors, topic leaf and abstract. A filter, `{"exclude": [...], "authors": [...], "date_range": [start, end]}`, holds a recall or a search.
 
-Each claim carries a label of the first author's surname and a run-wide count, such as [Karpukhin7]. Bare numbers let the model hand labels out in order across papers, which put most of a long report's citations on the wrong paper, while a surname makes that visible to the writer and the reader. Every citing sentence `list_citations` and `trace_lineages` return carries a label of its own, so a lineage claim cites the sentence it rests on. The quotes stay on the server, and the agent sees the claims and their labels alone.
+Each claim carries a label of the first author's surname and a run-wide count, such as [Karpukhin7]. Bare numbers let the model hand labels out in order across papers, which put most of a long report's citations on the wrong paper, while a surname makes that visible to the writer and the reader. Every citing sentence `list_citations` and `trace_lineages` return carries a label of its own, so a claim that one paper critiques another cites the sentence it rests on. The quotes stay on the server, and the agent sees the claims and their labels alone.
 
 ## The Mechanical Check
 
-`save_report` matches strings only, so it guarantees by construction, whatever the model, that every quote exists in its paper and every cited paper was read:
+`save_report` takes the report as an object of findings, inferences, open areas, tables, coverage grids and posets, and matches strings only, so it guarantees by construction, whatever the model, that every quote exists in its paper and every cited paper was read.
+Each fault names the path of the field it sits in, and the agent resends only that field as a patch.
 
-1. every label resolves to a quote a read returned,
-2. every number on a cited line appears in the paragraph behind its label,
-3. every name on a cited sentence appears in the full text of a paper it cites,
-4. every paper cited in the body was read, and every search the report describes was run,
-5. every sentence of 12 or more words carries a label or begins with "Inference",
-6. a report may open on a TL;DR of one sentence of at most 40 words, which must cite.
+1. Every marker resolves to a quote a reply gave.
+2. Every number and every quoted phrase in a finding appears in a paragraph behind its markers.
+3. Every name in a finding appears in the full text of a paper it cites, or in the title or abstract of a paper the session read.
+4. Every finding cites, and no inference does.
+5. A TL;DR that names a paper carries one of that paper's markers, which the saved report places beside the name.
+6. An open area names a search the session ran, and one of that search's three nearest papers was read.
+7. Every paper in the further reading was returned by a tool.
 
-It does not guarantee that a statement fully agrees with the sentence it cites. A run whose last save failed still shows its report, each faulted line marked unverified where it sits.
+At `deep` effort the report must also hold a comparison table from `read_paper` with its coverage grid, a poset with at least three findings citing its sentences, a finding for every paper in the table, and the checked open areas.
+It must have read the top four papers of the question's two opening searches, the first four newer papers citing the table, and the papers the poset names as argued with most and newest.
+
+The check does not guarantee that a statement fully agrees with the sentence it cites. A run whose last save failed still shows its report, each faulted line marked unverified where it sits.
 
 ## Effort
 
@@ -44,14 +49,15 @@ The agent's instructions carry three effort presets, named in the question, in t
 | --- | --- | --- | --- |
 | `quick` | 3 to 5 minutes | 1 or 2 | 4 to 6 |
 | `standard` | About 10 minutes | 2 to 4 | 8 to 12 |
-| `deep` | At most 20 minutes | Up to 6 | 12 to 20, adding a comparison table, lineages and open questions |
+| `deep` | At most 20 minutes | Up to 12 | 12 to 24, adding a comparison table, a poset and open questions |
 
 ## What a Run Writes
 
-A run is every call of one MCP session since its last passing `save_report`. `save_report` writes one directory under `RUNS_PATH`: `report.md`, `calls.jsonl` with every call's arguments, reply and timing, and `run.json` with the check, the papers read, every quote under its label, the tables, the lineages and why each searched paper ranked, term by term. A client may add `session.json`, its own transcript. The webui ([`src/webui/`](../src/webui/README.md)) opens a run on its report, papers, process, timeline and check, and a label in the report opens the paragraph its quote came from.
+A run is every call of one MCP session since its last passing `save_report`. `save_report` writes one directory under `RUNS_PATH`: `report.md`, `report.json` with the report object, `calls.jsonl` with every call's arguments, reply and timing, `state.json` with the server's state of the session, and `run.json` with the check, the papers read, every quote under its label, the tables, the posets and why each searched paper ranked, term by term. A client may add `session.json`, its own transcript. The webui ([`src/webui/`](../src/webui/README.md)) opens a run on its report, papers, process, timeline and check, and a label in the report opens the paragraph its quote came from.
 
 ## Results
 
+These runs were measured on 2026-11-11 with an earlier version of the tools, whose `save_report` took markdown and whose `trace_lineages` sampled LeyLine paths.
 I ran 21 test questions, three fields (non-ML computer science, machine learning and physics) by seven question types, once at each effort, for 63 runs. All 63 are public at [graphiv.kuroma.dev](https://graphiv.kuroma.dev), each with its report, its calls and the agent's reasoning.
 
 | Effort | Passed | Minutes | Saves until passing | Papers read | `recall` | `search` | `read` | `list` | `trace` |
@@ -117,107 +123,54 @@ claude mcp add --transport http graphiv http://127.0.0.1:6767/mcp
 
 The server needs the store of [`01_preprocessing.md`](01_preprocessing.md), the citation graph export, an embedding endpoint serving nomic-embed-text-v2-moe through llama-server, and any OpenAI-compatible chat endpoint for the reader and `recall_paper`. Every prompt the tools send is a markdown file under [`src/mcp/prompts/`](../src/mcp/prompts). On NixOS, `services.graphiv` runs the store, the tools, the webui and the manager as units, and [`nix/README.md`](../nix/README.md) is its page.
 
-## LeyLine
+## The poset
 
-LeyLine is GraphIV's trajectory miner, and it backs `trace_lineages`. A ranking, however good, is still a static list, and I think research needs a story: where an idea comes from, what the arguments are, and where that leads us today. A ranking built on citations alone is temporally static, while the citation intents, like `extends` or `critiques`, let me sample those stories out of a list of retrieved papers.
+A ranking, however good, is still a static list, and research needs a story: where an idea comes from, who argues with it, and where it stands today.
+`trace_lineages` draws that story from the citation intents, as a poset: the sub-DAG of the citation graph whose edges are `extends`, `critiques` and `compares` citations among a field's past and present papers.
+The code is [`src/mcp/lineages.py`](../src/mcp/lineages.py), and its queries are in [`src/miner/store.py`](../src/miner/store.py).
 
-The name references Fate/Type-Moon's ley lines, the grid of magical power that runs from node to node. Here, the power is the argument each citation made, and it runs inside the field [BoundedField](02_retrieval.md) draws.
+### Building it
 
-![How LeyLine walks toward magnets, the Unseen Newcomers only its successors reach, magnet weight against citations, and one question's lineages](../assets/figures/leyline.png)
-
-The code is [`src/miner/`](../src/miner/README.md). [`leyline.py`](../src/miner/leyline.py) is the algorithm on a typed graph and knows nothing about papers, so [`tests/miner/test_leyline.py`](../tests/miner/test_leyline.py) runs it on a hand-built graph with no store and no GPU, and [`miner.py`](../src/miner/miner.py) is what feeds it citations. Every constant below is in the `[miner]` block of [`config.toml`](../config.toml).
-
-A **lineage** is a chain of papers, oldest first, in which each paper cites the one before it, running through the papers a field takes a position on rather than the ones it only names. Following one tells how an idea developed: a method, the works that extended it, and the ones that critiqued or compared against those, up to the present. As 69.1% of citations are `background`, a chain of plain citations mostly passes through the surveys and tools every paper cites, so LeyLine weighs each paper by the intents it is cited with, which keeps the chain on the papers that moved the idea.
-
-### The typed graph
-
-> **Definition (typed graph).** A typed graph is $G = (V, E)$ with $E \subseteq V \times V \times I$, where $(c, p, i) \in E$ means $c$ cites $p$ with intent $i$. $V$ is the first 30 papers of a search together with everything they cite, and each node $v$ carries its closeness $s(v) = \max(\cos(q, v), 0)$ to the question $q$ and a date.
-
-Papers a reader kept rarely cite each other, and the papers a field argues with are the ones they all cite, which is why the list is expanded by what it cites.
-
-### Magnets
-
-A **magnet** is a paper the field takes a position on, rather than one it merely names.
-
-> **Definition (magnet).** With intent weights $W_i$ of 1.0 for `extends` and `critiques`, 0.8 for `compares`, 0.4 for `uses`, 0.15 for `motivates` and 0 for `background`,
-> $$m(p) = \frac{1}{Z}\, \text{stance}(p) \cdot \frac{\text{stance}(p)}{\text{total}(p)} \cdot \left(\frac{s(p)}{\max_{v} s(v)}\right)^{\phi}$$
-> where $\text{stance}(p) = \sum_{(c,p,i) \in E} W_i\, s(c)$, $\text{total}(p) = \sum_{(c,p,i) \in E} s(c)$, $Z$ scales the strongest magnet to 1, and $\phi = 4$.
-
-| Factor | What it removes |
+| Part | What it holds |
 | --- | --- |
-| $\text{stance}(p)$ | A paper nobody takes a position on, however often it is named |
-| $\text{stance}(p) / \text{total}(p)$ | A paper cited as background by everything, which is the generic hub |
-| $(s(p) / \max s)^{\phi}$ | A paper argued about for a reason other than the question |
+| past | a `survey` search of the caller's phrase, 50 papers, plus papers the caller names, like the one the question is about |
+| present | a `focused` search of the same phrase over the last 730 days, 50 papers |
+| reads | every paper the session read |
+| added | up to 30 papers outside the set that cite 3 or more of it with an intent, closest to the question first |
+| edges | every labeled citation among those papers with one of the three intents, newer citing older, one per pair, critiques over extends over compares |
 
-The closeness enters as a power and not as a factor, since at a power of one a backbone paper the whole pool cites outranks the field's own landmarks. On a question about temporal knowledge graphs, the most cited papers in the graph were not its strongest magnets:
+`background` and `uses` citations are left out: on the five questions measured, `uses` was about 40% of the edges, mostly pointing at model reports and datasets, and leaving it out kept every poset connected.
+One hop is enough, since adding the papers between the past and the present two hops apart added 69 to 289 papers and connected nothing one hop missed.
 
-| Paper | Citations across GraphIV | Magnet weight |
+### What the reply gives
+
+1. The chain whose papers' closeness to the question, above the poset's median, sums highest, oldest first, so it starts where the papers turn to the question rather than at the oldest hub.
+2. The papers the session's reads critique or extend most, then the ones the whole poset argues with most weighted by closeness, each with up to four of the later sentences on it, one intent at a time.
+3. The newest papers closest to the question and the earlier work each takes a position on.
+4. The added papers, which are leads to read.
+
+Every sentence shown carries a label, so the report can write "Zoology critiques Hungry Hungry Hippos for insufficient data-dependent mixing" and cite Zoology's own sentence.
+At `deep` effort the first call fixes required reads, the four papers argued with most and the four newest papers taking a position, so the report reads where each debate starts and where it stands now.
+A lineage block places the poset in the report, drawn on the papers a section discusses with the papers joining them, and the webui's Timeline tab shows the whole poset with every citing sentence a click away.
+
+### Against the earlier lineages and Consensus
+
+| Run | Earlier `trace_lineages` | Poset |
 | --- | --- | --- |
-| Learning Sequence Encoders for Temporal Knowledge Graph Completion | 161 | **1.000** |
-| Recurrent Event Network | 162 | 0.733 |
-| Modeling Relational Data with Graph Convolutional Networks | 2,093 | 0.569 |
-| Semi-Supervised Classification with Graph Convolutional Networks | 11,675 | 0.219 |
-| Inductive Representation Learning on Large Graphs | 7,260 | 0.214 |
-| Graph Attention Networks | 8,006 | 0.174 |
+| EvalGen follow-ups | 3 paths of 3 papers, none through EvalGen | one connected part holding EvalGen with 4 extends, 3 compares and 1 critiques among the papers read |
 
-### Reach
-
-> **Definition (reach).** For magnet weights $w$, starting at $m$, the reach $\rho(v) = \sum_{u : w(u) > 0} w(u)\, \lambda^{h(v,u)}$ is the magnet mass reachable forward in time from $v$, where $h(v,u)$ is the fewest citation hops from $u$ back to $v$ and $\lambda = 0.5$.
-
-Without the discount, a magnet six hops away counts as much as an adjacent one, and every walk would start at the oldest paper in the graph, since it reaches all of them.
-
-### Lineages
-
-> **Algorithm (lineages).** For each seed $1, \dots, S$, reset $w \gets m$, then run $T$ walks:
-> 1. Start at $v = \arg\max_{u : \rho(u) > 0,\, w(u) > 0} \rho(u)\, w(u)$.
-> 2. Among the papers citing $v$ with $\rho > 0$, draw the next one with probability proportional to its $\rho$ (Efraimidis and Spirakis, 2006), and repeat until none is left.
-> 3. Count one more run of the path, knock down every magnet it collected, $w(u) \gets \kappa\, w(u)$, and recompute $\rho$.
->
-> Then drop every path another path contains, and rank the rest by $\text{runs}(\pi) \cdot \sum_{u \in \pi} m(u)$.
-
-Here $S = 10$ seeds, $T = 50$ walks per seed and $\kappa = 0.4$. A walk starts where the most argued-with mass is reachable, since rooting on reach alone would start every path at the oldest node again. The knockdown sends the next walk to a part of the graph the last one left alone, and as every seed fixes the sampler, the same graph always returns the same lineages.
-
-### Successors
-
-The lineages look backward, so LeyLine also returns **successors**, in `Miner.successors`.
-
-> **Definition (successor).** A successor is a paper outside the search, dated within 240 days before the cap, that `extends`, `critiques` or `compares` against at least one paper of the search with an intent score of at least 0.60, ranked by the number of such papers times its cosine to the question.
-
-A successor needs no citations of its own, which reaches the brand new papers that BoundedField's citation terms cannot. The miner also returns disputes, one citing sentence per pair that took a position, and connectors, papers outside the list sitting on a short path between two papers in it.
-
-### Evaluation
-
-No document lists a field's lineages to score against, so the walk's design was settled by reading the lineages it produced. What can be measured is the cold start, by asking at a date in the past and scoring against what happened after. Five Topic Queries were asked on 2025-03-01, with the citation graph running to 2026-09-10. An **Unseen Newcomer** is a paper of the 365 days before the question with no citations at the question date and 20 or more in the 18 months after.
-
-| Topic | Unseen Newcomers | BoundedField's top 20 | Successor top 20 | Successor set |
-| --- | --- | --- | --- | --- |
-| Tabular foundation models | 30 | 0 | 2 | 3 |
-| Mechanistic interpretability | 49 | 0 | 5 | 14 |
-| Retrieval for scientific literature | 43 | 0 | 4 | 11 |
-| Diffusion language models | 195 | 0 | 7 | 45 |
-| Test-time compute and reasoning | 240 | 0 | 2 | 63 |
-| **all** | **557** | **0** | **20** | **136** |
-
-The best rank any Unseen Newcomer reached in BoundedField's ranking was 41, and the median citation count the successor top 20 held at the question date was 0 for every topic. Each Topic Query is written as a researcher saying what they already know and what they are trying to decide:
-
-| Topic | Topic Query |
-| --- | --- |
-| Tabular foundation models | I work on tabular prediction and I have been away from the literature for about a year. I know TabPFN and the in-context learning story behind it, and I know gradient boosting is still the thing to beat on real datasets. I am trying to decide whether prior-fitted networks are now good enough to put in a production pipeline, or whether the whole line is still a benchmark curiosity. What has actually changed, and who is pushing it forward right now? |
-| Mechanistic interpretability | I am a safety researcher moving into mechanistic interpretability from RL. I have read the induction heads work and the sparse autoencoder papers, and I understand superposition as the motivating problem. I want to know what the field is actually doing now rather than what it was doing two years ago, and specifically whether sparse autoencoders are still the main tool or whether something replaced them. What should I read to be current, and what is still unsolved? |
-| Retrieval for scientific literature | I am building a system that finds the papers a literature review should cite, over a few million arXiv papers, running on one consumer GPU. I know dense retrieval with a scientific embedding model, and I know the LLM reranking line of work. I am trying to decide whether the citation graph is a useful signal at query time or whether everyone has settled on baking it into the embedding at training time. What is the current state, and where are the open problems? |
-| Diffusion language models | I work on efficient inference for language models and I keep seeing diffusion language models claimed as an alternative to autoregressive decoding. I know the discrete diffusion formulation and I have read the early masked diffusion papers. I want to know whether these have closed the quality gap with autoregressive models at a comparable scale, and what the current bottleneck is. Who is doing the serious work here now? |
-| Test-time compute and reasoning | I am a graduate student starting on reasoning in language models. I know chain of thought prompting and I know the basic idea that sampling more and verifying buys accuracy. I want to understand where the field currently draws the line between training a reasoner and spending compute at inference, and which of the two is winning. What is the frontier and what is still argued about? |
+On "Do state space models like Mamba match transformers on language modeling, and where do they still fall short?", Consensus cited 41 arXiv papers with 68 extends, critiques or compares pairs among them, and its answer used none of them.
+The poset holds those relations, such as three later papers critiquing the 8B empirical study Consensus calls its anchor.
 
 ### Related work
 
-- Main path analysis (Hummon and Doreian, 1989) traces a field's development along the citation path with the highest traversal count. LeyLine instead weights papers by how much the field argues with them and samples many paths toward that mass, keeping the distinct paths rather than the single heaviest one.
-- Randomized shortest paths (Saerens et al., 2009) and the betweenness measures built on them ([arXiv:1509.03147](https://arxiv.org/abs/1509.03147), [arXiv:1210.4276](https://arxiv.org/abs/1210.4276)) sample paths between two chosen endpoints. A LeyLine walk has no target, and its steps depend only on the mass reachable ahead.
-- Intermediacy ([arXiv:1812.08259](https://arxiv.org/abs/1812.08259)) measures how much a publication lies on paths between two others, which is the question LeyLine's connectors answer by enumeration.
+- Main path analysis (Hummon and Doreian, 1989) traces a field along the single citation path with the highest traversal count, while the poset keeps every argued citation and lets the reader follow any of them.
+- Intermediacy ([arXiv:1812.08259](https://arxiv.org/abs/1812.08259)) measures how much a publication lies on paths between two others, which the poset's added papers approximate by counting how many of the set each one argues with.
 
 ## Limitations
 
 - The agent was tested on 21 questions, once per effort, with one model, and no human expert rated the reports.
 - The check matches strings, so a report can quote a real sentence and still overstate it.
-- Lineages have no ground truth, and the walk's constants were set by reading the lineages rather than by a score.
-- Every intent comes from GraphIV's DistilBERT labeler, so a mislabeled citation moves a magnet.
-- The cold-start measurement is five questions on one date, and the successor set it reports is a reach, not a ranking that put the Unseen Newcomers on top.
+- A poset has no ground truth, and its sizes and cuts were set by reading the posets of five questions and comparing three runs against Consensus.
+- Every intent comes from GraphIV's DistilBERT labeler, so a mislabeled citation adds or drops an edge.
+- The added papers are ranked by closeness to the caller's phrase, so a phrase naming a model family pulls in its spin-offs in other domains.

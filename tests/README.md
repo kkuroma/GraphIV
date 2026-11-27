@@ -7,8 +7,8 @@ run.py                runs the whole suite, or one subdirectory
 core/                 how config paths resolve, and where a paper's full text is looked for
 retrieve/conftest.py  an eight paper citation graph written in the format stage2 exports
 retrieve/             the graph reader, the score, the expanders, the BM25 term, the recipe, the pipeline and author lookup
-miner/                LeyLine on a hand-built graph, and the successor order
-report/               the report check, the TL;DR split and the paragraph chunking
+mcp/                  the poset's edges, its reduction and its longest chain
+report/               the report check, the rendered report and the paragraph chunking
 export/               what the publish stage uploads
 graphiv_manager/      the manager's runner against fake stages, its disk gate, its schedule, its publish button and its fetch against a local server
 ```

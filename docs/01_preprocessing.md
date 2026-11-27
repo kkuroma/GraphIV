@@ -16,7 +16,7 @@ As of 2026-11-11, the corpus held 3,233,527 papers, 3,196,302 of them processed.
 | PDF mirror | `[source] PDF_BASE_URL` | Google's arxiv-dataset bucket |
 | HTML renders | `[source] HTML_BASE_URL`, `HTML_FALLBACK_URL` | arXiv's own render (ar5iv before 2024-01) |
 | Embedding endpoint | `[endpoints] EMBEDDING_ENDPOINT` | OpenAI compatible (uses `/tokenize`) |
-| LLM endpoint | `[endpoints] LLM_ENDPOINT` | Any OpenAI-compatible host, for naming the topics |
+| LLM endpoint | `[endpoints] PREPROCESS_LLM_ENDPOINT` | Any OpenAI-compatible host, for naming the topics |
 | Disk | `[dataset] PDF_PATH`, `HTML_PATH` | 5.6 TB PDF, 496 GB HTML and about 90 GB of Postgres |
 
 Every other path and default is a key of [`config.toml`](../config.toml), and every script takes `--config_path`.
@@ -85,7 +85,7 @@ For each paper with an HTML version, [`stage0_create_citation.py`](../scripts/ci
 
 ## Citation Intent
 
-Each citation is classified into one of six intents. Existing classifiers are coarser: SciCite uses background, method and result comparison, while ACL-ARC and MultiCite separate extending from comparing but fold critiques into comparison. I kept `critiques` separate since, with `extends` and `compares`, it forms what the lineage tracing follows ([`03_tools.md`](03_tools.md#leyline)).
+Each citation is classified into one of six intents. Existing classifiers are coarser: SciCite uses background, method and result comparison, while ACL-ARC and MultiCite separate extending from comparing but fold critiques into comparison. I kept `critiques` separate since, with `extends` and `compares`, it forms the edges of the poset `trace_lineages` builds ([`03_tools.md`](03_tools.md#the-poset)).
 
 | Intent | The citing paper | Share |
 | --- | --- | --- |
