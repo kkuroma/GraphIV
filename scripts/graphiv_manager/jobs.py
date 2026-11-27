@@ -20,7 +20,7 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
-from src.core.config import OVERRIDE_ENV
+from src.core.config import OVERRIDE_ENV, load_config
 
 # a stage finishing its current batch needs longer than a network timeout, and less than a COPY
 GRACE_INT = 60.0
@@ -272,6 +272,21 @@ def verdict(text: str) -> tuple[str, str]:
     return ("failed" if crashed else "blocked"), last[:300]
 
 
+def cap(config: Path) -> int:
+    """
+    The CPUs one job may use
+
+    Args:
+        config: The config.toml, whose [manager] THREADS is the cap.
+
+    Returns:
+        The cap, 0 for no cap or a missing config.
+    """
+    if not config.is_file():
+        return 0
+    return int(load_config(config).get("manager", {}).get("THREADS", 0))
+
+
 class Runner:
     """
     Runs one job's steps in order, and stops one by escalating from SIGINT to SIGKILL
@@ -313,6 +328,8 @@ class Runner:
         self.proc: asyncio.subprocess.Process | None = None
         self.job: Job | None = None
         self.stopping = False
+        # a child takes the affinity of the thread that spawns it, so each spawn narrows this set
+        self.cpus = sorted(os.sched_getaffinity(0))
         self.halted = "cancelled"
 
     async def run(self, job: Job) -> None:
@@ -400,6 +417,8 @@ class Runner:
         if step.config:
             # a step's own config is already merged, so no override may land on it again
             env[OVERRIDE_ENV] = os.devnull
+        threads = cap(self.config)
+        os.sched_setaffinity(0, self.cpus[:threads] if threads > 0 else self.cpus)
         with log.open("ab") as fh:
             self.proc = await asyncio.create_subprocess_exec(
                 self.python,
@@ -414,6 +433,7 @@ class Runner:
                 start_new_session=True,
                 env=env,
             )
+            os.sched_setaffinity(0, self.cpus)
             job.pid = self.proc.pid
             self.store.save(job)
             code = await self.proc.wait()

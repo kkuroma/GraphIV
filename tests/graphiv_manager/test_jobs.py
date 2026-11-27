@@ -3,6 +3,7 @@ The runner against fake stages: halting, refusing, the snapshot gate, cancelling
 """
 
 import asyncio
+import os
 import sys
 import textwrap
 import time
@@ -89,6 +90,18 @@ def test_cancel_escalates_past_an_ignored_sigint(world: tuple[Store, Runner, Pat
     took = asyncio.run(go())
     assert job.status == "cancelled"
     assert 0.9 < took < 5
+
+
+def test_a_step_runs_on_the_first_threads_cpus(
+    world: tuple[Store, Runner, Path], tmp_path: Path
+) -> None:
+    store, runner, scripts = world
+    _ = (tmp_path / "config.toml").write_text("[manager]\nTHREADS = 1\n")
+    count = stage(scripts, "count", "import os\nprint('cpus', len(os.sched_getaffinity(0)))\n")
+    job = store.new("t", [Step("a", count)])
+    asyncio.run(runner.run(job))
+    assert "cpus 1" in store.log(job).read_text()
+    assert len(os.sched_getaffinity(0)) == len(runner.cpus)
 
 
 def test_a_job_left_running_reads_back_interrupted(tmp_path: Path) -> None:

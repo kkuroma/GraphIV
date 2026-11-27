@@ -96,7 +96,7 @@ def build_rows(
     Returns:
         One row per sample, keyed by the schema's columns.
     """
-    drafter = str(cfg["endpoints"]["LLM_NAME"])
+    drafter = str(cfg["endpoints"]["PREPROCESS_LLM_NAME"])
     ids = sorted({a for s in samples for a in s.anchors})
     with psycopg.connect(str(cfg["database"]["PG_DEST"])) as conn:
         rows_meta = conn.execute(META, (ids,)).fetchall()
@@ -173,10 +173,10 @@ def main() -> None:
     out = Path(str(cfg["export"]["EXPORT_PATH"])) / f"graphiv-benchmarks-{cutoff}"
     part = out.with_name(out.name + ".part")
     writer = GemmaWriter(
-        str(cfg["endpoints"]["LLM_ENDPOINT"]),
-        str(cfg["endpoints"]["LLM_NAME"]),
+        str(cfg["endpoints"]["PREPROCESS_LLM_ENDPOINT"]),
+        str(cfg["endpoints"]["PREPROCESS_LLM_NAME"]),
         Path(str(cfg["export"]["QUERY_CACHE"])),
-        str(cfg["endpoints"]["LLM_API_KEY"]),
+        str(cfg["endpoints"]["PREPROCESS_LLM_API_KEY"]),
     )
     counts: dict[str, dict[str, int]] = {}
     medians: dict[str, int] = {}

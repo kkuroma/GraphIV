@@ -407,12 +407,13 @@ def probe(
     changed = {k for k, v in wanted.items() if at(before, k[0]).get(k[1]) != v}
     out: list[str] = []
     ep = after["endpoints"]
-    if any(s == "endpoints" and k.startswith("LLM_") for s, k in changed):
-        ok, said = probes.models(
-            str(ep["LLM_ENDPOINT"]), str(ep["LLM_NAME"]), str(ep["LLM_API_KEY"])
-        )
-        if not ok:
-            out.append(f"LLM: {said}")
+    for prefix, name in (("LLM_", "MCP LLM"), ("PREPROCESS_LLM_", "preprocessing LLM")):
+        if any(s == "endpoints" and k.startswith(prefix) for s, k in changed):
+            ok, said = probes.models(
+                str(ep[f"{prefix}ENDPOINT"]), str(ep[f"{prefix}NAME"]), str(ep[f"{prefix}API_KEY"])
+            )
+            if not ok:
+                out.append(f"{name}: {said}")
     if any(s == "endpoints" and k.startswith("EMBEDDING_") for s, k in changed):
         said = same_space(EmbeddingEndpoint.from_config(after), str(after["database"]["PG_DEST"]))
         if said:

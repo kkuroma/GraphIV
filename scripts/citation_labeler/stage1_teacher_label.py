@@ -182,9 +182,9 @@ def main() -> None:
     teacher = Teacher(
         model=str(cl["LABELER_APE_MODEL"]),
         prompt_path=str(Path(root) / "best.txt"),
-        api=str(cfg["endpoints"]["LLM_ENDPOINT"]),
+        api=str(cfg["endpoints"]["PREPROCESS_LLM_ENDPOINT"]),
         parallel=int(cl["LABELER_APE_PARALLEL"]),
-        key=str(cfg["endpoints"]["LLM_API_KEY"]),
+        key=str(cfg["endpoints"]["PREPROCESS_LLM_API_KEY"]),
     )
     _ = teacher.label(
         str(cfg["database"]["PG_DEST"]),

@@ -181,7 +181,6 @@ STAGES = [
         table="citations",
         label="Extract citations",
         script=f"{C}/stage0_create_citation.py",
-        args=["--workers", "16"],
         reads="the html of papers at stage 3 or later that were never parsed",
         writes="citations: one row per citation occurrence, and papers.is_citation_parsable",
         fetches="nothing, it reads the html on disk",

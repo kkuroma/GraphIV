@@ -310,9 +310,9 @@ class Manager:
             asyncio.to_thread(probes.store, self.dsn),
             asyncio.to_thread(
                 probes.models,
-                str(ep.get("LLM_ENDPOINT", "")),
-                str(ep.get("LLM_NAME", "")),
-                str(ep.get("LLM_API_KEY", "")),
+                str(ep.get("PREPROCESS_LLM_ENDPOINT", "")),
+                str(ep.get("PREPROCESS_LLM_NAME", "")),
+                str(ep.get("PREPROCESS_LLM_API_KEY", "")),
             ),
             asyncio.to_thread(
                 probes.models,

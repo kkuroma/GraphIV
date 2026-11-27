@@ -390,11 +390,11 @@ def main() -> None:
     cfg = load_config(str(args.config_path))
     ep, tp = cfg["endpoints"], cfg["topics"]
     labeler = TopicTreeLabeler(
-        base_url=str(ep["LLM_ENDPOINT"]),
-        model=str(ep["LLM_NAME"]),
+        base_url=str(ep["PREPROCESS_LLM_ENDPOINT"]),
+        model=str(ep["PREPROCESS_LLM_NAME"]),
         batch_size=int(tp["TOPIC_BATCH"]),
         n_papers=int(tp["N_TOPIC_LABEL"]),
-        key=str(ep["LLM_API_KEY"]),
+        key=str(ep["PREPROCESS_LLM_API_KEY"]),
     )
     _ = labeler.label_tree(str(cfg["database"]["PG_DEST"]))
 

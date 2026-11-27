@@ -303,9 +303,9 @@ def main() -> None:
     refiner = PromptRefiner(
         model=str(cl["LABELER_APE_MODEL"]),
         generations=int(cl["LABELER_APE_GENERATIONS"]),
-        api=str(cfg["endpoints"]["LLM_ENDPOINT"]),
+        api=str(cfg["endpoints"]["PREPROCESS_LLM_ENDPOINT"]),
         parallel=int(cl["LABELER_APE_PARALLEL"]),
-        key=str(cfg["endpoints"]["LLM_API_KEY"]),
+        key=str(cfg["endpoints"]["PREPROCESS_LLM_API_KEY"]),
     )
     _ = refiner.refine(str(cl["LABELER_PATH"]))
     report(str(cl["LABELER_PATH"]), refiner)

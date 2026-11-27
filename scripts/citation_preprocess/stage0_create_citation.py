@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import multiprocessing
+import os
 import re
 from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass
@@ -310,7 +311,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     _ = ap.add_argument("--config_path", default="config.toml")
     _ = ap.add_argument("--min-stage", type=int, default=3)
-    _ = ap.add_argument("--workers", type=int, default=16)
+    _ = ap.add_argument("--workers", type=int, default=len(os.sched_getaffinity(0)))
     _ = ap.add_argument("--limit", type=int, default=0, help="stop after N papers")
     args = ap.parse_args()
 
