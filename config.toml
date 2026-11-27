@@ -46,34 +46,22 @@ EXPANSION_LIMIT = 20000 # most papers each expander appends
 DEPTH = 4 # hops the decay terms reach
 DECAY = 0.5 # weight kept per hop in the decay terms
 
-# LeyLine Miner
-[miner]
-FOCUS = 4.0 # exponent on closeness when scoring an argued-with paper
-WALK_PREFIX = 30 # head of the ranking the walks run on
-CONNECTORS = 40 # most bridging papers kept
-DECAY = 0.5 # weight kept per hop of a paper's reach
-KNOCKDOWN = 0.4 # weight left on a paper once a line takes it
-SEEDS = 10 # papers the walks start from
-WALKS = 50 # walks per seed
-BRANCH = 1 # papers a walk steps to at a time
-ARGUES = ["extends", "critiques", "compares"] # intents that count as arguing with a paper
-SUCCESSOR_DAYS = 240 # days before the cap a successor may date from
-SUCCESSOR_FLOOR = 0.60 # lowest intent score a successor's citation needs
-
-# LeyLine Intent Weights
-[miner.weights]
-extends = 1.0
-critiques = 1.0
-compares = 0.8
-uses = 0.4
-motivates = 0.15
-background = 0.0
+# Lineage Poset
+[lineages]
+SIDE = 50 # papers each of the survey and recent searches returns
+RECENT_DAYS = 730 # days back the recent search reaches
+LEAST = 3 # set papers an outside paper must cite to join
+ADDED = 30 # most outside papers joining
+LEAST_READS = 2 # reads citing a paper before it counts as argued with
+MUST_ARGUED = 4 # argued-with papers a deep report must read
+MUST_RECENT = 4 # recent papers a deep report must read
 
 # Manager
 [manager]
 PORT = 6868 # port of the manager page
 STATE_PATH = "data/manager" # jobs and cached charts
 HF_TOKEN_PATH = "" # Hugging Face token file for publishing (empty means none)
+THREADS = 8 # CPU threads a job may use (0 means all)
 
 # Export and Publishing
 [export]
@@ -94,9 +82,12 @@ EMBEDDING_BATCH = 256 # papers per embedding batch
 EMBEDDING_MAX_SEQ = 512 # token budget per document
 EMBEDDING_DOCUMENT_PREFIX = "search_document: " # prefix on every embedded document
 EMBEDDING_QUERY_PREFIX = "search_query: " # prefix on every embedded question
-LLM_ENDPOINT = "http://localhost:11434/v1" # chat model endpoint
-LLM_API_KEY = "" # chat model endpoint key (empty means none)
-LLM_NAME = "Wordslop-Qwen3.6-27B" # chat model
+LLM_ENDPOINT = "http://localhost:11434/v1" # chat model endpoint of the MCP tools
+LLM_API_KEY = "" # chat model endpoint key of the MCP tools (empty means none)
+LLM_NAME = "Wordslop-Qwen3.6-27B" # chat model of the MCP tools
+PREPROCESS_LLM_ENDPOINT = "http://localhost:11434/v1" # chat model endpoint of the preprocessing stages
+PREPROCESS_LLM_API_KEY = "" # chat model endpoint key of the preprocessing stages (empty means none)
+PREPROCESS_LLM_NAME = "Gemma-4-26B-Batched" # chat model of the preprocessing stages
 
 # Review Classifier
 [survey]
@@ -130,7 +121,7 @@ LABELER_PATH = "data/citation_labeler" # checkpoint directory
 LABELER_MODEL = "distilbert/distilbert-base-uncased" # student base model
 LABELER_BATCH = 48 # citations per forward pass
 LABELER_MAX_SEQ = 256 # token budget per citation
-LABELER_APE_MODEL = "Wordslop-Qwen3.6-27B" # teacher model
+LABELER_APE_MODEL = "Gemma-4-26B-Batched" # teacher model
 LABELER_APE_GENERATIONS = 6 # prompt search generations
 LABELER_APE_PARALLEL = 4 # teacher calls in flight
 LABELER_TEACHER_SAMPLE = 10000 # citations the teacher labels

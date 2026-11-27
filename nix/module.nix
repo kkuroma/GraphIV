@@ -369,30 +369,14 @@ in
             DECAY = opt types.float 0.5 "Decay weight kept per hop";
           };
 
-          miner = section "LeyLine Miner" {
-            FOCUS = opt types.float 4.0 "Closeness exponent for magnets";
-            WALK_PREFIX = opt types.int 30 "Ranking head the walks use";
-            CONNECTORS = opt types.int 40 "Max bridging papers";
-            DECAY = opt types.float 0.5 "Reach weight kept per hop";
-            KNOCKDOWN = opt types.float 0.4 "Weight left once a line takes a paper";
-            SEEDS = opt types.int 10 "Papers the walks start from";
-            WALKS = opt types.int 50 "Walks per seed";
-            BRANCH = opt types.int 1 "Papers per walk step";
-            ARGUES = opt (types.listOf types.str) [
-              "extends"
-              "critiques"
-              "compares"
-            ] "Intents that count as arguing";
-            SUCCESSOR_DAYS = opt types.int 240 "Successor window before the cap (days)";
-            SUCCESSOR_FLOOR = opt types.float 0.6 "Min intent score for a successor";
-            weights = section "LeyLine Intent Weights" {
-              extends = opt types.float 1.0 "Weight of extends citations";
-              critiques = opt types.float 1.0 "Weight of critiques citations";
-              compares = opt types.float 0.8 "Weight of compares citations";
-              uses = opt types.float 0.4 "Weight of uses citations";
-              motivates = opt types.float 0.15 "Weight of motivates citations";
-              background = opt types.float 0.0 "Weight of background citations";
-            };
+          lineages = section "Lineage Poset" {
+            SIDE = opt types.int 50 "Papers per survey and recent search";
+            RECENT_DAYS = opt types.int 730 "Days the recent search reaches back";
+            LEAST = opt types.int 3 "Set papers an outside paper must cite";
+            ADDED = opt types.int 30 "Max outside papers joining";
+            LEAST_READS = opt types.int 2 "Reads citing a paper to count it argued with";
+            MUST_ARGUED = opt types.int 4 "Argued-with papers a deep report reads";
+            MUST_RECENT = opt types.int 4 "Recent papers a deep report reads";
           };
 
           manager = section "Manager" {
@@ -402,6 +386,7 @@ in
               derived types.str (lib.optionalString (cfg.manager.huggingface.tokenFile != null) credential)
                 ''"${credential}" when manager.huggingface.tokenFile is set, and "" otherwise''
                 "Hugging Face token file";
+            THREADS = opt types.int 8 "CPU threads a job may use (0 means all)";
           };
 
           export = section "Export and Publishing" {
@@ -423,12 +408,19 @@ in
             EMBEDDING_MAX_SEQ = opt types.int 512 "Max tokens per document";
             EMBEDDING_DOCUMENT_PREFIX = opt types.str "search_document: " "Document prefix";
             EMBEDDING_QUERY_PREFIX = opt types.str "search_query: " "Question prefix";
-            LLM_ENDPOINT = opt types.str "http://127.0.0.1:11434/v1" "Chat model URL (OpenAI compatible)";
-            LLM_API_KEY = opt types.str "" "Chat API key (set in the manager)";
+            LLM_ENDPOINT = opt types.str "http://127.0.0.1:11434/v1" "MCP tools' chat model URL (OpenAI compatible)";
+            LLM_API_KEY = opt types.str "" "MCP tools' chat API key (set in the manager)";
             LLM_NAME = mkOption {
               type = types.str;
               example = "Wordslop-Qwen3.6-27B";
-              description = "Chat model";
+              description = "MCP tools' chat model";
+            };
+            PREPROCESS_LLM_ENDPOINT = opt types.str "http://127.0.0.1:11434/v1" "Preprocessing chat model URL (OpenAI compatible)";
+            PREPROCESS_LLM_API_KEY = opt types.str "" "Preprocessing chat API key (set in the manager)";
+            PREPROCESS_LLM_NAME = mkOption {
+              type = types.str;
+              example = "Gemma-4-26B-Batched";
+              description = "Preprocessing chat model";
             };
           };
 
@@ -473,7 +465,7 @@ in
             LABELER_MODEL = opt types.str "distilbert/distilbert-base-uncased" "Student base model";
             LABELER_BATCH = opt types.int 48 "Sentences per inference batch";
             LABELER_MAX_SEQ = opt types.int 256 "Max tokens per sentence";
-            LABELER_APE_MODEL = derived types.str s.endpoints.LLM_NAME "settings.endpoints.LLM_NAME" "Teacher model for prompt evolution";
+            LABELER_APE_MODEL = derived types.str s.endpoints.PREPROCESS_LLM_NAME "settings.endpoints.PREPROCESS_LLM_NAME" "Teacher model for prompt evolution";
             LABELER_APE_GENERATIONS = opt types.int 6 "Prompt evolution rounds";
             LABELER_APE_PARALLEL = opt types.int 4 "Concurrent teacher calls";
             LABELER_TEACHER_SAMPLE = opt types.int 10000 "Citations the teacher labels";
@@ -529,7 +521,11 @@ in
         message = "services.graphiv.settings needs API_PORT, FRONTEND_PORT and manager.PORT to differ";
       }
       {
-        assertion = s.endpoints.LLM_API_KEY == "" && s.endpoints.EMBEDDING_API_KEY == "";
+        assertion = lib.all (k: s.endpoints.${k} == "") [
+          "LLM_API_KEY"
+          "PREPROCESS_LLM_API_KEY"
+          "EMBEDDING_API_KEY"
+        ];
         message = "services.graphiv.settings.endpoints API keys would land in the world-readable store, so set them in the manager";
       }
       {

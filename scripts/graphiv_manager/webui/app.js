@@ -1155,7 +1155,7 @@ function historyTab() {
 // the left column serves and stores, the right column builds and measures
 const CFG_GROUPS = [
   ["Models", "--secondary", ["endpoints"], 0],
-  ["MCP and retrieval", "--primary", ["serve", "retrieve", "miner", "miner.weights"], 0],
+  ["MCP and retrieval", "--primary", ["serve", "retrieve", "lineages"], 0],
   ["Corpus and storage", "--yellow", ["database", "source", "download", "dataset", "export"], 0],
   ["Preprocessing", "--green", ["survey", "umap", "topics", "citation_labeler"], 1],
   ["Benchmarks", "--sky", ["surveymatch", "benchmarks"], 1],

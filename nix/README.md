@@ -42,6 +42,7 @@ A key the module does not declare fails evaluation, and `nix flake check` holds 
     enable = true;
     stateDir = "/srv/graphiv";
     settings.endpoints.LLM_NAME = "Wordslop-Qwen3.6-27B";
+    settings.endpoints.PREPROCESS_LLM_NAME = "Gemma-4-26B-Batched";
     settings.serve.ALLOWED_HOSTS = [ "graphiv.example.com" ];
   };
 }
@@ -91,7 +92,7 @@ The exponents live in the recipe files that ship with the package, because an op
 
 The generated `config.toml` is the default, linked as `<stateDir>/config.toml`, and `<stateDir>/config-override.toml` holds only the keys the manager's graphiv-mcp tab changed.
 Every unit reads the default with the override merged over it, and reverting a key in the tab deletes it from the override.
-The override is 0600, since it holds `settings.endpoints.LLM_API_KEY` and `EMBEDDING_API_KEY`, which have to stay empty in nix because a value set there lands in the world-readable store.
+The override is 0600, since it holds `settings.endpoints.LLM_API_KEY`, `PREPROCESS_LLM_API_KEY` and `EMBEDDING_API_KEY`, which have to stay empty in nix because a value set there lands in the world-readable store.
 The tab renders `graphiv-config-schema.json`, every section and option with its type and description, which the module writes and hands the manager as `GRAPHIV_CONFIG_SCHEMA`.
 A path, a port, `HOST`, `ALLOWED_HOSTS` and `PG_DEST` are marked built in the tab, since the units, caddy and the sandbox are built around their nix value until the next rebuild.
 

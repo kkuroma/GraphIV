@@ -79,6 +79,7 @@
           system.stateVersion = "25.11";
           services.graphiv.enable = true;
           services.graphiv.settings.endpoints.LLM_NAME = "probe";
+          services.graphiv.settings.endpoints.PREPROCESS_LLM_NAME = "probe";
         }
       ];
     };
