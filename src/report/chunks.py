@@ -29,6 +29,29 @@ BM25_B = 0.75
 WORD = re.compile(r"[a-z0-9]+")
 SKIPPED = "section.ltx_bibliography, nav, header, footer"
 READABLE = "p.ltx_p, figure.ltx_table, figure.ltx_figure > figcaption"
+# a sentence ends at a stop before a capital, but not after a short form a reference or name follows
+SHORT_FORMS = (
+    "Ref", "Refs", "Fig", "Figs", "Eq", "Eqs", "Sec", "Tab", "App", "al", "i.e", "e.g", "vs", "cf",
+    "No", "Thm", "Lem", "Prop", "Alg", "Def",
+)  # fmt: skip
+SENTENCE = re.compile(
+    "".join(rf"(?<!\b{re.escape(f)}\.)" for f in SHORT_FORMS)
+    + r"(?<!\b[A-Z]\.)(?<=[.!?])\s+(?=[A-Z])"
+)
+# a piece this short, or one ending on a colon, belongs with the piece after it
+PIECE_CHARS = 15
+# a chunk with this many cell separators is a table, which stays one unit
+TABLE_BARS = 4
+
+
+@dataclass(frozen=True)
+class Sentence:
+    """
+    One sentence of a shown paragraph, or a whole table, which is what a reader points at
+    """
+
+    pid: str
+    text: str
 
 
 @dataclass
@@ -242,3 +265,43 @@ def around(hits: list[int], count: int, reach: int) -> list[int]:
         The positions to show.
     """
     return sorted({j for i in hits for j in range(i - reach, i + reach + 1) if 0 <= j < count})
+
+
+def split(text: str) -> list[str]:
+    """
+    One paragraph as sentences, a piece ending on a colon or under PIECE_CHARS joining the next
+
+    Args:
+        text: The paragraph.
+
+    Returns:
+        The sentences in order.
+    """
+    out: list[str] = []
+    for piece in (p.strip() for p in SENTENCE.split(text)):
+        if not piece:
+            continue
+        if out and (out[-1].endswith(":") or len(out[-1]) < PIECE_CHARS):
+            out[-1] = f"{out[-1]} {piece}"
+        else:
+            out.append(piece)
+    return out
+
+
+def sentences(chunks: list[Chunk], spots: list[int]) -> list[Sentence]:
+    """
+    Every sentence of the shown chunks in reading order, each table kept whole
+
+    Args:
+        chunks: The paper.
+        spots: The chunk positions shown.
+
+    Returns:
+        The sentences, each with its paragraph id.
+    """
+    out = []
+    for i in spots:
+        chunk = chunks[i]
+        parts = [chunk.text] if chunk.text.count("|") > TABLE_BARS else split(chunk.text)
+        out += [Sentence(chunk.pid, part) for part in parts]
+    return out

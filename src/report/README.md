@@ -5,7 +5,8 @@ The prose belongs to the agent that called the tools, and nothing here writes or
 
 ```
 chunks.py  one paper as numbered paragraphs, tables and captions, and the ones a question needs
-check.py   the mechanical check on an agent's report, string matching against what the run read
+check.py   the mechanical check on an agent's report object, each fault under the path of its field
+render.py  the report object as markdown, its tables, coverage, posets and searches from the session
 ```
 
 ## The Paragraphs
@@ -17,19 +18,26 @@ A quote is checked against the one paragraph it came from, so a paragraph id is 
 
 ## The Check
 
+A report is an object: a question, a TL;DR, overview blocks, sections of blocks and further reading.
+A block is a finding, an inference, an open area, or a table, coverage or poset placed by its id.
 `check` runs on every save, and a report passes only when it finds nothing.
 
 | Fault | When |
 | --- | --- |
-| `unknown marker` | A label no read gave |
-| `number not in its paragraph` | A number on a cited line that no paragraph behind its labels holds |
-| `quote not in its paragraph` | A quoted phrase that none of the line's paragraphs holds |
-| `name not in the papers cited` | A name on a cited sentence that no cited paper's full text holds |
-| `paper cited but never read` | An arXiv id in the body that the reader never went through |
+| `unknown marker` | A label no reply gave |
+| `cites nothing` | A finding or TL;DR with no marker, or an open area stating a number with none |
+| `number not in its paragraph` | A number that no paragraph behind the block's markers holds |
+| `quote not in its paragraph` | A quoted phrase that none of the block's paragraphs holds |
+| `name not in the papers cited` | A name that neither a cited paper's full text nor a read paper's title or abstract holds |
+| `paper named but never read` | An arXiv id in a block's text that the reader never went through |
 | `paper never returned by a tool` | An arXiv id in the further reading that no tool returned |
-| `search claimed but never run` | A search the report describes with words the run never searched with |
-| `statement with no marker` | A sentence of 12 words or more with no label, outside a line opening on Inference |
+| `search never run` | An open area naming a search the session never made |
+| `nearest hits never read` | An open area whose search's three nearest papers were none of them read |
+| `names a paper without its marker` | A TL;DR naming a paper the session holds a marker of, without citing one |
+| `no such table`, `no such poset` | A placed id the session lacks |
+| `papers not in the poset` | A poset block drawing a paper its poset does not hold |
 
-`save_report` in `src/mcp` adds three of its own: a TL;DR that cites nothing, one over 40 words, and a body citing nothing.
-`split_tldr` takes the opening TL;DR paragraph off the report before the check.
-`relist` rewrites the further reading from the store, so a listed title is never the agent's.
+`contract` adds one fault to a deep report missing a table, its coverage, a poset, three findings citing the poset's sentences, or an open area, at the path of a new section.
+`patch` applies a writer's fix by path, so a failed check costs only the fields it named.
+`render` draws every table and poset the session made, the unplaced ones under Also from this study, and the further reading from the store.
+It puts each marker beside the name of the paper it quotes when the text names it, and at the end of the sentence otherwise.
