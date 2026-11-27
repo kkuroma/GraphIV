@@ -1,35 +1,18 @@
 # miner
 
-LeyLine, the miner.
-It takes the papers a search kept, never the question, and reads them as one citation graph to find what the field argues about and how it got there.
-The math is in [`docs/03_tools.md`](../../docs/03_tools.md#leyline).
+The queries `trace_lineages` builds its poset from, and the paper reads the citation tools share.
+Nothing here reads a question, so a caller passes the vector a ranking needs.
 
 ```
-leyline.py   LeyLine itself, on a typed graph, knowing nothing about papers
-miner.py     Miner, which turns papers into that graph and calls LeyLine once
-store.py     every query this package sends to Postgres
-recipe.py    reads config.toml's [miner] block, where every constant lives
+store.py     every statement this package sends to Postgres
 ```
 
-## Why LeyLine Takes No Papers
-
-Its whole input is an edge list typed by intent, a score and an order per node, and a weight per intent.
-So `tests/miner/test_leyline.py` runs it on a hand-built ten-node graph with no store and no GPU, and only `miner.py` knows what an arXiv id is.
-
-## What a Call Does
-
-```python
-found = Miner(dsn, graph, build_recipe(config["miner"])).mine(papers, vector, asked)
-```
-
-The list is first expanded by one citation hop, because papers a reader kept rarely cite each other, while the papers a field argues with are the ones they all cite.
-The walks run on the head of the list and the successors on all of it.
-Lineages stop repeating once the graph gets wide, while successors keep growing with every paper added.
-
-| Field | What it holds |
+| Function | Returns |
 | --- | --- |
-| `magnets` | The papers the list takes positions on, with their counts per intent |
-| `lineages` | Dated paths through the graph, and how many runs repeated each one |
-| `disputes` | One sentence per citing pair that took a position |
-| `successors` | Recent papers that extend, critique or compare against the list, which need no citations of their own |
-| `connectors` | Papers outside the list that sit on a path between two papers inside it |
+| `read_edges` | every labeled citation with both ends inside a set of papers |
+| `read_citers` | papers outside a set citing at least some of it with an intent, closest to a question first |
+| `read_cosines` | each paper's cosine to a vector |
+| `read_papers` | the fields a `Paper` needs for a list of ids |
+| `read_seed` | one paper and its stored vector, which a search around that paper sends |
+
+The poset itself is described in [`docs/03_tools.md`](../../docs/03_tools.md#the-poset).

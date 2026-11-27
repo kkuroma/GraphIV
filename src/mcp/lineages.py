@@ -1,209 +1,319 @@
 """
-The lines a set of papers developed along, sampled by LeyLine over the citations around them
+The citation poset of a field, a survey search as its past and a recent focused one as its present
 
-The graph is the papers plus every paper on a citation path of at most two hops joining two of them
-A short list of unrelated papers has no such paths, which is why a whole search is the input
+Every edge is a citation with an intent inside that set, so each is a sentence a report can cite
+Papers outside both searches join when they argue with several of the set, closest to the question
 """
 
 from __future__ import annotations
 
+import statistics
+from collections import Counter
+from datetime import date, timedelta
+from functools import cache
 from typing import Any
 
-import numpy as np
-
-from src.core.parse_graph_export import gather_rows
 from src.mcp.context import Context
-from src.mcp.papers import clean, read_records
+from src.mcp.papers import Filter, Record, clean, read_records
 from src.mcp.runs import Run
-from src.miner.leyline import LeyLine
-from src.miner.store import mean_vector, read_edges, read_papers, read_vectors
+from src.mcp.search import rank
+from src.miner.store import read_citers, read_cosines, read_edges
+from src.report.check import name_of
 
-HOPS = 2
-MOST_PAPERS = 1500
-LINES = 4
-SHORTEST = 3
-STEPS = 6
-SENTENCE_CHARS = 200
-RANK = {"critiques": 0, "extends": 1, "compares": 2, "motivates": 3, "uses": 4}
+INTENTS = ("extends", "critiques", "compares")
+# how a pair cited with several intents is drawn, the strongest position first
+RANK = {"critiques": 0, "extends": 1, "compares": 2}
+# config.toml's [lineages] block overrides each of these
+DEFAULTS = {
+    "SIDE": 50,
+    "RECENT_DAYS": 730,
+    "LEAST": 3,
+    "ADDED": 30,
+    "LEAST_READS": 2,
+    "MUST_ARGUED": 4,
+    "MUST_RECENT": 4,
+}
+ARGUED = 8
+PER_PAPER = 4
+NEWEST = 10
+SENTENCE_CHARS = 220
+TITLE_CHARS = 80
 
 
-def step(ctx: Context, rows: np.ndarray, forward: bool) -> np.ndarray:
+def best_edges(
+    edges: list[Any], papers: dict[str, Record], intents: list[str]
+) -> dict[tuple[str, str], Any]:
     """
-    Every paper one citation hop from a set of rows
+    One citation per citing pair, the strongest intent with a sentence, newer paper citing older
 
     Args:
-        ctx: The open handles.
-        rows: Graph rows.
-        forward: Toward citers when True, toward references when False.
+        edges: Every labeled citation inside the set.
+        papers: The set by id.
+        intents: The intents kept.
 
     Returns:
-        The rows reached, with repeats.
+        The citation per (citer, cited) pair.
     """
-    g = ctx.graph
-    ptr, idx = (g.cites_ptr, g.cites_idx) if forward else (g.refs_ptr, g.refs_idx)
-    return gather_rows(idx, ptr[rows], ptr[rows + 1] - ptr[rows])
+    order = {a: (p.date, a) for a, p in papers.items()}
+    best: dict[tuple[str, str], Any] = {}
+    for e in edges:
+        pair = (e.source, e.target)
+        if e.intent not in intents or e.source not in order or e.target not in order:
+            continue
+        # a same day citation both ways would loop, so time and then id decide the direction
+        if order[e.source] <= order[e.target]:
+            continue
+        old = best.get(pair)
+        if old is None or (RANK[e.intent], not e.sentence) < (RANK[old.intent], not old.sentence):
+            best[pair] = e
+    return best
 
 
-def reach(ctx: Context, seeds: np.ndarray, forward: bool) -> dict[int, int]:
+def reduce(pairs: set[tuple[str, str]]) -> set[tuple[str, str]]:
     """
-    How many hops each paper sits from the seeds in one direction
+    The pairs no longer path joins, which is what a figure of the poset draws
 
     Args:
-        ctx: The open handles.
-        seeds: Graph rows.
-        forward: The direction.
+        pairs: The (citer, cited) pairs, acyclic.
 
     Returns:
-        Hops per row reached, the seeds at zero.
+        The pairs kept.
     """
-    out = {int(s): 0 for s in seeds}
-    frontier = seeds
-    for hop in range(1, HOPS + 1):
-        if not len(frontier):
-            break
-        fresh = [int(x) for x in np.unique(step(ctx, frontier, forward)) if int(x) not in out]
-        for x in fresh:
-            out[x] = hop
-        frontier = np.array(fresh, np.int64)
-    return out
+    refs: dict[str, set[str]] = {}
+    for a, b in pairs:
+        refs.setdefault(a, set()).add(b)
+
+    @cache
+    def below(a: str) -> frozenset[str]:
+        out: set[str] = set()
+        for b in refs.get(a, ()):
+            out |= {b} | below(b)
+        return frozenset(out)
+
+    return {
+        (a, b) for a, b in pairs if not any(b in below(c) for c in refs[a] if c != b)
+    }  # fmt: skip
 
 
-def between(ctx: Context, ids: list[str]) -> list[str]:
+def longest(
+    pairs: set[tuple[str, str]], papers: dict[str, Record], weight: dict[str, float]
+) -> list[str]:
     """
-    The papers plus every paper on a short citation path joining two of them
+    The chain of citations with the largest summed weight, oldest paper first
+
+    A paper of negative weight ends a chain, so a chain starts where it turns to the question.
 
     Args:
-        ctx: The open handles.
-        ids: The caller's papers.
+        pairs: The (citer, cited) pairs.
+        papers: The set by id.
+        weight: How far each paper sits above the median closeness to the question.
 
     Returns:
-        The ids of the graph the walks run on.
+        The chain's ids.
     """
-    rows = np.array([ctx.graph.index[a] for a in ids if a in ctx.graph.index], np.int64)
-    up, down = reach(ctx, rows, True), reach(ctx, rows, False)
-    keep = {x for x, a in up.items() if x in down and a + down[x] <= HOPS} | {int(r) for r in rows}
-    return [ctx.graph.ids[x].decode() for x in keep]
+    refs: dict[str, list[str]] = {}
+    for a, b in pairs:
+        refs.setdefault(a, []).append(b)
+    depth: dict[str, tuple[float, str]] = {}
+    for a in sorted({x for p in pairs for x in p}, key=lambda a: (papers[a].date, a)):
+        below = [(depth[b][0], b) for b in refs.get(a, []) if b in depth]
+        top = max(below, default=(0.0, ""))
+        top = top if top[0] > 0 else (0.0, "")
+        depth[a] = (top[0] + weight.get(a, 0.0), top[1])
+    if not depth:
+        return []
+    end = max(depth, key=lambda a: (depth[a][0], papers[a].date))
+    chain = [end]
+    while depth[chain[-1]][1]:
+        chain.append(depth[chain[-1]][1])
+    return chain[::-1]
 
 
-def describe(
-    nodes: list[str], edges: list[Any], held: dict[str, Any], given: set[str]
-) -> dict[str, Any]:
+def named(record: Record) -> str:
     """
-    One line as its papers oldest first, the citing sentences along it and a figure
+    A paper as one line, id, short title and year
 
     Args:
-        nodes: The line's papers, oldest first.
-        edges: Every labeled citation in the graph.
-        held: The papers by id.
-        given: The caller's own papers.
+        record: The paper.
 
     Returns:
         The line.
     """
-    keep = set(nodes)
-    best: dict[tuple[str, str], Any] = {}
-    for e in edges:
-        pair = (e.target, e.source)
-        if (
-            e.source in keep
-            and e.target in keep
-            and e.intent in RANK
-            and (pair not in best or RANK[e.intent] < RANK[best[pair].intent])
-        ):
-            best[pair] = e
-    marks = {a: f"p{i}" for i, a in enumerate(nodes)}
-    boxes = [
-        f'{marks[a]}["{a} ({held[a].date.year}) {clean(held[a].title)[:44].replace(chr(34), "")}"]'
-        for a in nodes
-    ]
-    arrows = [f"{marks[a]} -->|{e.intent}| {marks[b]}" for (a, b), e in best.items()]
-    said = sorted((e for e in best.values() if e.sentence), key=lambda e: RANK[e.intent])[:STEPS]
-    return {
-        "papers": [
-            {
-                "arxiv_id": a,
-                "year": held[a].date.year,
-                "title": clean(held[a].title),
-                "yours": a in given,
-            }
-            for a in nodes
-        ],
-        "steps": [
-            {
-                "citer": e.source,
-                "cited": e.target,
-                "intent": e.intent,
-                "sentence": clean(e.sentence)[:SENTENCE_CHARS],
-            }
-            for e in said
-        ],
-        "mermaid": "graph LR\n" + "\n".join(boxes + arrows),
-    }
+    return f"{record.arxiv_id} {clean(record.title)[:TITLE_CHARS]} ({record.date.year})"
 
 
-def trace_lineages(ctx: Context, run: Run, arxiv_ids: list[str], question: str) -> str:
+def trace_lineages(
+    ctx: Context, run: Run, query: str, past: list[str], present: list[str], intents: list[str]
+) -> str:
     """
-    The lines a set of papers developed along
+    The poset of citations with an intent among a field's past and present papers
 
     Args:
         ctx: The open handles.
-        run: The caller's run, which keeps the lines for the report.
-        arxiv_ids: The papers, best a whole search.
-        question: What the caller works on, which holds the walks to the topic.
+        run: The caller's run, which keeps the poset for the report and labels its sentences.
+        query: A phrase for the field, searched in survey mode as the past, focused as the present.
+        past: Papers the caller adds to the past, like one the question names.
+        present: Papers the caller adds to the present.
+        intents: The intents an edge may carry, empty for extends, critiques and compares.
 
     Returns:
-        Each line as its papers oldest first and the sentences joining them.
+        The poset's longest chain, the papers argued with most and the newest positions taken.
     """
-    ids = list(dict.fromkeys(a.strip() for a in arxiv_ids if a.strip()))
-    if len(ids) < SHORTEST:
-        return f"Pass at least {SHORTEST} papers, best a whole search."
-    vector = (
-        ctx.embed(question)
-        if question.strip()
-        else mean_vector(list(read_vectors(ctx.dsn, ids).values()))
+    knobs = {**DEFAULTS, **ctx.config.get("lineages", {})}
+    side, least, reading = int(knobs["SIDE"]), int(knobs["LEAST"]), int(knobs["LEAST_READS"])
+    wanted = [i for i in intents if i in RANK] or list(INTENTS)
+    since = date.today() - timedelta(days=int(knobs["RECENT_DAYS"]))
+    olds = [a.strip() for a in past if a.strip()]
+    news = [a.strip() for a in present if a.strip()]
+    if query.strip():
+        found, _ = rank(ctx, "survey", query, "", Filter(), side)
+        olds += [r.arxiv_id for r in found]
+        found, _ = rank(
+            ctx, "focused", query, "", Filter(date_range=[since.isoformat(), None]), side
+        )
+        news += [r.arxiv_id for r in found]
+    reads = list(run.papers)
+    base = list(dict.fromkeys(olds + news + reads))
+    if len(base) < 2:
+        return "Pass a query, or papers in past and present."
+    vector = ctx.embed(query.strip() or run.question or " ".join(base))
+    added = read_citers(ctx.dsn, base, wanted, least, vector, int(knobs["ADDED"]))
+    papers = read_records(ctx.dsn, base + added)
+    best = best_edges(read_edges(ctx.dsn, list(papers)), papers, wanted)
+    if not best:
+        return (
+            f"No citation with an intent of {', '.join(wanted)} joins these {len(papers)} papers."
+        )
+    kept = {x for pair in best for x in pair}
+    near = {a: max(c, 0.0) for a, c in read_cosines(ctx.dsn, vector, list(kept)).items()}
+    drawn = reduce(set(best))
+    middle = statistics.median(near.values()) if near else 0.0
+    chain = longest(drawn, papers, {a: c - middle for a, c in near.items()})
+    argued: dict[str, Counter[str]] = {}
+    for (_, b), e in best.items():
+        argued.setdefault(b, Counter())[e.intent] += 1
+    # what the reads critique or extend comes first, as a hub or a baseline is no debate
+    by_reads = Counter(
+        b for (a, b), e in best.items() if a in run.papers and e.intent in ("critiques", "extends")
     )
-    graph = between(ctx, ids)
-    papers = {p.arxiv_id: p for p in read_papers(ctx.dsn, vector, graph)}
-    given = set(ids)
-    ranked = sorted(papers, key=lambda a: (a not in given, -(papers[a].cosine or 0.0)))[
-        :MOST_PAPERS
-    ]
-    held = {a: papers[a] for a in ranked}
-    edges = read_edges(ctx.dsn, ranked)
-    scores = {a: max(p.cosine or 0.0, 0.0) for a, p in held.items()}
-    order = {a: float(p.date.toordinal()) for a, p in held.items()}
-    walker = LeyLine(edges, ctx.mining.settings, scores, order, focus=scores)
-    lines = [x for x in walker.lineages() if len(x.nodes) >= SHORTEST][:LINES]
-    found = [describe(x.nodes, edges, held, given) for x in lines]
-    citers = {step["citer"] for line in found for step in line["steps"]}
-    keys = {a: r.key for a, r in read_records(ctx.dsn, list(citers)).items()}
-    for line in found:
-        for step in line["steps"]:
-            key = keys.get(step["citer"], "Paper")
-            step["label"] = run.cite(step["citer"], step["cited"], step["sentence"], key)
+    debated = [a for a, n in by_reads.most_common() if n >= reading]
+    closest = sorted(argued, key=lambda a: (-sum(argued[a].values()) * near.get(a, 0.0), a))
+    top = list(dict.fromkeys(debated + closest))[:ARGUED]
+    shown: list[tuple[str, str]] = list(zip(chain[1:], chain[:-1], strict=True))
+    weight = {a: sum(c.values()) for a, c in argued.items()}
+    for b in top:
+        # each intent in turn, its citers the field itself argues with most first
+        into = [p for p in best if p[1] == b and best[p].sentence and p not in shown]
+        into.sort(key=lambda p: (-weight.get(p[0], 0), -papers[p[0]].date.toordinal()))
+        turns = [[p for p in into if best[p].intent == i] for i in RANK]
+        while turns and len([p for p in shown if p[1] == b]) < PER_PAPER and any(turns):
+            for turn in turns:
+                if turn and len([p for p in shown if p[1] == b]) < PER_PAPER:
+                    shown.append(turn.pop(0))
+    recent = sorted(
+        (a for a in kept if papers[a].date >= since and a not in top),
+        key=lambda a: near.get(a, 0.0),
+        reverse=True,
+    )[:NEWEST]
+    for a in recent:
+        out = sorted((p for p in best if p[0] == a), key=lambda p: RANK[best[p].intent])
+        shown += out[:1]
+    shown = list(dict.fromkeys(p for p in shown if best[p].sentence))
+    labels = {
+        pair: run.cite(pair[0], pair[1], best[pair].sentence, papers[pair[0]].key)
+        for pair in shown
+    }  # fmt: skip
+    pid = f"P{len(run.lineages) + 1}"
     with run.lock:
         run.lineages.append(
             {
-                "question": question,
-                "inputs": ids,
-                "graph": len(held),
-                "edges": len(edges),
-                "lines": found,
+                "id": pid,
+                "query": query,
+                "since": since.isoformat(),
+                "intents": wanted,
+                "papers": [
+                    {
+                        "arxiv_id": a,
+                        "title": clean(papers[a].title),
+                        "name": name_of(papers[a].title),
+                        "date": papers[a].date.isoformat(),
+                        "from": [
+                            side
+                            for side, ids in (
+                                ("past", olds),
+                                ("present", news),
+                                ("read", reads),
+                                ("added", added),
+                            )
+                            if a in ids
+                        ],
+                    }
+                    for a in sorted(kept, key=lambda a: (papers[a].date, a))
+                ],
+                "edges": [
+                    {
+                        "citer": a,
+                        "cited": b,
+                        "intent": e.intent,
+                        "sentence": clean(e.sentence),
+                        "implied": (a, b) not in drawn,
+                        "label": labels.get((a, b), ""),
+                    }
+                    for (a, b), e in best.items()
+                ],
+                "chain": chain,
+                "focus": list(dict.fromkeys([a for a in past if a in kept] + top + chain)),
             }
         )
-    if not found:
-        size = f"{len(held)} papers and {len(edges)} citations"
-        return f"No line of {SHORTEST} or more papers over {size}. Pass a whole search instead."
-    out = [f"{len(found)} lines over {len(held)} papers and {len(edges)} citations"]
-    for spot, line in enumerate(found, 1):
-        out.append(f"\nLine {len(run.lineages)}.{spot}")
-        out += [
-            f"  {p['arxiv_id']} ({p['year']}) {p['title'][:90]}"
-            + ("" if p["yours"] else " [not in your list]")
-            for p in line["papers"]
-        ]
-        out += [
-            f"  {s['citer']} {s['intent']} {s['cited']}: {s['sentence']} [{s['label']}]"
-            for s in line["steps"]
-        ]
+    if run.effort == "deep" and not run.argued:
+        disputed = [a for a in debated if a not in run.papers][: int(knobs["MUST_ARGUED"])]
+        newest = [a for a in recent if a not in run.papers][: int(knobs["MUST_RECENT"])]
+        run.argued = list(dict.fromkeys(disputed + newest))
+    owed = [a for a in run.argued if a not in run.papers]
+    mix = Counter(e.intent for e in best.values())
+    unread = [a for a in kept if a not in run.papers]
+    out = [
+        f"Poset {pid}: {len(kept)} papers and {len(best)} citations with an intent among them "
+        f"({', '.join(f'{n} {i}' for i, n in mix.most_common())}), {len(drawn)} once a citation "
+        "a longer path implies is dropped.",
+        f"Built from a survey search ({len(olds)} papers with yours), a focused search since "
+        f"{since.isoformat()} ({len(news)}), the {len(reads)} papers this session read, and "
+        f"{len(added)} papers that argue with {least} or more of those.",
+        f'Place it with {{"type": "lineage", "poset": "{pid}", "papers": [the ids a section '
+        "discusses]}. Each sentence below is citable by its marker; the other "
+        f"{len(unread)} unread papers here are leads to read first.",
+    ]
+
+    def step(pair: tuple[str, str]) -> str:
+        said = best[pair].sentence[:SENTENCE_CHARS]
+        mark = run.mark(labels[pair]) if pair in labels else ""
+        return f'{best[pair].intent} {named(papers[pair[1]])}: "{said}"{mark}'
+
+    printed: set[tuple[str, str]] = set()
+
+    def lines(pairs: list[tuple[str, str]]) -> list[str]:
+        fresh = [p for p in pairs if p not in printed]
+        printed.update(fresh)
+        return [f"  {named(papers[a])} {step((a, b))}" for a, b in fresh]
+
+    out.append("\nLongest chain, oldest first:")
+    out.append(f"  {named(papers[chain[0]])}")
+    out += lines(list(zip(chain[1:], chain[:-1], strict=True)))
+    out.append("\nArgued with most by the papers you read, then by the field, and what each says:")
+    for b in top:
+        counts = ", ".join(f"{n} {i}" for i, n in argued[b].most_common())
+        out.append(f"{named(papers[b])}: {counts}")
+        out += lines([p for p in shown if p[1] == b])
+    out.append("\nNewest papers and the earlier work they take a position on:")
+    out += lines([p for p in shown if p[0] in recent])
+    if owed:
+        out.append(
+            f"\nAt deep effort the report passes only once you have read {', '.join(owed)}, the "
+            "papers argued with most and the newest ones taking a position; read them with the "
+            "question of what each claims and on what evidence, so the report can say who disputes "
+            "what and where the field stands now."
+        )
+    joined = [named(papers[a]) for a in added if a in papers]
+    if joined:
+        out.append("\nAdded because they argue with this set: " + "; ".join(joined))
     return "\n".join(out)

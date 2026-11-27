@@ -16,7 +16,6 @@ from src.core.config import load_config
 from src.core.embed import EmbeddingEndpoint, embed, embed_documents
 from src.core.llm import Gemma
 from src.core.parse_graph_export import GraphExport, load_graph_export
-from src.miner.recipe import Recipe, build_recipe
 from src.retrieve.query import PaperQuery
 from src.retrieve.recipe import build_pipeline, read_recipe
 
@@ -60,7 +59,6 @@ class Context:
     pipes: dict[str, PaperQuery]
     weights: dict[str, dict[str, float]]
     seed_limit: int
-    mining: Recipe
     html: Path
     pdfs: Path
     runs: Path
@@ -123,7 +121,6 @@ def load() -> Context:
         pipes=pipes,
         weights=weights,
         seed_limit=int(retrieve["COSINE_LIMIT"]),
-        mining=build_recipe(config["miner"]),
         html=Path(str(config["dataset"]["HTML_PATH"])),
         pdfs=Path(str(config["dataset"]["PDF_PATH"])),
         runs=Path(str(serve["RUNS_PATH"])),

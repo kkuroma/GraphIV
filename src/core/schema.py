@@ -120,29 +120,3 @@ class Grade(BaseModel):
             A multiplier on [0, 1].
         """
         return (max(-2, min(2, self.relevance)) + 2) / 4.0
-
-
-class Magnet(BaseModel):
-    """
-    A node the graph argues with, and the three parts of why it does
-
-    `stance` is the mass of positions taken on it, `share` is what fraction of its mentions those
-    are, and `focus` is how close it sits to what was asked.
-    """
-
-    node: str
-    weight: float
-    stance: float = 0.0
-    share: float = 0.0
-    focus: float = 0.0
-    argued: dict[str, int] = Field(default_factory=dict)
-
-
-class Lineage(BaseModel):
-    """
-    One path the walks took, oldest first, and how many independent runs reproduced it
-    """
-
-    nodes: list[str] = Field(default_factory=list)
-    magnets: list[str] = Field(default_factory=list)
-    runs: int = 0
